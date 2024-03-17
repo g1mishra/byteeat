@@ -34,19 +34,19 @@ const menuFormSchema = z.object({
     z.number().int().min(1, { message: "Price must be at least 1." })
   ),
   category: z.string().min(3, { message: "Category is required." }),
-  restaurant: z.preprocess(
-    (x) => Number(x),
-    z.number().int().min(1, { message: "Restaurant is required." })
-  ),
 })
 
 type MenuFormValues = z.infer<typeof menuFormSchema>
 
 interface MenuCreateFormProps {
   closeModal?: () => void
+  restaurantId: number
 }
 
-export default function MenuCreateForm({ closeModal }: MenuCreateFormProps) {
+export default function MenuCreateForm({
+  closeModal,
+  restaurantId,
+}: MenuCreateFormProps) {
   const form = useForm<MenuFormValues>({
     resolver: zodResolver(menuFormSchema),
     mode: "onChange",
@@ -55,7 +55,7 @@ export default function MenuCreateForm({ closeModal }: MenuCreateFormProps) {
   const onSubmit = async (data: MenuFormValues) => {
     try {
       console.log(data)
-      await addMenu(data)
+      await addMenu({ ...data, restaurantId })
       toast({
         title: "Menu created successfully.",
       })
@@ -63,7 +63,6 @@ export default function MenuCreateForm({ closeModal }: MenuCreateFormProps) {
         dish: "",
         price: 0,
         category: "",
-        restaurant: 0,
       })
       closeModal?.()
     } catch (error) {
@@ -120,36 +119,9 @@ export default function MenuCreateForm({ closeModal }: MenuCreateFormProps) {
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="sabzi">Sabzi</SelectItem>
-                  <SelectItem value="meat">Meat</SelectItem>
-                  <SelectItem value="drink">Drink</SelectItem>
-                </SelectContent>
-              </Select>
-
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="restaurant"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Restaurant</FormLabel>
-              <Select
-                onValueChange={field.onChange}
-                defaultValue={String(field.value)}
-              >
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a verified email to display" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value="1">Restaurant 1</SelectItem>
-                  <SelectItem value="2">Restaurant 2</SelectItem>
-                  <SelectItem value="3">Restaurant 3</SelectItem>
+                  {["sabzi", "meat", "drink"].map((category) => (
+                    <SelectItem value={category}>{category}</SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
 
@@ -168,10 +140,12 @@ export default function MenuCreateForm({ closeModal }: MenuCreateFormProps) {
 
 type WithCreateMenuDialogProps = {
   children: React.ReactElement
+  restaurantId: number
 }
 
 export function WithCreateMenuDialog({
   children,
+  restaurantId,
 }: WithCreateMenuDialogProps): React.ReactElement {
   const [isOpen, setIsOpen] = useState(false)
   const openDialog = () => setIsOpen(true)
@@ -189,7 +163,10 @@ export function WithCreateMenuDialog({
           <DialogHeader>
             <DialogTitle>Create Menu</DialogTitle>
           </DialogHeader>
-          <MenuCreateForm closeModal={onCloseModal} />
+          <MenuCreateForm
+            restaurantId={restaurantId}
+            closeModal={onCloseModal}
+          />
         </DialogContent>
       </Dialog>
     </>

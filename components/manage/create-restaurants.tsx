@@ -22,7 +22,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog"
 
 const restaurantFormSchema = z.object({
   name: z.string().min(1, { message: "Name is required." }),
-  table_size: z.preprocess(
+  tableSize: z.preprocess(
     (x) => Number(x),
     z.number().int().min(1, { message: "Table size must be at least 1." })
   ),
@@ -46,17 +46,19 @@ export default function RestaurantCreateForm({
   const onSubmit = async (data: RestaurantFormValues) => {
     try {
       console.log(data)
-      await addRestaurant(data)
+      const resp = await addRestaurant(data)
+      console.log(resp)
       toast({
         title: "Restaurant created successfully.",
       })
       form.reset({
         name: "",
-        table_size: 0,
+        tableSize: 0,
         address: "",
       })
       closeModal?.()
     } catch (error) {
+      console.error(error)
       toast({
         title: "Error creating restaurant.",
       })
@@ -81,7 +83,7 @@ export default function RestaurantCreateForm({
         />
         <FormField
           control={form.control}
-          name="table_size"
+          name="tableSize"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Table Size</FormLabel>

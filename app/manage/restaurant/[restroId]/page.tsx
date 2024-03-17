@@ -1,17 +1,46 @@
-import React from "react"
+import Link from "next/link"
 import { fetchRestaurant } from "@/services/restaurantService"
+import { PlusIcon } from "lucide-react"
+
+import {
+  Card,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import { WithCreateMenuDialog } from "@/components/manage/create-menu"
 
 const RestaurantDetails = async ({ params }: any) => {
   const { restroId } = params
 
-  const response = await fetchRestaurant(restroId)
+  const response = await fetchRestaurant(parseInt(restroId))
   if (!response) throw new Error("Network response was not ok.")
 
   return (
-    <div className="text-white">
-      <h1 className="text-4xl font-bold">{response.name}</h1>
-      <p>{response.address}</p>
-      <p>Table size: {response.table_size}</p>
+    <div className="flex flex-col gap-y-6 text-white">
+      <div>
+        <h1 className="text-4xl font-bold">{response.name}</h1>
+        <p>{response.address}</p>
+        <p>Table size: {response.tableSize}</p>
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
+        {response?.menus?.map((menu) => (
+          <Link key={menu.id} href={`/manage/menu/${menu.id}`}>
+            <Card key={menu.id}>
+              <CardHeader>
+                <CardTitle>{menu.dish}</CardTitle>
+                <CardDescription>{menu.category}</CardDescription>
+              </CardHeader>
+            </Card>
+          </Link>
+        ))}
+      </div>
+      <WithCreateMenuDialog restaurantId={parseInt(restroId)}>
+        <Card className="flex items-center justify-center hover:cursor-pointer">
+          <PlusIcon size={24} />
+        </Card>
+      </WithCreateMenuDialog>
     </div>
   )
 }

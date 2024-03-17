@@ -1,62 +1,73 @@
-import { API_BASE_URL } from "@/config/apiConfig"
+"use server"
 
-export interface MenuI {
+import prisma from "@/lib/prisma"
+
+export interface MenuItemI {
   id?: number
   category: string
   dish: string
   price: number
-  restaurant: number
+  restaurantId: number
 }
 
-const fetchMenus = async (): Promise<MenuI[]> => {
+const fetchMenus = async (): Promise<MenuItemI[]> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/menus/`, {
-      cache: "no-store",
-    })
-    if (!response.ok) throw new Error("Network response was not ok.")
-    return await response.json()
+    return await prisma.item.findMany()
   } catch (error) {
     throw error
   }
 }
 
-const fetchMenu = async (menuId: number): Promise<MenuI> => {
+export const fetchAllCategories = async (
+  restaurantId: string
+): Promise<string[]> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/menus/${menuId}`)
-    if (!response.ok) throw new Error("Network response was not ok.")
-    return await response.json()
-  } catch (error) {
-    throw error
-  }
-}
-
-const addMenu = async (menuData: MenuI): Promise<MenuI> => {
-  try {
-    const response = await fetch(`${API_BASE_URL}/menus/`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+    const categories = await prisma.item.findMany({
+      distinct: ["category"],
+      where: {
+        restaurantId: parseInt(restaurantId),
       },
-      body: JSON.stringify(menuData),
+      select: {
+        category: true,
+      },
     })
-    if (!response.ok) throw new Error("Error creating menu.")
-    return await response.json()
+
+    return categories.map((category) => category.category)
   } catch (error) {
     throw error
   }
 }
 
-const updateMenu = async (menuData: MenuI): Promise<MenuI> => {
+const fetchMenu = async (menuId: number): Promise<MenuItemI | null> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/menus/${menuData.id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
+    return await prisma.item.findUnique({
+      where: {
+        id: menuId,
       },
-      body: JSON.stringify(menuData),
     })
-    if (!response.ok) throw new Error("Error updating menu.")
-    return await response.json()
+  } catch (error) {
+    throw error
+  }
+}
+
+const addMenu = async (menuData: MenuItemI): Promise<MenuItemI> => {
+  try {
+    return await prisma.item.create({
+      data: menuData,
+    })
+  } catch (error) {
+    throw error
+  }
+}
+
+const updateMenu = async (menuData: MenuItemI): Promise<MenuItemI> => {
+  try {
+    return await prisma.item.update({
+      where: {
+        id: menuData.id,
+      },
+      data: menuData,
+    })
   } catch (error) {
     throw error
   }
@@ -64,13 +75,14 @@ const updateMenu = async (menuData: MenuI): Promise<MenuI> => {
 
 const deleteMenu = async (menuId: number): Promise<void> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/menus/${menuId}`, {
-      method: "DELETE",
+    await prisma.item.delete({
+      where: {
+        id: menuId,
+      },
     })
-    if (!response.ok) throw new Error("Error deleting menu.")
   } catch (error) {
     throw error
   }
 }
 
-export { fetchMenus, fetchMenu, addMenu, updateMenu, deleteMenu }
+export { addMenu, deleteMenu, fetchMenu, fetchMenus, updateMenu }
