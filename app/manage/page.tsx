@@ -1,17 +1,15 @@
-import Link from "next/link"
-import { fetchMenus } from "@/services/menuService"
 import { fetchRestaurants } from "@/services/restaurantService"
 import { PlusIcon } from "lucide-react"
+import Link from "next/link"
 
+import { WithCreateRestaurantDialog } from "@/components/manage/create-restaurants"
+import NoRestaurant from "@/components/manage/no-restaurant"
 import {
   Card,
   CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { WithCreateMenuDialog } from "@/components/manage/create-menu"
-import { WithCreateRestaurantDialog } from "@/components/manage/create-restaurants"
-import NoRestaurant from "@/components/manage/no-restaurant"
 
 const Dashboard = () => {
   return (
