@@ -1,5 +1,32 @@
 import { fetchRestaurant } from "@/services/restaurantService"
 
+const MenuByCategory = ({ menus }) => {
+    // Grouping menu items by category
+    const groupedMenus = menus.reduce((acc, menu) => {
+      if (!acc[menu.category]) {
+        acc[menu.category] = [];
+      }
+      acc[menu.category].push(menu);
+      return acc;
+    }, {});
+  
+    return (
+      <div>
+        {Object.keys(groupedMenus).map(category => (
+          <div key={category}>
+            <h1><strong>{category}</strong></h1>
+            <ul>
+              {groupedMenus[category].map(item => (
+                <li key={item.id}>
+                  {item.dish} - {item.price}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+    );
+  }
 
 
 const Welcome = async ({ params }: any) => {
@@ -10,14 +37,7 @@ const Welcome = async ({ params }: any) => {
     console.log(items)
     return (
         <>
-         <ul>
-            {items.map(item => (
-                <li>
-                    {item.dish}
-                    {item.price}
-                </li>
-            ))}
-         </ul>
+         <MenuByCategory menus={items}></MenuByCategory>
         </>
     )
 }
