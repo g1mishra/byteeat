@@ -2,6 +2,7 @@ import Link from "next/link"
 import { fetchRestaurant } from "@/services/restaurantService"
 import { PlusIcon } from "lucide-react"
 
+
 import {
   Card,
   CardDescription,
@@ -9,6 +10,7 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { WithCreateMenuDialog } from "@/components/manage/create-menu"
+import { Button } from "@/components/ui/button"
 
 const RestaurantDetails = async ({ params }: any) => {
   const { restroId } = params
@@ -41,6 +43,8 @@ const RestaurantDetails = async ({ params }: any) => {
           <PlusIcon size={24} />
         </Card>
       </WithCreateMenuDialog>
+    
+    <Link href={`/${response.id}`} ><Button>view menu</Button></Link>
     </div>
   )
 }

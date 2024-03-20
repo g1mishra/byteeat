@@ -42,7 +42,7 @@ const fetchMenu = async (menuId: number): Promise<MenuItemI | null> => {
   try {
     return await prisma.item.findUnique({
       where: {
-        id: menuId,
+        id:  Number(menuId),
       },
     })
   } catch (error) {
