@@ -34,7 +34,7 @@ const menuFormSchema = z.object({
     z.number().int().min(1, { message: "Price must be at least 1." })
   ),
   category: z.string().min(3, { message: "Category is required." }),
-  description: z.string()
+  description: z.string(),
 })
 
 type MenuFormValues = z.infer<typeof menuFormSchema>
@@ -60,11 +60,7 @@ export default function MenuCreateForm({
       toast({
         title: "Menu created successfully.",
       })
-      form.reset({
-        dish: "",
-        price: 0,
-        category: "",
-      })
+      form.reset({})
       closeModal?.()
     } catch (error) {
       toast({
@@ -96,17 +92,13 @@ export default function MenuCreateForm({
             <FormItem>
               <FormLabel>Price</FormLabel>
               <FormControl>
-                <Input
-                  type="number"
-                  {...field}
-                  placeholder="Enter prcie"
-                />
+                <Input type="number" {...field} placeholder="Enter prcie" />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-          <FormField
+        <FormField
           control={form.control}
           name="description"
           render={({ field }) => (
@@ -119,7 +111,7 @@ export default function MenuCreateForm({
             </FormItem>
           )}
         />
-      
+
         <FormField
           control={form.control}
           name="category"
@@ -134,7 +126,9 @@ export default function MenuCreateForm({
                 </FormControl>
                 <SelectContent>
                   {["sabzi", "meat", "drink"].map((category) => (
-                    <SelectItem value={category}>{category}</SelectItem>
+                    <SelectItem value={category} key={category}>
+                      {category}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>

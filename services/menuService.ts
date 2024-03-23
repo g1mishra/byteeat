@@ -6,10 +6,10 @@ export interface MenuItemI {
   id?: number
   category: string
   dish: string
-  price: number,
-  description: string,
-  imgPath?: string
+  price: number
   restaurantId: number
+  description?: string
+  imgPath?: string
 }
 
 const fetchMenus = async (): Promise<MenuItemI[]> => {
@@ -44,7 +44,7 @@ const fetchMenu = async (menuId: number): Promise<MenuItemI | null> => {
   try {
     return await prisma.item.findUnique({
       where: {
-        id:  Number(menuId),
+        id: Number(menuId),
       },
     })
   } catch (error) {
@@ -53,7 +53,6 @@ const fetchMenu = async (menuId: number): Promise<MenuItemI | null> => {
 }
 
 const addMenu = async (menuData: MenuItemI): Promise<MenuItemI> => {
-  console.log(menuData)
   try {
     return await prisma.item.create({
       data: menuData,

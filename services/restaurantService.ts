@@ -27,6 +27,10 @@ const fetchRestaurant = async (
     })
   | null
 > => {
+  if (!restaurantId) {
+    throw new Error("Restaurant ID is required")
+  }
+
   try {
     return await prisma.restaurant.findUnique({
       where: {
@@ -85,6 +89,5 @@ export {
   deleteRestaurant,
   fetchRestaurant,
   fetchRestaurants,
-  updateRestaurant
+  updateRestaurant,
 }
-

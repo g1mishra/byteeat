@@ -15,7 +15,6 @@ datasource db {
 
 model Restaurant {
   id        Int    @id @default(autoincrement())
-
   name      String
   tableSize Int
   address   String
@@ -26,8 +25,8 @@ model Item {
   id           Int        @id @default(autoincrement())
   restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
   restaurantId Int
-  description String @default("")
-  imgPath String @default("")
+  description  String     @default("")
+  imgPath      String     @default("")
   category     String
   dish         String
   price        Float

@@ -1,44 +1,29 @@
 "use client"
 
-import React from "react"
-import { CaretSortIcon } from "@radix-ui/react-icons"
-
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion"
-import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardTitle,
-  CardHeader,
-  CardFooter
-} from "@/components/ui/card"
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible"
+import { OrganizedMenu } from "@/app/[restroId]/page"
 
-const CatAndItems = ({ menu }: any) => {
-  // console.log(menu)
+interface CatAndItemsProps {
+  menu: OrganizedMenu
+}
+
+const CatAndItems = ({ menu }: CatAndItemsProps) => {
   return (
     <div className="gap-y-120 content-center">
       <Accordion type="single" collapsible className="w-full">
         {Object.keys(menu).map((category) => (
-          
           <AccordionItem value={category}>
-              <AccordionTrigger className="text-lg font-bold">{category}</AccordionTrigger>
+            <AccordionTrigger className="text-lg font-bold capitalize">
+              {category}
+            </AccordionTrigger>
             {menu[category].map((item) => (
               <AccordionContent>
-                <h2>
-                  {item.dish}
-                </h2>
-                <p></p>
+                <h2>{item.dish}</h2>
                 <p>{item.price}</p>
                 <p>{item.description}</p>
               </AccordionContent>
@@ -50,19 +35,4 @@ const CatAndItems = ({ menu }: any) => {
   )
 }
 
-{
-  /* <Collapsible>
-<CollapsibleTrigger asChild>
-  <Button variant="ghost" size="sm">
-    Can I use this in my project?
-    <CaretSortIcon className="h-4 w-4" />
-    <span className="sr-only">Toggle</span>
-  </Button>
-</CollapsibleTrigger>
-<CollapsibleContent>
-  Yes. Free to use for personal and commercial projects. No attribution
-  required.
-</CollapsibleContent>
-</Collapsible> */
-}
 export default CatAndItems
