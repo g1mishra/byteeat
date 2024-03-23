@@ -8,6 +8,8 @@ export interface MenuItemI {
   dish: string
   price: number
   restaurantId: number
+  description?: string
+  imgPath?: string
 }
 
 const fetchMenus = async (): Promise<MenuItemI[]> => {
@@ -42,7 +44,7 @@ const fetchMenu = async (menuId: number): Promise<MenuItemI | null> => {
   try {
     return await prisma.item.findUnique({
       where: {
-        id:  Number(menuId),
+        id: Number(menuId),
       },
     })
   } catch (error) {

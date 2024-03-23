@@ -1,47 +1,38 @@
+import { MenuItemI } from "@/services/menuService"
 import { fetchRestaurant } from "@/services/restaurantService"
-import CatAndItems from "@/components/cat_and_items";
 
-interface MenuItem {
-  id?: number;
-  restaurantId: number;
-  category: string;
-  dish: string;
-  price: number;
+import CatAndItems from "@/components/cat_and_items"
+
+export interface OrganizedMenu {
+  [category: string]: MenuItemI[]
 }
 
-interface OrganizedMenu {
-  [category: string]: { dish: string; price: number }[];
-}
+function reorganizeMenu(menuItems: MenuItemI[]): OrganizedMenu {
+  const organizedMenu: OrganizedMenu = {}
 
-function reorganizeMenu(menuItems: MenuItem[]): OrganizedMenu {
-  const organizedMenu: OrganizedMenu = {};
-
-  menuItems.forEach(item => {
-    const { category, dish, price } = item;
+  menuItems.forEach((item) => {
+    const { category } = item
 
     if (!organizedMenu[category]) {
-      organizedMenu[category] = [];
+      organizedMenu[category] = []
     }
 
-    organizedMenu[category].push({ dish, price });
-  });
+    organizedMenu[category].push(item)
+  })
 
-  return organizedMenu;
+  return organizedMenu
 }
 
-
-
 const Welcome = async ({ params }: any) => {
-  console.log(params)
-  const restro_id = Number(params.restroId)
-  const menu = await fetchRestaurant(restro_id)
-  console.log(menu)
-  const items = menu?.menus
-  const parsedMenu = reorganizeMenu(items!)
+  const restaurant = await fetchRestaurant(Number(params.restroId))
+  const parsedMenu = reorganizeMenu(restaurant?.menus!)
+
   return (
-    <>
-      <CatAndItems menu={parsedMenu}></CatAndItems>
-    </>
+    <div className="container py-6">
+      <h1 className="text-2xl font-bold">{restaurant?.name}</h1>
+      <p>{restaurant?.address}</p>
+      <CatAndItems menu={parsedMenu} />
+    </div>
   )
 }
 

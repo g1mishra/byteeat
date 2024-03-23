@@ -7,8 +7,9 @@ const RestaurantDetails = async ({ params }: any) => {
   if (!response) throw new Error("Network response was not ok.")
   console.log(response)
   return (
-    <div className="text-black">
+    <div className="text-black dark:text-white">
       <h1 className="text-4xl font-bold">{response.dish}</h1>
+      <p>{response.description}</p>
       <p>{response.category}</p>
       <p>{response.price}</p>
     </div>
