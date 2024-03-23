@@ -25,8 +25,8 @@ model Item {
   id           Int        @id @default(autoincrement())
   restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
   restaurantId Int
-  vegOrNonVeg String @default("Veg") 
-  foodOrBar String @default("Food")
+  vegOrNonVeg  String     @default("Veg")
+  foodOrBar    String     @default("Food")
   description  String     @default("")
   imgPath      String     @default("")
   category     String

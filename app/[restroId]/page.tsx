@@ -8,6 +8,10 @@ export interface OrganizedMenu {
 }
 
 function reorganizeMenu(menuItems: MenuItemI[]): OrganizedMenu {
+  if (!menuItems) {
+    return {}
+  }
+
   const organizedMenu: OrganizedMenu = {}
 
   menuItems.forEach((item) => {
@@ -28,9 +32,9 @@ const Welcome = async ({ params }: any) => {
   const parsedMenu = reorganizeMenu(restaurant?.menus!)
 
   return (
-    <div className="container py-6">
+    <div className="container gap-y-2 py-4 sm:py-8">
       <h1 className="text-2xl font-bold">{restaurant?.name}</h1>
-      <p>{restaurant?.address}</p>
+      <p className="text-sm font-light">{restaurant?.address}</p>
       <CatAndItems menu={parsedMenu} />
     </div>
   )

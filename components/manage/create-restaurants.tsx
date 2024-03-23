@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useState } from "react"
+import { useRouter } from "next/navigation"
 import { addRestaurant } from "@/services/restaurantService"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
@@ -43,6 +44,8 @@ export default function RestaurantCreateForm({
     mode: "onChange",
   })
 
+  const router = useRouter()
+
   const onSubmit = async (data: RestaurantFormValues) => {
     try {
       console.log(data)
@@ -51,6 +54,7 @@ export default function RestaurantCreateForm({
       toast({
         title: "Restaurant created successfully.",
       })
+      router.refresh()
       form.reset({
         name: "",
         tableSize: 0,

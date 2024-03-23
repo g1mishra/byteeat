@@ -2,7 +2,7 @@ import Link from "next/link"
 import { fetchRestaurant } from "@/services/restaurantService"
 import { PlusIcon } from "lucide-react"
 
-
+import { Button } from "@/components/ui/button"
 import {
   Card,
   CardDescription,
@@ -10,7 +10,6 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { WithCreateMenuDialog } from "@/components/manage/create-menu"
-import { Button } from "@/components/ui/button"
 
 const RestaurantDetails = async ({ params }: any) => {
   const { restroId } = params
@@ -28,14 +27,18 @@ const RestaurantDetails = async ({ params }: any) => {
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
         {response?.menus?.map((menu) => (
-          <Link key={menu.id} href={`/manage/menu/${menu.id}`}>
-            <Card key={menu.id}>
+          <WithCreateMenuDialog
+            key={menu.id}
+            restaurantId={parseInt(restroId)}
+            itemData={menu}
+          >
+            <Card>
               <CardHeader>
                 <CardTitle>{menu.dish}</CardTitle>
                 <CardDescription>{menu.category}</CardDescription>
               </CardHeader>
             </Card>
-          </Link>
+          </WithCreateMenuDialog>
         ))}
       </div>
       <WithCreateMenuDialog restaurantId={parseInt(restroId)}>
@@ -43,8 +46,10 @@ const RestaurantDetails = async ({ params }: any) => {
           <PlusIcon size={24} />
         </Card>
       </WithCreateMenuDialog>
-    
-    <Link href={`/${response.id}`} ><Button>view menu</Button></Link>
+
+      <Link href={`/${response.id}`}>
+        <Button>view menu</Button>
+      </Link>
     </div>
   )
 }

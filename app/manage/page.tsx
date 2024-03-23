@@ -1,15 +1,15 @@
+import Link from "next/link"
 import { fetchRestaurants } from "@/services/restaurantService"
 import { PlusIcon } from "lucide-react"
-import Link from "next/link"
 
-import { WithCreateRestaurantDialog } from "@/components/manage/create-restaurants"
-import NoRestaurant from "@/components/manage/no-restaurant"
 import {
   Card,
   CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import { WithCreateRestaurantDialog } from "@/components/manage/create-restaurants"
+import NoRestaurant from "@/components/manage/no-restaurant"
 
 const Dashboard = () => {
   return (

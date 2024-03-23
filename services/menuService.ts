@@ -12,7 +12,6 @@ export interface MenuItemI {
   imgPath?: string
   foodOrBar: string
   vegOrNonVeg?: string
-
 }
 
 const fetchMenus = async (): Promise<MenuItemI[]> => {

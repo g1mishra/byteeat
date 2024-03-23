@@ -1,7 +1,8 @@
 "use client"
 
 import React, { useState } from "react"
-import { addMenu } from "@/services/menuService"
+import { useRouter } from "next/navigation"
+import { MenuItemI, addMenu, updateMenu } from "@/services/menuService"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
@@ -35,8 +36,8 @@ const menuFormSchema = z.object({
   ),
   category: z.string().min(3, { message: "Category is required." }),
   description: z.string(),
-  vegOrNonVeg?: z.string(),
-  foodOrBar: z.string()
+  vegOrNonVeg: z.string().optional(),
+  foodOrBar: z.string(),
 })
 
 type MenuFormValues = z.infer<typeof menuFormSchema>
@@ -44,29 +45,47 @@ type MenuFormValues = z.infer<typeof menuFormSchema>
 interface MenuCreateFormProps {
   closeModal?: () => void
   restaurantId: number
+  itemData?: MenuItemI
 }
 
 export default function MenuCreateForm({
   closeModal,
   restaurantId,
+  itemData,
 }: MenuCreateFormProps) {
+  const router = useRouter()
   const form = useForm<MenuFormValues>({
     resolver: zodResolver(menuFormSchema),
     mode: "onChange",
+    defaultValues: {
+      dish: "",
+      price: 0,
+      category: "",
+      description: "",
+      vegOrNonVeg: "",
+      foodOrBar: "",
+      ...(itemData || {}),
+    },
   })
 
   const onSubmit = async (data: MenuFormValues) => {
     try {
       console.log(data)
-      await addMenu({ ...data, restaurantId })
+      if (itemData) {
+        await updateMenu({ ...data, restaurantId, id: itemData.id })
+      } else {
+        // Create menu item
+        await addMenu({ ...data, restaurantId })
+      }
       toast({
-        title: "Menu created successfully.",
+        title: `Menu ${itemData ? "updated" : "created"} successfully.`,
       })
+      router.refresh()
       form.reset({})
       closeModal?.()
     } catch (error) {
       toast({
-        title: "Error creating restaurant.",
+        title: `Error ${itemData ? "updating" : "creating"} menu.`,
       })
     }
   }
@@ -113,7 +132,7 @@ export default function MenuCreateForm({
             </FormItem>
           )}
         />
-         <FormField
+        <FormField
           control={form.control}
           name="foodOrBar"
           render={({ field }) => (
@@ -126,7 +145,7 @@ export default function MenuCreateForm({
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {["Food","Bar"].map((forb) => (
+                  {["Food", "Bar"].map((forb) => (
                     <SelectItem value={forb} key={forb}>
                       {forb}
                     </SelectItem>
@@ -135,38 +154,39 @@ export default function MenuCreateForm({
               </Select>
 
               <FormMessage />
-        </FormItem>
-         )}
+            </FormItem>
+          )}
         />
-        {
-        form.getValues().foodOrBar == "Food"?
-        <FormField
-          control={form.control}
-          name="vegOrNonVeg"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Veg or Non Veg?</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Veg or Non Veg?" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {["Veg","Non-Veg"].map((vnv) => (
-                    <SelectItem value={vnv} key={vnv}>
-                      {vnv}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+        {form.getValues().foodOrBar == "Food" ? (
+          <FormField
+            control={form.control}
+            name="vegOrNonVeg"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Veg or Non Veg?</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Veg or Non Veg?" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {["Veg", "Non-Veg"].map((vnv) => (
+                      <SelectItem value={vnv} key={vnv}>
+                        {vnv}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
 
-              <FormMessage />
-        </FormItem>
-         )}
-        />:null
-        }
-        
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        ) : null}
 
         <FormField
           control={form.control}
@@ -177,7 +197,7 @@ export default function MenuCreateForm({
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select a verified email to display" />
+                    <SelectValue placeholder="Select Category" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
@@ -195,7 +215,9 @@ export default function MenuCreateForm({
         />
 
         <Button type="submit">
-          {form.formState.isSubmitting ? "Creating..." : "Create Menu"}
+          {form.formState.isSubmitting
+            ? `${itemData ? "Updating" : "Creating"} Menu...`
+            : `${itemData ? "Update" : "Create"} Menu`}
         </Button>
       </form>
     </Form>
@@ -205,11 +227,13 @@ export default function MenuCreateForm({
 type WithCreateMenuDialogProps = {
   children: React.ReactElement
   restaurantId: number
+  itemData?: MenuItemI
 }
 
 export function WithCreateMenuDialog({
   children,
   restaurantId,
+  itemData,
 }: WithCreateMenuDialogProps): React.ReactElement {
   const [isOpen, setIsOpen] = useState(false)
   const openDialog = () => setIsOpen(true)
@@ -228,6 +252,7 @@ export function WithCreateMenuDialog({
             <DialogTitle>Create Menu</DialogTitle>
           </DialogHeader>
           <MenuCreateForm
+            itemData={itemData}
             restaurantId={restaurantId}
             closeModal={onCloseModal}
           />
