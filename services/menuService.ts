@@ -10,6 +10,9 @@ export interface MenuItemI {
   restaurantId: number
   description?: string
   imgPath?: string
+  foodOrBar: string
+  vegOrNonVeg?: string
+
 }
 
 const fetchMenus = async (): Promise<MenuItemI[]> => {

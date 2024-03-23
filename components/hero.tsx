@@ -1,7 +1,7 @@
 import Link from "next/link"
-
 import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
+import AnimatingEmoji from "./rolling_emojis"
 
 export default function HeroHeader() {
   return (
@@ -9,10 +9,10 @@ export default function HeroHeader() {
       <div className="flex flex-1 flex-col items-center justify-center gap-4 text-center lg:gap-8">
         <div className="space-y-4">
           <h1 className="text-4xl font-bold lg:text-6xl">
-            Welcome to ByteEat 🍔
+            ByteEat {<AnimatingEmoji/>}
           </h1>
           <h2 className="text-muted-foreground text-lg font-light lg:text-3xl">
-            Start creating your menu today!
+            The better way to serve
           </h2>
         </div>
         <Link

@@ -7,6 +7,10 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion"
 import { OrganizedMenu } from "@/app/[restroId]/page"
+import Veg from "./icons/veg"
+import NonVeg from "./icons/nonveg"
+
+
 
 interface CatAndItemsProps {
   menu: OrganizedMenu
@@ -23,9 +27,11 @@ const CatAndItems = ({ menu }: CatAndItemsProps) => {
             </AccordionTrigger>
             {menu[category].map((item) => (
               <AccordionContent>
+                {item.vegOrNonVeg == 'Veg'?<Veg width="25" height="25"/>:<NonVeg width="25" height="25"/>}
                 <h2>{item.dish}</h2>
                 <p>{item.price}</p>
                 <p>{item.description}</p>
+                
               </AccordionContent>
             ))}
           </AccordionItem>
