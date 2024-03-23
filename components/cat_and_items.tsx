@@ -40,6 +40,7 @@ const CatAndItems = ({ menu }: any) => {
                 </h2>
                 <p></p>
                 <p>{item.price}</p>
+                <p>{item.description}</p>
               </AccordionContent>
             ))}
           </AccordionItem>

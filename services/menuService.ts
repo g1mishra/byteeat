@@ -6,7 +6,9 @@ export interface MenuItemI {
   id?: number
   category: string
   dish: string
-  price: number
+  price: number,
+  description: string,
+  imgPath?: string
   restaurantId: number
 }
 
@@ -51,6 +53,7 @@ const fetchMenu = async (menuId: number): Promise<MenuItemI | null> => {
 }
 
 const addMenu = async (menuData: MenuItemI): Promise<MenuItemI> => {
+  console.log(menuData)
   try {
     return await prisma.item.create({
       data: menuData,

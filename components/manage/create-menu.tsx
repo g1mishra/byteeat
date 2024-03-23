@@ -34,6 +34,7 @@ const menuFormSchema = z.object({
     z.number().int().min(1, { message: "Price must be at least 1." })
   ),
   category: z.string().min(3, { message: "Category is required." }),
+  description: z.string()
 })
 
 type MenuFormValues = z.infer<typeof menuFormSchema>
@@ -98,14 +99,27 @@ export default function MenuCreateForm({
                 <Input
                   type="number"
                   {...field}
-                  placeholder="Enter max table size"
+                  placeholder="Enter prcie"
                 />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-
+          <FormField
+          control={form.control}
+          name="description"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Add description</FormLabel>
+              <FormControl>
+                <Input {...field} placeholder="Add description" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      
         <FormField
           control={form.control}
           name="category"
