@@ -35,6 +35,8 @@ const menuFormSchema = z.object({
   ),
   category: z.string().min(3, { message: "Category is required." }),
   description: z.string(),
+  vegOrNonVeg?: z.string(),
+  foodOrBar: z.string()
 })
 
 type MenuFormValues = z.infer<typeof menuFormSchema>
@@ -92,7 +94,7 @@ export default function MenuCreateForm({
             <FormItem>
               <FormLabel>Price</FormLabel>
               <FormControl>
-                <Input type="number" {...field} placeholder="Enter prcie" />
+                <Input type="number" {...field} placeholder="Enter price" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -111,6 +113,60 @@ export default function MenuCreateForm({
             </FormItem>
           )}
         />
+         <FormField
+          control={form.control}
+          name="foodOrBar"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>🍔 or 🍺?</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Food or Bar?" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {["Food","Bar"].map((forb) => (
+                    <SelectItem value={forb} key={forb}>
+                      {forb}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              <FormMessage />
+        </FormItem>
+         )}
+        />
+        {
+        form.getValues().foodOrBar == "Food"?
+        <FormField
+          control={form.control}
+          name="vegOrNonVeg"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Veg or Non Veg?</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Veg or Non Veg?" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {["Veg","Non-Veg"].map((vnv) => (
+                    <SelectItem value={vnv} key={vnv}>
+                      {vnv}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              <FormMessage />
+        </FormItem>
+         )}
+        />:null
+        }
+        
 
         <FormField
           control={form.control}
