@@ -188,27 +188,15 @@ export default function MenuCreateForm({
           />
         ) : null}
 
-        <FormField
+      <FormField
           control={form.control}
           name="category"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Category</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select Category" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {["sabzi", "meat", "drink"].map((category) => (
-                    <SelectItem value={category} key={category}>
-                      {category}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
+              <FormLabel>Add category</FormLabel>
+              <FormControl>
+                <Input {...field} placeholder={`Add category (ex. ${form.getValues().foodOrBar == "Food" ? 'Main Course' : 'Wine'})`} />
+              </FormControl>
               <FormMessage />
             </FormItem>
           )}
