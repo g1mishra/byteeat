@@ -14,15 +14,18 @@ datasource db {
 }
 
 model Restaurant {
-  id        Int    @id @default(autoincrement())
-  name      String
-  tableSize Int
-  address   String
-  menus     Item[]
+  id           Int            @id @default(autoincrement())
+  name         String
+  tableSize    Int
+  address      String
+  menus        Item[]
+  ItemCategory ItemCategory[]
 }
 
 model ItemCategory {
   id               Int                @id @default(autoincrement())
+  restaurant       Restaurant         @relation(fields: [restaurantId], references: [id]) 
+  restaurantId     Int                
   categoryName     String
   Item             Item[]
   CategoryPosition CategoryPosition[]

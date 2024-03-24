@@ -4,10 +4,11 @@ import prisma from "@/lib/prisma"
 
 export interface MenuItemI {
   id?: number
-  category: string
+  // category: string
   dish: string
   // price: number
   restaurantId: number
+  categoryId: number,
   description?: string
   imgPath?: string
   foodOrBar: string
@@ -19,6 +20,12 @@ export interface PriceItemMapI {
   price: number
   portion: string
   itemId: number
+}
+
+export interface ItemCategoryI {
+  id?: number,
+  categoryName: string
+  restaurantId: number
 }
 
 const fetchMenus = async (): Promise<MenuItemI[]> => {
@@ -33,20 +40,30 @@ export const fetchAllCategories = async (
   restaurantId: string
 ): Promise<string[]> => {
   try {
-    const categories = await prisma.item.findMany({
-      distinct: ["category"],
+    const categories = await prisma.itemCategory.findMany({
+      //distinct: ["category"],
       where: {
         restaurantId: parseInt(restaurantId),
-      },
-      select: {
-        category: true,
-      },
+      }
     })
 
-    return categories.map((category) => category.category)
+    return categories.map((category) => category.categoryName)
   } catch (error) {
     throw error
   }
+}
+
+export const fetchCategory = async (categoryId: number): Promise<ItemCategoryI | null>=> {
+    try{
+      return prisma.itemCategory.findUnique({
+        where: {
+          id: Number(categoryId)
+        }
+      })
+    } 
+    catch (error) {
+      throw error
+    }
 }
 
 const fetchMenu = async (menuId: number): Promise<MenuItemI | null> => {

@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { fetchRestaurant } from "@/services/restaurantService"
+import { fetchCategory } from "@/services/menuService"
 import { PlusIcon } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -10,6 +11,19 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { WithCreateMenuDialog } from "@/components/manage/create-menu"
+
+const ReturnCategory = async (categoryId: any) => {
+
+  console.log(await fetchCategory(1))
+  console.log()
+  const categ = await fetchCategory(categoryId.categoryId);
+
+  return (<>
+   {categ?.categoryName}
+  </>)
+
+
+}
 
 const RestaurantDetails = async ({ params }: any) => {
   const { restroId } = params
@@ -35,7 +49,9 @@ const RestaurantDetails = async ({ params }: any) => {
             <Card>
               <CardHeader>
                 <CardTitle>{menu.dish}</CardTitle>
-                <CardDescription>{menu.category}</CardDescription>
+                <CardDescription>
+                  <ReturnCategory categoryId={menu.categoryId}></ReturnCategory>
+                </CardDescription>
               </CardHeader>
             </Card>
           </WithCreateMenuDialog>
