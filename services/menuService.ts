@@ -6,12 +6,19 @@ export interface MenuItemI {
   id?: number
   category: string
   dish: string
-  price: number
+  // price: number
   restaurantId: number
   description?: string
   imgPath?: string
   foodOrBar: string
   vegOrNonVeg?: string
+}
+
+export interface PriceItemMapI {
+  id? : number,
+  price: number
+  portion: string
+  itemId: number
 }
 
 const fetchMenus = async (): Promise<MenuItemI[]> => {
@@ -64,6 +71,20 @@ const addMenu = async (menuData: MenuItemI): Promise<MenuItemI> => {
   }
 }
 
+const addPrice = async (priceData: PriceItemMapI) : Promise<PriceItemMapI> => {
+
+  try {
+    return await prisma.priceItemMap.create({
+      data: priceData
+    })
+
+  } catch (error){
+    throw error
+  }
+
+}
+
+
 const updateMenu = async (menuData: MenuItemI): Promise<MenuItemI> => {
   try {
     return await prisma.item.update({
@@ -77,6 +98,19 @@ const updateMenu = async (menuData: MenuItemI): Promise<MenuItemI> => {
   }
 }
 
+
+const updatePrice = async (priceData: PriceItemMapI): Promise<PriceItemMapI> => {
+  try {
+    return await prisma.priceItemMap.update({
+      where: {
+        id: priceData.id,
+      },
+      data: priceData,
+    })
+  } catch (error) {
+    throw error
+  }
+}
 const deleteMenu = async (menuId: number): Promise<void> => {
   try {
     await prisma.item.delete({

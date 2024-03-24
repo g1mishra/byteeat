@@ -21,17 +21,48 @@ model Restaurant {
   menus     Item[]
 }
 
+model ItemCategory {
+  id               Int                @id @default(autoincrement())
+  categoryName     String
+  Item             Item[]
+  CategoryPosition CategoryPosition[]
+}
+
 model Item {
-  id           Int        @id @default(autoincrement())
-  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+  id           Int            @id @default(autoincrement())
+  restaurant   Restaurant     @relation(fields: [restaurantId], references: [id])
   restaurantId Int
-  vegOrNonVeg  String     @default("Veg")
-  foodOrBar    String     @default("Food")
-  description  String     @default("")
-  imgPath      String     @default("")
-  category     String
+  category     ItemCategory   @relation(fields: [categoryId], references: [id])
+  categoryId   Int
+  vegOrNonVeg  String         @default("Veg")
+  foodOrBar    String         @default("Food")
+  description  String         @default("")
+  imgPath      String         @default("")
   dish         String
-  price        Float
+  PriceItemMap PriceItemMap[]
+  ItemPosition ItemPosition[]
+}
+
+model PriceItemMap {
+  id      Int    @id @default(autoincrement())
+  item    Item   @relation(fields: [itemId], references: [id])
+  itemId  Int
+  price   Float
+  portion String
+}
+
+model CategoryPosition {
+  id         Int          @id @default(autoincrement())
+  catPos     Int          @default(autoincrement())
+  category   ItemCategory @relation(fields: [categoryId], references: [id])
+  categoryId Int
+}
+
+model ItemPosition {
+  id      Int  @id @default(autoincrement())
+  itemPos Int  @default(autoincrement())
+  item    Item @relation(fields: [itemId], references: [id])
+  itemId  Int
 }
 
 // create postgreSQL database
