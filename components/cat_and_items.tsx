@@ -33,12 +33,12 @@ const CatAndItems = ({ menu }: CatAndItemsProps) => {
       Object.keys(menu).reduce(
         (acc: { food: any; bar: any }, key: string) => {
           const items = menu[key]
-          const food = items.filter((item) => item.foodOrBar === "Food")
+          const food = items.filter((item) => item.foodOrBar)
           if (food.length > 0) {
             acc.food[key] = food
           }
 
-          const bar = items.filter((item) => item.foodOrBar === "Bar")
+        const bar = items.filter((item) => !item.foodOrBar)
           if (bar.length > 0) {
             acc.bar[key] = bar
           }
@@ -85,8 +85,8 @@ const CatAndItems = ({ menu }: CatAndItemsProps) => {
             </AccordionTrigger>
             {itemsToRender[category].map((item: any) => (
               <AccordionContent className="flex flex-col gap-y-1" key={item.id}>
-                {item.foodOrBar === "Food" ? (
-                  item.vegOrNonVeg === "Veg" ? (
+                {item.foodOrBar ? (
+                  item.vegOrNonVeg ? (
                     <VegIcon />
                   ) : (
                     <NonVegIcon />

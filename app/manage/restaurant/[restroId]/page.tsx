@@ -1,34 +1,21 @@
 import Link from "next/link"
+import { fetchCategoryById } from "@/services/menuService"
 import { fetchRestaurant } from "@/services/restaurantService"
-import { fetchCategory } from "@/services/menuService"
 import { PlusIcon } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
+import { Card } from "@/components/ui/card"
 import { WithCreateMenuDialog } from "@/components/manage/create-menu"
 
-const ReturnCategory = async (categoryId: any) => {
-
-  console.log(await fetchCategory(1))
-  console.log()
-  const categ = await fetchCategory(categoryId.categoryId);
-
-  return (<>
-   {categ?.categoryName}
-  </>)
-
-
-}
+import MenuList from "./MenuList"
 
 const RestaurantDetails = async ({ params }: any) => {
   const { restroId } = params
 
   const response = await fetchRestaurant(parseInt(restroId))
+
+  console.log(JSON.stringify(response, null, 2))
+
   if (!response) throw new Error("Network response was not ok.")
 
   return (
@@ -39,22 +26,9 @@ const RestaurantDetails = async ({ params }: any) => {
         <p>Table size: {response.tableSize}</p>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
-        {response?.menus?.map((menu) => (
-          <WithCreateMenuDialog
-            key={menu.id}
-            restaurantId={parseInt(restroId)}
-            itemData={menu}
-          >
-            <Card>
-              <CardHeader>
-                <CardTitle>{menu.dish}</CardTitle>
-                <CardDescription>
-                  <ReturnCategory categoryId={menu.categoryId}></ReturnCategory>
-                </CardDescription>
-              </CardHeader>
-            </Card>
-          </WithCreateMenuDialog>
+      <div>
+        {response?.ItemCategory?.map((menu) => (
+          <MenuList key={menu.id} menu={menu} restroId={restroId} />
         ))}
       </div>
       <WithCreateMenuDialog restaurantId={parseInt(restroId)}>

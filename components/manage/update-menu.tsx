@@ -1,9 +1,9 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { addMenuItemHelper } from "@/services/helper.service"
-import { MenuItemI, addMenuItem, updateMenuItem } from "@/services/menuService"
+import { updateMenuItemHelper } from "@/services/helper.service"
+import { MenuItemI } from "@/services/menuService"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { PlusIcon, Trash2 } from "lucide-react"
 import { useForm } from "react-hook-form"
@@ -29,75 +29,51 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select"
+import { menuFormSchema } from "./create-menu"
 
-export const menuFormSchema = z.object({
-  dish: z.string().min(3, { message: "Name is required." }),
-  category: z.string().min(3, { message: "Category is required." }),
-  description: z.string(),
-  isVeg: z.preprocess(
-    (x) => x === "true" || x === true,
-    z.boolean().optional()
-  ),
-  foodOrBar: z.preprocess((x) => x === "true" || x === true, z.boolean()),
-  priceMap: z.array(
-    z.object({
-      price: z.preprocess(
-        (x) => Number(x),
-        z.number().int().min(1, { message: "Price must be at least 1." })
-      ),
-      portion: z.string().optional(),
-    })
-  ),
-})
 export type MenuFormValues = z.infer<typeof menuFormSchema>
 
-interface MenuCreateFormProps {
+interface MenuUpdateFormProps {
   closeModal?: () => void
-  restaurantId: number
+  itemData: MenuFormValues & MenuItemI
 }
 
-export default function MenuCreateForm({
+export default function MenuUpdateForm({
   closeModal,
-  restaurantId,
-}: MenuCreateFormProps) {
+  itemData,
+}: MenuUpdateFormProps) {
   const router = useRouter()
   const form = useForm<MenuFormValues>({
     resolver: zodResolver(menuFormSchema),
     mode: "onChange",
     defaultValues: {
-      dish: "",
-      priceMap: [
-        {
-          price: 0,
-          portion: "",
-        },
-      ],
-      category: "",
-      description: "",
-      isVeg: true,
-      foodOrBar: true,
+      ...(itemData || {}),
     },
   })
-
   form.watch(["foodOrBar", "priceMap"])
+  console.log("form", form.getValues())
 
   const onSubmit = async (data: MenuFormValues) => {
     try {
-      console.log(data)
+      await updateMenuItemHelper({ ...itemData, ...data })
 
-      await addMenuItemHelper(data, restaurantId)
       toast({
-        title: `Menu created successfully.`,
+        title: `Menu ${itemData ? "updated" : "created"} successfully.`,
       })
       router.refresh()
       form.reset({})
       closeModal?.()
     } catch (error) {
       toast({
-        title: `Error creating menu.`,
+        title: `Error ${itemData ? "updating" : "creating"} menu.`,
       })
     }
   }
+
+  useEffect(() => {
+    //  fetchPriceMap()
+    // form.setValue("priceMap", itemData.priceMap) // []
+  }, [form.setValue])
 
   return (
     <Form {...form}>
@@ -177,9 +153,9 @@ export default function MenuCreateForm({
               <FormItem>
                 <FormLabel>Veg or Non Veg?</FormLabel>
                 <Select
-                  onValueChange={(value) =>
+                  onValueChange={(value) => {
                     field.onChange(value === "true" ? true : false)
-                  }
+                  }}
                   defaultValue={String(field.value)}
                 >
                   <FormControl>
@@ -301,22 +277,24 @@ export default function MenuCreateForm({
         ))}
 
         <Button type="submit">
-          {form.formState.isSubmitting ? "Creating Menu..." : "Create Menu"}
+          {form.formState.isSubmitting
+            ? `${itemData ? "Updating" : "Creating"} Menu...`
+            : `${itemData ? "Update" : "Create"} Menu`}
         </Button>
       </form>
     </Form>
   )
 }
 
-type WithCreateMenuDialogProps = {
+type WithUpdateMenuDialogProps = {
   children: React.ReactElement
-  restaurantId: number
+  itemData: MenuFormValues & MenuItemI
 }
 
-export function WithCreateMenuDialog({
+export function WithUpdateMenuDialog({
   children,
-  restaurantId,
-}: WithCreateMenuDialogProps): React.ReactElement {
+  itemData,
+}: WithUpdateMenuDialogProps): React.ReactElement {
   const [isOpen, setIsOpen] = useState(false)
   const openDialog = () => setIsOpen(true)
   const onCloseModal = () => setIsOpen(false)
@@ -331,12 +309,9 @@ export function WithCreateMenuDialog({
       <Dialog open={isOpen} onOpenChange={onCloseModal} modal>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Create Menu</DialogTitle>
+            <DialogTitle>Update Menu</DialogTitle>
           </DialogHeader>
-          <MenuCreateForm
-            restaurantId={restaurantId}
-            closeModal={onCloseModal}
-          />
+          <MenuUpdateForm itemData={itemData} closeModal={onCloseModal} />
         </DialogContent>
       </Dialog>
     </>

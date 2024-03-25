@@ -18,27 +18,26 @@ model Restaurant {
   name         String
   tableSize    Int
   address      String
-  menus        Item[]
   ItemCategory ItemCategory[]
 }
 
 model ItemCategory {
   id               Int                @id @default(autoincrement())
-  restaurant       Restaurant         @relation(fields: [restaurantId], references: [id]) 
-  restaurantId     Int                
-  categoryName     String
+  restaurant       Restaurant         @relation(fields: [restaurantId], references: [id])
+  restaurantId     Int
+  categoryName     String @unique
   Item             Item[]
   CategoryPosition CategoryPosition[]
 }
 
 model Item {
   id           Int            @id @default(autoincrement())
-  restaurant   Restaurant     @relation(fields: [restaurantId], references: [id])
-  restaurantId Int
   category     ItemCategory   @relation(fields: [categoryId], references: [id])
   categoryId   Int
-  vegOrNonVeg  String         @default("Veg")
-  foodOrBar    String         @default("Food")
+  // foodOrBar    String         @default("Food")
+  // make it boolean
+  isVeg  Boolean        @default(true)
+  foodOrBar    Boolean        @default(true)
   description  String         @default("")
   imgPath      String         @default("")
   dish         String
@@ -51,7 +50,7 @@ model PriceItemMap {
   item    Item   @relation(fields: [itemId], references: [id])
   itemId  Int
   price   Float
-  portion String
+  portion String @default("null")
 }
 
 model CategoryPosition {
@@ -68,4 +67,5 @@ model ItemPosition {
   itemId  Int
 }
 
-// create postgreSQL database
+
+// category -> item -> price
