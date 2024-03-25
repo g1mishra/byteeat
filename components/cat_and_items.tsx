@@ -38,7 +38,7 @@ const CatAndItems = ({ menu }: CatAndItemsProps) => {
             acc.food[key] = food
           }
 
-        const bar = items.filter((item) => !item.foodOrBar)
+          const bar = items.filter((item) => !item.foodOrBar)
           if (bar.length > 0) {
             acc.bar[key] = bar
           }

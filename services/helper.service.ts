@@ -38,7 +38,7 @@ const addMenuItemHelper = async (
 // update
 
 const updateMenuItemHelper = async (
-  data: MenuFormValues & MenuItemI,
+  data: MenuFormValues & MenuItemI
 ): Promise<void> => {
   console.log(
     "data",
