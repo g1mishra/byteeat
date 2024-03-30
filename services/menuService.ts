@@ -188,6 +188,30 @@ const fetchCategoryById = async (
 
 // price
 
+const fetchPrice = async (itemId: number) => {
+  try {
+    return prisma.priceItemMap.findMany({
+      where: {
+        itemId: Number(itemId)
+      }
+    })
+  } catch(error){
+    throw error
+  }
+}
+
+const fetchPriceMap = async (itemId: number) => {
+  try {
+    return prisma.priceItemMap.findMany({
+      where: {
+        itemId: Number(itemId)
+      }
+    })
+  } catch(error){
+    throw error
+  }
+}
+
 const addItemPrice = async (priceData: PriceItemMapI[]) => {
   try {
     return await prisma.priceItemMap.createMany({
@@ -199,12 +223,12 @@ const addItemPrice = async (priceData: PriceItemMapI[]) => {
   }
 }
 
-const updateItemPrice = async (priceData: PriceItemMapI[]) => {
+const updateItemPrice = async (priceData: Partial<PriceItemMapI>[]) => {
   try {
     const operations = priceData.map((price) => {
       return prisma.priceItemMap.update({
         where: {
-          id: price.id,
+          id: price.id
         },
         data: price,
       })
@@ -225,6 +249,8 @@ export {
   fetchMenuItem,
   fetchMenuItems,
   updateItemPrice,
+  fetchPrice,
+  fetchPriceMap,
   updateMenuItem,
   updateCategory,
 }

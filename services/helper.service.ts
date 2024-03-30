@@ -59,10 +59,10 @@ const updateMenuItemHelper = async (
       categoryId,
     })
 
-    const payload: PriceItemMapI[] = data?.priceMap?.map((price) => ({
+    const payload: Partial<PriceItemMapI>[] = data?.priceMap?.map((price) => ({
       price: price.price,
       portion: price.portion || "",
-      itemId: menuResp.id as number,
+      id : price.id
     }))
 
     if (payload) {

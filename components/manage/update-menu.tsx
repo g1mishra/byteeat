@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { updateMenuItemHelper } from "@/services/helper.service"
-import { MenuItemI } from "@/services/menuService"
+import { MenuItemI, fetchPrice, fetchPriceMap } from "@/services/menuService"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { PlusIcon, Trash2 } from "lucide-react"
 import { useForm } from "react-hook-form"
@@ -43,6 +43,7 @@ export default function MenuUpdateForm({
   itemData,
 }: MenuUpdateFormProps) {
   const router = useRouter()
+
   const form = useForm<MenuFormValues>({
     resolver: zodResolver(menuFormSchema),
     mode: "onChange",
@@ -50,8 +51,21 @@ export default function MenuUpdateForm({
       ...(itemData || {}),
     },
   })
+
   form.watch(["foodOrBar", "priceMap"])
-  console.log("form", form.getValues())
+
+  useEffect(
+    () => {
+      fetch("/api/price/"+itemData.id).then(
+        res => res.json()
+      ).then(
+    data => {
+      if (!data) throw new Error("API error");
+      form.setValue("priceMap" ,data)
+    }
+      )
+    }, []
+  )
 
   const onSubmit = async (data: MenuFormValues) => {
     try {
@@ -70,11 +84,7 @@ export default function MenuUpdateForm({
     }
   }
 
-  useEffect(() => {
-    //  fetchPriceMap()
-    // form.setValue("priceMap", itemData.priceMap) // []
-  }, [form.setValue])
-
+  
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -190,7 +200,7 @@ export default function MenuUpdateForm({
         <FormField
           control={form.control}
           name="category"
-          // disabled={itemData ? true : false}
+          //disabled={itemData ? true : false}
           render={({ field }) => (
             <FormItem>
               <FormLabel>Add category</FormLabel>
@@ -213,6 +223,7 @@ export default function MenuUpdateForm({
               control={form.control}
               name={`priceMap.${idx}.portion`}
               render={({ field }) => (
+                
                 <FormItem>
                   <FormLabel>Portion</FormLabel>
                   <FormControl>
@@ -298,7 +309,6 @@ export function WithUpdateMenuDialog({
   const [isOpen, setIsOpen] = useState(false)
   const openDialog = () => setIsOpen(true)
   const onCloseModal = () => setIsOpen(false)
-
   const cloneChildren = React.cloneElement(children, {
     onClick: openDialog,
   })

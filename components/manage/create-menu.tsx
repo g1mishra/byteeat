@@ -46,6 +46,7 @@ export const menuFormSchema = z.object({
         z.number().int().min(1, { message: "Price must be at least 1." })
       ),
       portion: z.string().optional(),
+      id: z.number().optional()
     })
   ),
 })

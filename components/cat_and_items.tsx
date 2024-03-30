@@ -27,6 +27,23 @@ interface CatAndItemsProps {
   menu: OrganizedMenu
 }
 
+const ViewPrices = ({item}: any) => {
+  /*
+
+  */
+  console.log(item.prices)
+
+  return (
+    <ul>
+        {item.prices.map(
+        (price: any) => 
+          <li key={item.id}>{price.portion!=''?price.portion+' - ':''} {price.price}</li>
+        
+      )}
+    </ul>
+  )
+}
+
 const CatAndItems = ({ menu }: CatAndItemsProps) => {
   const { food: foodItems, bar: barItems } = useMemo(
     () =>
@@ -92,8 +109,10 @@ const CatAndItems = ({ menu }: CatAndItemsProps) => {
                     <NonVegIcon />
                   )
                 ) : null}
-                <h2 className="text-lg font-bold">{item.dish}</h2>
-                <p className="text-sm">₹{item.price}</p>
+                <span className="flex gap-2">
+                  <h2 className="text-lg font-bold">{item.dish}</h2>
+                  <ViewPrices item={item}/>
+                </span>
                 <p className="mt-2.5 text-sm text-opacity-75">
                   {item.description}
                 </p>

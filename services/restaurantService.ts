@@ -33,7 +33,7 @@ const fetchRestaurant = async (restaurantId: number) => {
         ItemCategory: {
           include: {
             Item: true,
-          },
+          }
         },
       },
     })
