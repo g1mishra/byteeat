@@ -19,7 +19,13 @@ const fetchRestaurants = async (): Promise<RestaurantI[]> => {
   }
 }
 
-const fetchRestaurant = async (restaurantId: number) => {
+const fetchRestaurant = async (
+  restaurantId: number,
+  options?: {
+    includeMenuItems: boolean
+    includePrice: boolean
+  }
+) => {
   if (!restaurantId) {
     throw new Error("Restaurant ID is required")
   }
@@ -32,8 +38,16 @@ const fetchRestaurant = async (restaurantId: number) => {
       include: {
         ItemCategory: {
           include: {
-            Item: true,
-          }
+            Item: options?.includeMenuItems
+              ? {
+                  include: options?.includePrice
+                    ? {
+                        PriceItemMap: true,
+                      }
+                    : {},
+                }
+              : false,
+          },
         },
       },
     })

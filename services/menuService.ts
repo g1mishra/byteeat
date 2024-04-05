@@ -3,6 +3,7 @@
 import prisma from "@/lib/prisma"
 
 export interface MenuItemI {
+  PriceItemMap?: PriceItemMapI[]
   id?: number
   dish: string
   categoryId: number
