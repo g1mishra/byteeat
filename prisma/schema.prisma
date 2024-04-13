@@ -14,24 +14,58 @@ datasource db {
 }
 
 model Restaurant {
-  id        Int    @id @default(autoincrement())
-  name      String
-  tableSize Int
-  address   String
-  menus     Item[]
+  id           Int            @id @default(autoincrement())
+  name         String
+  tableSize    Int
+  address      String
+  ItemCategory ItemCategory[]
+}
+
+model ItemCategory {
+  id               Int                @id @default(autoincrement())
+  restaurant       Restaurant         @relation(fields: [restaurantId], references: [id])
+  restaurantId     Int
+  categoryName     String @unique
+  Item             Item[]
+  CategoryPosition CategoryPosition[]
 }
 
 model Item {
-  id           Int        @id @default(autoincrement())
-  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
-  restaurantId Int
-  vegOrNonVeg  String     @default("Veg")
-  foodOrBar    String     @default("Food")
-  description  String     @default("")
-  imgPath      String     @default("")
-  category     String
+  id           Int            @id @default(autoincrement())
+  category     ItemCategory   @relation(fields: [categoryId], references: [id])
+  categoryId   Int
+  // foodOrBar    String         @default("Food")
+  // make it boolean
+  isVeg  Boolean        @default(true)
+  foodOrBar    Boolean        @default(true)
+  description  String         @default("")
+  imgPath      String         @default("")
   dish         String
-  price        Float
+  PriceItemMap PriceItemMap[]
+  ItemPosition ItemPosition[]
 }
 
-// create postgreSQL database
+model PriceItemMap {
+  id      Int    @id @default(autoincrement())
+  item    Item   @relation(fields: [itemId], references: [id])
+  itemId  Int
+  price   Float
+  portion String @default("null")
+}
+
+model CategoryPosition {
+  id         Int          @id @default(autoincrement())
+  catPos     Int          @default(autoincrement())
+  category   ItemCategory @relation(fields: [categoryId], references: [id])
+  categoryId Int
+}
+
+model ItemPosition {
+  id      Int  @id @default(autoincrement())
+  itemPos Int  @default(autoincrement())
+  item    Item @relation(fields: [itemId], references: [id])
+  itemId  Int
+}
+
+
+// category -> item -> price

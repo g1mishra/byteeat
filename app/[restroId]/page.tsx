@@ -1,41 +1,35 @@
-import { MenuItemI } from "@/services/menuService"
+import { MenuItemI, fetchPrice } from "@/services/menuService"
 import { fetchRestaurant } from "@/services/restaurantService"
 
-import CatAndItems from "@/components/cat_and_items"
+import MenuView from "@/components/cat_and_items"
 
 export interface OrganizedMenu {
   [category: string]: MenuItemI[]
 }
 
-function reorganizeMenu(menuItems: MenuItemI[]): OrganizedMenu {
-  if (!menuItems) {
-    return {}
-  }
-
-  const organizedMenu: OrganizedMenu = {}
-
-  menuItems.forEach((item) => {
-    const { category } = item
-
-    if (!organizedMenu[category]) {
-      organizedMenu[category] = []
+async function addPrices(parsedMenu: OrganizedMenu) {
+  for (const categ in parsedMenu) {
+    for (const idx in parsedMenu[categ]) {
+      const itemObj: any = parsedMenu[categ][idx]
+      itemObj["prices"] = await fetchPrice(Number(itemObj.id))
     }
-
-    organizedMenu[category].push(item)
-  })
-
-  return organizedMenu
+  }
+  return parsedMenu
 }
 
 const Welcome = async ({ params }: any) => {
-  const restaurant = await fetchRestaurant(Number(params.restroId))
-  const parsedMenu = reorganizeMenu(restaurant?.menus!)
+  const response = await fetchRestaurant(Number(params.restroId), {
+    includeMenuItems: true,
+    includePrice: true,
+  })
+  console.log("here's the restro=>", JSON.stringify(response, null, 2))
 
   return (
     <div className="container gap-y-2 py-4 sm:py-8">
-      <h1 className="text-2xl font-bold">{restaurant?.name}</h1>
-      <p className="text-sm font-light">{restaurant?.address}</p>
-      <CatAndItems menu={parsedMenu} />
+      <h1 className="text-2xl font-bold">{response?.name}</h1>
+      <p className="text-sm font-light">{response?.address}</p>
+
+      {response?.ItemCategory && <MenuView data={response?.ItemCategory} />}
     </div>
   )
 }

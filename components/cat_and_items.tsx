@@ -1,6 +1,7 @@
 "use client"
 
 import { useMemo, useState } from "react"
+import { MenuItemI, PriceItemMapI } from "@/services/menuService"
 
 import { cn } from "@/lib/utils"
 import {
@@ -15,7 +16,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-import { OrganizedMenu } from "@/app/[restroId]/page"
 
 import NonVegIcon from "./icons/nonveg"
 import VegIcon from "./icons/veg"
@@ -23,31 +23,42 @@ import { Label } from "./ui/label"
 import { Separator } from "./ui/separator"
 import { Switch } from "./ui/switch"
 
-interface CatAndItemsProps {
-  menu: OrganizedMenu
+const ViewPrices = ({ data }: { data: PriceItemMapI[] }) => {
+  if (!data) return null
+  return (
+    <ul>
+      {data.map((price: any) => (
+        <li key={price.id}>
+          {price.portion != "" ? price.portion + " - " : ""} {price.price}
+        </li>
+      ))}
+    </ul>
+  )
 }
 
-const CatAndItems = ({ menu }: CatAndItemsProps) => {
+type PropsData = {
+  id: number
+  categoryName: string
+  Item: MenuItemI[]
+}
+
+const MenuView = ({ data }: { data: PropsData[] }) => {
+  console.log("data=>", data)
+
   const { food: foodItems, bar: barItems } = useMemo(
     () =>
-      Object.keys(menu).reduce(
-        (acc: { food: any; bar: any }, key: string) => {
-          const items = menu[key]
-          const food = items.filter((item) => item.foodOrBar === "Food")
-          if (food.length > 0) {
-            acc.food[key] = food
-          }
-
-          const bar = items.filter((item) => item.foodOrBar === "Bar")
-          if (bar.length > 0) {
-            acc.bar[key] = bar
-          }
-
+      data.reduce(
+        (acc, menu) => {
+          const foodOrBar = menu.Item[0].foodOrBar ? "food" : "bar"
+          acc[foodOrBar].push(menu)
           return acc
         },
-        { food: {}, bar: {} }
+        {
+          food: [] as PropsData[],
+          bar: [] as PropsData[],
+        }
       ),
-    [menu]
+    [data]
   )
 
   const [isFood, setIsFood] = useState(true)
@@ -56,9 +67,6 @@ const CatAndItems = ({ menu }: CatAndItemsProps) => {
 
   return (
     <div className="mt-4 flex flex-col content-center">
-      {/* <Button onClick={() => setIsFood((prev) => !prev)} className="bg-silver">
-        {isFood ? "Food menu 🍔" : "Bar menu 🥂"}
-      </Button> */}
       <Separator className="my-4" />
       <div className="flex items-center space-x-2">
         <Label htmlFor="menu-toggle">Bar menu 🥂</Label>
@@ -72,36 +80,50 @@ const CatAndItems = ({ menu }: CatAndItemsProps) => {
       </div>
       <Separator className="my-4" />
 
-      <Accordion type="single" collapsible className="w-full">
-        {Object.keys(itemsToRender).map((category) => (
+      {itemsToRender.map((category) => (
+        <Accordion
+          key={String(category.id)}
+          type="single"
+          collapsible
+          className="w-full"
+        >
           <AccordionItem
             className="border-b-15 mt-4 px-2 first:mt-0"
-            id={category.toLowerCase()}
-            key={category}
-            value={category}
+            id={String(category.id)}
+            value={String(category.id)}
           >
             <AccordionTrigger className="text-lg font-bold capitalize !no-underline">
-              {category} - ({itemsToRender[category].length})
+              {category.categoryName} - ({category.Item.length})
             </AccordionTrigger>
-            {itemsToRender[category].map((item: any) => (
-              <AccordionContent className="flex flex-col gap-y-1" key={item.id}>
-                {item.foodOrBar === "Food" ? (
-                  item.vegOrNonVeg === "Veg" ? (
-                    <VegIcon />
-                  ) : (
-                    <NonVegIcon />
-                  )
-                ) : null}
-                <h2 className="text-lg font-bold">{item.dish}</h2>
-                <p className="text-sm">₹{item.price}</p>
-                <p className="mt-2.5 text-sm text-opacity-75">
-                  {item.description}
-                </p>
-              </AccordionContent>
-            ))}
+
+            <AccordionContent className="flex flex-col gap-y-1">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
+                {category.Item.map((item) => (
+                  <AccordionContent
+                    className="flex flex-col gap-y-1"
+                    key={item.id}
+                  >
+                    {item.foodOrBar ? (
+                      item.isVeg ? (
+                        <VegIcon />
+                      ) : (
+                        <NonVegIcon />
+                      )
+                    ) : null}
+                    <span className="flex gap-2">
+                      <h2 className="text-lg font-bold">{item.dish}</h2>
+                      <ViewPrices data={item.PriceItemMap!} />
+                    </span>
+                    <p className="mt-2.5 text-sm text-opacity-75">
+                      {item.description}
+                    </p>
+                  </AccordionContent>
+                ))}
+              </div>
+            </AccordionContent>
           </AccordionItem>
-        ))}
-      </Accordion>
+        </Accordion>
+      ))}
 
       <div
         className={cn("fixed inset-x-0 bottom-10 flex justify-center", {
@@ -114,9 +136,9 @@ const CatAndItems = ({ menu }: CatAndItemsProps) => {
   )
 }
 
-export default CatAndItems
+export default MenuView
 
-export function MenuPopover({ itemsToRender }: { itemsToRender: any }) {
+export function MenuPopover({ itemsToRender }: { itemsToRender: PropsData[] }) {
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -126,11 +148,11 @@ export function MenuPopover({ itemsToRender }: { itemsToRender: any }) {
       </PopoverTrigger>
       <PopoverContent className="w-80">
         <div className="grid gap-4">
-          {Object.keys(itemsToRender).map((category) => (
+          {itemsToRender.map((category) => (
             <div
               key={"goto-" + category}
               onClick={() => {
-                const el = document.getElementById(category.toLowerCase())
+                const el = document.getElementById(category.id.toString())
                 if (el) {
                   el.scrollIntoView({ behavior: "smooth" })
                 }
@@ -138,7 +160,7 @@ export function MenuPopover({ itemsToRender }: { itemsToRender: any }) {
               className="cursor-pointer rounded-md p-2 hover:bg-gray-200"
             >
               <h3 className="text-lg font-bold capitalize">
-                {category} - ({itemsToRender[category].length})
+                {category.categoryName} - ({category.Item.length})
               </h3>
             </div>
           ))}
