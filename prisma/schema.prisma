@@ -13,13 +13,19 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+
+
 model Restaurant {
-  id           Int            @id @default(autoincrement())
-  name         String
-  tableSize    Int
-  address      String
+  id                  Int            @id @default(autoincrement())
+  name                String
+  tableSize           Int
+  address_string      String
+  city                String
+  state               String
+  country             String          @default("India")
   ItemCategory ItemCategory[]
 }
+
 
 model ItemCategory {
   id               Int                @id @default(autoincrement())
@@ -28,6 +34,10 @@ model ItemCategory {
   categoryName     String @unique
   Item             Item[]
   CategoryPosition CategoryPosition[]
+  address_string    String
+  city              String
+  state             String
+  country           String         @default("India")
 }
 
 model Item {

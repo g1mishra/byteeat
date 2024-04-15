@@ -21,6 +21,7 @@ const Dashboard = () => {
 
 const Restaurant = async () => {
   const restroResponse = await fetchRestaurants()
+  console.log(restroResponse)
   if (!restroResponse) throw new Error("Network response was not ok.")
 
   return (
@@ -38,7 +39,7 @@ const Restaurant = async () => {
               <Card key={restaurant.id}>
                 <CardHeader>
                   <CardTitle>{restaurant.name}</CardTitle>
-                  <CardDescription>{restaurant.address}</CardDescription>
+                  <CardDescription>{restaurant.address_string}</CardDescription>
                 </CardHeader>
               </Card>
             </Link>

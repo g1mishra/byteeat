@@ -27,6 +27,7 @@ const MenuList = ({
   }
   restroId: string
 }) => {
+  console.log("Menu => ", menu)
   return (
     <Accordion type="single" collapsible className="w-full">
       <AccordionItem
@@ -35,7 +36,7 @@ const MenuList = ({
         value={String(menu.id)}
       >
         <AccordionTrigger className="text-lg font-bold capitalize !no-underline">
-          {menu.categoryName} - ({menu.Item.length})
+          {menu.categoryName} ({menu.Item.length})
         </AccordionTrigger>
 
         <AccordionContent className="flex flex-col gap-y-1">

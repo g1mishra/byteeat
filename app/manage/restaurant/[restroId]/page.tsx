@@ -12,8 +12,12 @@ import MenuList from "./MenuList"
 const RestaurantDetails = async ({ params }: any) => {
   const { restroId } = params
 
-  const response = await fetchRestaurant(parseInt(restroId))
+  const response = await fetchRestaurant(parseInt(restroId), {
+    includeMenuItems: true,
+    includePrice: true
+  })
 
+  console.log("Restaurant response")
   console.log(JSON.stringify(response, null, 2))
 
   if (!response) throw new Error("Network response was not ok.")
@@ -39,6 +43,11 @@ const RestaurantDetails = async ({ params }: any) => {
 
       <Link href={`/${response.id}`}>
         <Button>view menu</Button>
+      </Link>
+      <Link href={`/${response.id}/menu`}>
+      <Button>
+        view QR
+      </Button>
       </Link>
     </div>
   )

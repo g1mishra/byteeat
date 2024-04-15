@@ -103,15 +103,16 @@ const MenuView = ({ data }: { data: PropsData[] }) => {
                     className="flex flex-col gap-y-1"
                     key={item.id}
                   >
-                    {item.foodOrBar ? (
+                    
+                    <span className="flex gap-2">
+                      <h2 className="text-lg font-bold">{item.dish} </h2>
+                      {item.foodOrBar ? (
                       item.isVeg ? (
-                        <VegIcon />
+                        "🟢"
                       ) : (
-                        <NonVegIcon />
+                        "🔴"
                       )
                     ) : null}
-                    <span className="flex gap-2">
-                      <h2 className="text-lg font-bold">{item.dish}</h2>
                       <ViewPrices data={item.PriceItemMap!} />
                     </span>
                     <p className="mt-2.5 text-sm text-opacity-75">

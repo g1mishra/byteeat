@@ -6,6 +6,7 @@ import { addRestaurant } from "@/services/restaurantService"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
+import state2city from "./utils/cities"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -20,6 +21,8 @@ import { Input } from "@/components/ui/input"
 import { toast } from "@/components/ui/use-toast"
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select"
+
 
 const restaurantFormSchema = z.object({
   name: z.string().min(1, { message: "Name is required." }),
@@ -27,8 +30,15 @@ const restaurantFormSchema = z.object({
     (x) => Number(x),
     z.number().int().min(1, { message: "Table size must be at least 1." })
   ),
-  address: z.string().min(1, { message: "Address is required." }),
+  // address: z.string().min(1, { message: "Address is required." }),
+  address_string: z.string().min(1, {"message":"Ex. 123 Main Street, Anytown"}),
+  city: z.string().default("Jalandhar"),
+  state: z.string(),
+  country: z.string()
+
+  
 })
+
 
 type RestaurantFormValues = z.infer<typeof restaurantFormSchema>
 
@@ -48,9 +58,7 @@ export default function RestaurantCreateForm({
 
   const onSubmit = async (data: RestaurantFormValues) => {
     try {
-      console.log(data)
       const resp = await addRestaurant(data)
-      console.log(resp)
       toast({
         title: "Restaurant created successfully.",
       })
@@ -58,7 +66,10 @@ export default function RestaurantCreateForm({
       form.reset({
         name: "",
         tableSize: 0,
-        address: "",
+        address_string: "",
+        city: "",
+        state: "",
+        country: "India"
       })
       closeModal?.()
     } catch (error) {
@@ -104,7 +115,7 @@ export default function RestaurantCreateForm({
         />
         <FormField
           control={form.control}
-          name="address"
+          name="address_string"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Address</FormLabel>
@@ -115,6 +126,68 @@ export default function RestaurantCreateForm({
             </FormItem>
           )}
         />
+        <FormField
+          control={form.control}
+          name="state"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>State</FormLabel>
+              <Select
+                onValueChange={(value) =>
+                  field.onChange(value)
+                }
+                defaultValue="Punjab"
+              >
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Find your state" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {Object.keys(state2city).map((state: any) => (
+                    <SelectItem value={String(state)} key={state}>
+                      {state}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="city"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>City</FormLabel>
+              <Select
+                onValueChange={(value) =>
+                  field.onChange(value)
+                  
+                }
+              >
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder={"Select city"}/>
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {(form.getValues().state!=undefined?state2city[form.getValues().state]:state2city["Punjab"]).map((city: any) => (
+                    <SelectItem value={String(city)} key={city}>
+                      {city}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        
+
         <Button type="submit">
           {form.formState.isSubmitting ? "Creating..." : "Create Restaurant"}
         </Button>

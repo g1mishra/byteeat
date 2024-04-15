@@ -2,6 +2,7 @@ import { MenuItemI, fetchPrice } from "@/services/menuService"
 import { fetchRestaurant } from "@/services/restaurantService"
 
 import MenuView from "@/components/cat_and_items"
+import { Button } from "@/components/ui/button"
 
 export interface OrganizedMenu {
   [category: string]: MenuItemI[]
@@ -27,7 +28,7 @@ const Welcome = async ({ params }: any) => {
   return (
     <div className="container gap-y-2 py-4 sm:py-8">
       <h1 className="text-2xl font-bold">{response?.name}</h1>
-      <p className="text-sm font-light">{response?.address}</p>
+      <p className="text-sm font-light">{response?.address_string}</p>
 
       {response?.ItemCategory && <MenuView data={response?.ItemCategory} />}
     </div>
