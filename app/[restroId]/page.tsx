@@ -1,8 +1,8 @@
 import { MenuItemI, fetchPrice } from "@/services/menuService"
 import { fetchRestaurant } from "@/services/restaurantService"
 
-import MenuView from "@/components/cat_and_items"
 import { Button } from "@/components/ui/button"
+import MenuView from "@/components/cat_and_items"
 
 export interface OrganizedMenu {
   [category: string]: MenuItemI[]
@@ -12,14 +12,14 @@ async function addPrices(parsedMenu: OrganizedMenu) {
   for (const categ in parsedMenu) {
     for (const idx in parsedMenu[categ]) {
       const itemObj: any = parsedMenu[categ][idx]
-      itemObj["prices"] = await fetchPrice(Number(itemObj.id))
+      itemObj["prices"] = await fetchPrice(itemObj.id)
     }
   }
   return parsedMenu
 }
 
 const Welcome = async ({ params }: any) => {
-  const response = await fetchRestaurant(Number(params.restroId), {
+  const response = await fetchRestaurant(params.restroId, {
     includeMenuItems: true,
     includePrice: true,
   })

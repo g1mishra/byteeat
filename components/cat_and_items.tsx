@@ -37,7 +37,7 @@ const ViewPrices = ({ data }: { data: PriceItemMapI[] }) => {
 }
 
 type PropsData = {
-  id: number
+  id: string
   categoryName: string
   Item: MenuItemI[]
 }
