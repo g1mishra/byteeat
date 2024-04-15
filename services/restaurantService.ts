@@ -8,9 +8,9 @@ interface RestaurantI {
   id?: number
   name: string
   tableSize: number
-  address_string: string,
-  city: string,
-  state: string,
+  address_string: string
+  city: string
+  state: string
   country: string
 }
 

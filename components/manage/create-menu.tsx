@@ -46,7 +46,7 @@ export const menuFormSchema = z.object({
         z.number().int().min(1, { message: "Price must be at least 1." })
       ),
       portion: z.string().optional(),
-      id: z.number().optional()
+      id: z.number().optional(),
     })
   ),
 })
@@ -62,7 +62,7 @@ export default function MenuCreateForm({
   restaurantId,
 }: MenuCreateFormProps) {
   const router = useRouter()
-  const form = useForm<MenuFormValues>({
+  const { handleSubmit, ...form } = useForm<MenuFormValues>({
     resolver: zodResolver(menuFormSchema),
     mode: "onChange",
     defaultValues: {
@@ -83,6 +83,7 @@ export default function MenuCreateForm({
   form.watch(["foodOrBar", "priceMap"])
 
   const onSubmit = async (data: MenuFormValues) => {
+    console.log(data)
     try {
       console.log(data)
 
@@ -97,12 +98,13 @@ export default function MenuCreateForm({
       toast({
         title: `Error creating menu.`,
       })
+      console.error(error)
     }
   }
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <form onSubmit={()=> console.log("Called")} className="space-y-8">
         <FormField
           control={form.control}
           name="dish"
