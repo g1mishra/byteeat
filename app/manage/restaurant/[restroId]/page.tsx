@@ -12,9 +12,9 @@ import MenuList from "./MenuList"
 const RestaurantDetails = async ({ params }: any) => {
   const { restroId } = params
 
-  const response = await fetchRestaurant(parseInt(restroId), {
+  const response = await fetchRestaurant(restroId, {
     includeMenuItems: true,
-    includePrice: true
+    includePrice: true,
   })
 
   console.log("Restaurant response")
@@ -26,7 +26,7 @@ const RestaurantDetails = async ({ params }: any) => {
     <div className="flex flex-col gap-y-6 text-white">
       <div>
         <h1 className="text-4xl font-bold">{response.name}</h1>
-        <p>{response.address}</p>
+        <p>{response.address_string}</p>
         <p>Table size: {response.tableSize}</p>
       </div>
 
@@ -35,7 +35,7 @@ const RestaurantDetails = async ({ params }: any) => {
           <MenuList key={menu.id} menu={menu} restroId={restroId} />
         ))}
       </div>
-      <WithCreateMenuDialog restaurantId={parseInt(restroId)}>
+      <WithCreateMenuDialog restaurantId={restroId}>
         <Card className="flex items-center justify-center hover:cursor-pointer">
           <PlusIcon size={24} />
         </Card>
@@ -45,9 +45,7 @@ const RestaurantDetails = async ({ params }: any) => {
         <Button>view menu</Button>
       </Link>
       <Link href={`/${response.id}/menu`}>
-      <Button>
-        view QR
-      </Button>
+        <Button>view QR</Button>
       </Link>
     </div>
   )

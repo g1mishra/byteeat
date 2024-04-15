@@ -46,7 +46,7 @@ export const menuFormSchema = z.object({
         z.number().int().min(1, { message: "Price must be at least 1." })
       ),
       portion: z.string().optional(),
-      id: z.number().optional(),
+      id: z.string().optional(),
     })
   ),
 })
@@ -54,7 +54,7 @@ export type MenuFormValues = z.infer<typeof menuFormSchema>
 
 interface MenuCreateFormProps {
   closeModal?: () => void
-  restaurantId: number
+  restaurantId: string
 }
 
 export default function MenuCreateForm({
@@ -62,7 +62,7 @@ export default function MenuCreateForm({
   restaurantId,
 }: MenuCreateFormProps) {
   const router = useRouter()
-  const { handleSubmit, ...form } = useForm<MenuFormValues>({
+  const form = useForm<MenuFormValues>({
     resolver: zodResolver(menuFormSchema),
     mode: "onChange",
     defaultValues: {
@@ -104,7 +104,7 @@ export default function MenuCreateForm({
 
   return (
     <Form {...form}>
-      <form onSubmit={()=> console.log("Called")} className="space-y-8">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
         <FormField
           control={form.control}
           name="dish"
@@ -313,7 +313,7 @@ export default function MenuCreateForm({
 
 type WithCreateMenuDialogProps = {
   children: React.ReactElement
-  restaurantId: number
+  restaurantId: string
 }
 
 export function WithCreateMenuDialog({

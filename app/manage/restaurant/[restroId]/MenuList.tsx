@@ -21,7 +21,7 @@ const MenuList = ({
   restroId,
 }: {
   menu: {
-    id: number
+    id: string
     categoryName: string
     Item: MenuItemI[]
   }
