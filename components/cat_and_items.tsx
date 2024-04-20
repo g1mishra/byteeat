@@ -37,7 +37,7 @@ const ViewPrices = ({ data }: { data: PriceItemMapI[] }) => {
 }
 
 type PropsData = {
-  id: number
+  id: string
   categoryName: string
   Item: MenuItemI[]
 }
@@ -81,12 +81,7 @@ const MenuView = ({ data }: { data: PropsData[] }) => {
       <Separator className="my-4" />
 
       {itemsToRender.map((category) => (
-        <Accordion
-          key={String(category.id)}
-          type="single"
-          collapsible
-          className="w-full"
-        >
+        <Accordion key={String(category.id)} type="multiple" className="w-full">
           <AccordionItem
             className="border-b-15 mt-4 px-2 first:mt-0"
             id={String(category.id)}
@@ -103,15 +98,9 @@ const MenuView = ({ data }: { data: PropsData[] }) => {
                     className="flex flex-col gap-y-1"
                     key={item.id}
                   >
-                    {item.foodOrBar ? (
-                      item.isVeg ? (
-                        <VegIcon />
-                      ) : (
-                        <NonVegIcon />
-                      )
-                    ) : null}
                     <span className="flex gap-2">
-                      <h2 className="text-lg font-bold">{item.dish}</h2>
+                      <h2 className="text-lg font-bold">{item.dish} </h2>
+                      {item.foodOrBar ? (item.isVeg ? "🟢" : "🔴") : null}
                       <ViewPrices data={item.PriceItemMap!} />
                     </span>
                     <p className="mt-2.5 text-sm text-opacity-75">

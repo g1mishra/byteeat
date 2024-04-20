@@ -12,17 +12,21 @@ import MenuList from "./MenuList"
 const RestaurantDetails = async ({ params }: any) => {
   const { restroId } = params
 
-  const response = await fetchRestaurant(parseInt(restroId))
+  const response = await fetchRestaurant(restroId, {
+    includeMenuItems: true,
+    includePrice: true,
+  })
 
+  console.log("Restaurant response")
   console.log(JSON.stringify(response, null, 2))
 
   if (!response) throw new Error("Network response was not ok.")
 
   return (
-    <div className="flex flex-col gap-y-6 text-white">
+    <div className="flex flex-col gap-y-6 dark:text-white">
       <div>
         <h1 className="text-4xl font-bold">{response.name}</h1>
-        <p>{response.address}</p>
+        <p>{response.address_string}</p>
         <p>Table size: {response.tableSize}</p>
       </div>
 
@@ -31,7 +35,7 @@ const RestaurantDetails = async ({ params }: any) => {
           <MenuList key={menu.id} menu={menu} restroId={restroId} />
         ))}
       </div>
-      <WithCreateMenuDialog restaurantId={parseInt(restroId)}>
+      <WithCreateMenuDialog restaurantId={restroId}>
         <Card className="flex items-center justify-center hover:cursor-pointer">
           <PlusIcon size={24} />
         </Card>
@@ -39,6 +43,9 @@ const RestaurantDetails = async ({ params }: any) => {
 
       <Link href={`/${response.id}`}>
         <Button>view menu</Button>
+      </Link>
+      <Link href={`/${response.id}/menu`}>
+        <Button>view QR</Button>
       </Link>
     </div>
   )

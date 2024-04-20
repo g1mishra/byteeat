@@ -46,7 +46,7 @@ export const menuFormSchema = z.object({
         z.number().int().min(1, { message: "Price must be at least 1." })
       ),
       portion: z.string().optional(),
-      id: z.number().optional()
+      id: z.string().optional(),
     })
   ),
 })
@@ -54,7 +54,7 @@ export type MenuFormValues = z.infer<typeof menuFormSchema>
 
 interface MenuCreateFormProps {
   closeModal?: () => void
-  restaurantId: number
+  restaurantId: string
 }
 
 export default function MenuCreateForm({
@@ -83,6 +83,7 @@ export default function MenuCreateForm({
   form.watch(["foodOrBar", "priceMap"])
 
   const onSubmit = async (data: MenuFormValues) => {
+    console.log(data)
     try {
       console.log(data)
 
@@ -97,6 +98,7 @@ export default function MenuCreateForm({
       toast({
         title: `Error creating menu.`,
       })
+      console.error(error)
     }
   }
 
@@ -311,7 +313,7 @@ export default function MenuCreateForm({
 
 type WithCreateMenuDialogProps = {
   children: React.ReactElement
-  restaurantId: number
+  restaurantId: string
 }
 
 export function WithCreateMenuDialog({

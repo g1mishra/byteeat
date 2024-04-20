@@ -15,19 +15,19 @@ import {
 
 const addMenuItemHelper = async (
   data: MenuFormValues,
-  restaurantId: number
+  restaurantId: string
 ): Promise<void> => {
   try {
     const categoryResp = await addOrFetchCategory(data.category, restaurantId)
     const menuResp = await addMenuItem({
       ...data,
-      categoryId: categoryResp.id as number,
+      categoryId: categoryResp.id as string,
     })
 
     const payload = data.priceMap.map((price) => ({
       price: price.price,
       portion: price.portion || "",
-      itemId: menuResp.id as number,
+      itemId: menuResp.id,
     }))
     await addItemPrice(payload)
   } catch (error) {

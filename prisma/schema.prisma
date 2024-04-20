@@ -14,29 +14,32 @@ datasource db {
 }
 
 model Restaurant {
-  id           Int            @id @default(autoincrement())
-  name         String
-  tableSize    Int
-  address      String
-  ItemCategory ItemCategory[]
+  id             String         @id @default(uuid())
+  name           String
+  tableSize      Int
+  address_string String
+  city           String
+  state          String
+  country        String         @default("India")
+  ItemCategory   ItemCategory[]
 }
 
 model ItemCategory {
-  id               Int                @id @default(autoincrement())
+  id               String             @id @default(uuid())
   restaurant       Restaurant         @relation(fields: [restaurantId], references: [id])
-  restaurantId     Int
-  categoryName     String @unique
+  restaurantId     String
+  categoryName     String             @unique
   Item             Item[]
   CategoryPosition CategoryPosition[]
 }
 
 model Item {
-  id           Int            @id @default(autoincrement())
+  id           String         @id @default(uuid())
   category     ItemCategory   @relation(fields: [categoryId], references: [id])
-  categoryId   Int
+  categoryId   String
   // foodOrBar    String         @default("Food")
   // make it boolean
-  isVeg  Boolean        @default(true)
+  isVeg        Boolean        @default(true)
   foodOrBar    Boolean        @default(true)
   description  String         @default("")
   imgPath      String         @default("")
@@ -46,26 +49,25 @@ model Item {
 }
 
 model PriceItemMap {
-  id      Int    @id @default(autoincrement())
+  id      String @id @default(uuid())
   item    Item   @relation(fields: [itemId], references: [id])
-  itemId  Int
+  itemId  String
   price   Float
   portion String @default("null")
 }
 
 model CategoryPosition {
-  id         Int          @id @default(autoincrement())
+  id         String       @id @default(uuid())
   catPos     Int          @default(autoincrement())
   category   ItemCategory @relation(fields: [categoryId], references: [id])
-  categoryId Int
+  categoryId String
 }
 
 model ItemPosition {
-  id      Int  @id @default(autoincrement())
-  itemPos Int  @default(autoincrement())
-  item    Item @relation(fields: [itemId], references: [id])
-  itemId  Int
+  id      String @id @default(uuid())
+  itemPos Int    @default(autoincrement())
+  item    Item   @relation(fields: [itemId], references: [id])
+  itemId  String
 }
-
 
 // category -> item -> price

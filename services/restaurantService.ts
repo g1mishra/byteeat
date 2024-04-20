@@ -5,10 +5,13 @@ import prisma from "@/lib/prisma"
 import { MenuItemI } from "./menuService"
 
 interface RestaurantI {
-  id?: number
+  id?: string
   name: string
   tableSize: number
-  address: string
+  address_string: string
+  city: string
+  state: string
+  country: string
 }
 
 const fetchRestaurants = async (): Promise<RestaurantI[]> => {
@@ -20,7 +23,7 @@ const fetchRestaurants = async (): Promise<RestaurantI[]> => {
 }
 
 const fetchRestaurant = async (
-  restaurantId: number,
+  restaurantId: string,
   options?: {
     includeMenuItems: boolean
     includePrice: boolean
@@ -56,9 +59,7 @@ const fetchRestaurant = async (
   }
 }
 
-const addRestaurant = async (
-  restaurantData: RestaurantI
-): Promise<RestaurantI> => {
+const addRestaurant = async (restaurantData: RestaurantI) => {
   try {
     return await prisma.restaurant.create({
       data: restaurantData,
@@ -68,9 +69,7 @@ const addRestaurant = async (
   }
 }
 
-const updateRestaurant = async (
-  restaurantData: RestaurantI
-): Promise<RestaurantI> => {
+const updateRestaurant = async (restaurantData: RestaurantI) => {
   try {
     return await prisma.restaurant.update({
       where: {
@@ -83,7 +82,7 @@ const updateRestaurant = async (
   }
 }
 
-const deleteRestaurant = async (restaurantId: number): Promise<void> => {
+const deleteRestaurant = async (restaurantId: string): Promise<void> => {
   try {
     await prisma.restaurant.delete({
       where: {

@@ -21,11 +21,12 @@ const Dashboard = () => {
 
 const Restaurant = async () => {
   const restroResponse = await fetchRestaurants()
+  console.log(restroResponse)
   if (!restroResponse) throw new Error("Network response was not ok.")
 
   return (
     <div className="flex flex-col gap-y-6">
-      <h1 className="text-4xl font-bold text-white">Restaurants</h1>
+      <h1 className="text-4xl font-bold dark:text-white">Restaurants</h1>
       {restroResponse.length === 0 ? (
         <NoRestaurant />
       ) : (
@@ -38,7 +39,7 @@ const Restaurant = async () => {
               <Card key={restaurant.id}>
                 <CardHeader>
                   <CardTitle>{restaurant.name}</CardTitle>
-                  <CardDescription>{restaurant.address}</CardDescription>
+                  <CardDescription>{restaurant.address_string}</CardDescription>
                 </CardHeader>
               </Card>
             </Link>

@@ -4,9 +4,9 @@ import prisma from "@/lib/prisma"
 
 export interface MenuItemI {
   PriceItemMap?: PriceItemMapI[]
-  id?: number
+  id?: string
   dish: string
-  categoryId: number
+  categoryId: string
   description?: string
   imgPath?: string
   foodOrBar: boolean
@@ -14,16 +14,16 @@ export interface MenuItemI {
 }
 
 export interface PriceItemMapI {
-  id?: number
+  id?: string
   price: number
   portion: string
-  itemId: number
+  itemId: string
 }
 
 export interface ItemCategoryI {
-  id?: number
+  id?: string
   categoryName: string
-  restaurantId: number
+  restaurantId: string
 }
 
 const fetchMenuItems = async (): Promise<MenuItemI[]> => {
@@ -34,11 +34,11 @@ const fetchMenuItems = async (): Promise<MenuItemI[]> => {
   }
 }
 
-const fetchMenuItem = async (menuId: number): Promise<MenuItemI | null> => {
+const fetchMenuItem = async (menuId: string): Promise<MenuItemI | null> => {
   try {
     return await prisma.item.findUnique({
       where: {
-        id: Number(menuId),
+        id: menuId,
       },
     })
   } catch (error) {
@@ -46,7 +46,7 @@ const fetchMenuItem = async (menuId: number): Promise<MenuItemI | null> => {
   }
 }
 
-const addMenuItem = async (menuData: MenuItemI): Promise<MenuItemI> => {
+const addMenuItem = async (menuData: MenuItemI) => {
   try {
     return await prisma.item.create({
       data: {
@@ -83,7 +83,7 @@ const updateMenuItem = async (menuData: MenuItemI): Promise<MenuItemI> => {
   }
 }
 
-const deleteMenuItem = async (menuId: number): Promise<void> => {
+const deleteMenuItem = async (menuId: string): Promise<void> => {
   try {
     await prisma.item.delete({
       where: {
@@ -100,7 +100,7 @@ const fetchAllCategories = async (restaurantId: string): Promise<string[]> => {
   try {
     const categories = await prisma.itemCategory.findMany({
       where: {
-        restaurantId: parseInt(restaurantId),
+        restaurantId: restaurantId,
       },
     })
 
@@ -112,8 +112,8 @@ const fetchAllCategories = async (restaurantId: string): Promise<string[]> => {
 
 const addOrFetchCategory = async (
   categoryName: string,
-  restaurantId: number
-): Promise<ItemCategoryI> => {
+  restaurantId: string
+) => {
   if (!categoryName) {
     throw new Error("Category name is required")
   }
@@ -148,7 +148,7 @@ const addOrFetchCategory = async (
 
 const updateCategory = async (
   categoryName: string,
-  categoryId: number
+  categoryId: string
 ): Promise<ItemCategoryI> => {
   if (!categoryName) {
     throw new Error("Category name is required")
@@ -174,12 +174,12 @@ const updateCategory = async (
 }
 
 const fetchCategoryById = async (
-  categoryId: number
+  categoryId: string
 ): Promise<ItemCategoryI | null> => {
   try {
     return prisma.itemCategory.findUnique({
       where: {
-        id: Number(categoryId),
+        id: categoryId,
       },
     })
   } catch (error) {
@@ -189,26 +189,26 @@ const fetchCategoryById = async (
 
 // price
 
-const fetchPrice = async (itemId: number) => {
+const fetchPrice = async (itemId: string) => {
   try {
     return prisma.priceItemMap.findMany({
       where: {
-        itemId: Number(itemId)
-      }
+        itemId: itemId,
+      },
     })
-  } catch(error){
+  } catch (error) {
     throw error
   }
 }
 
-const fetchPriceMap = async (itemId: number) => {
+const fetchPriceMap = async (itemId: string) => {
   try {
     return prisma.priceItemMap.findMany({
       where: {
-        itemId: Number(itemId)
-      }
+        itemId: itemId,
+      },
     })
-  } catch(error){
+  } catch (error) {
     throw error
   }
 }
@@ -229,7 +229,7 @@ const updateItemPrice = async (priceData: Partial<PriceItemMapI>[]) => {
     const operations = priceData.map((price) => {
       return prisma.priceItemMap.update({
         where: {
-          id: price.id
+          id: price.id,
         },
         data: price,
       })

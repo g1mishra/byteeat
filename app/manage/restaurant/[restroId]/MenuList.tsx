@@ -21,21 +21,22 @@ const MenuList = ({
   restroId,
 }: {
   menu: {
-    id: number
+    id: string
     categoryName: string
     Item: MenuItemI[]
   }
   restroId: string
 }) => {
+  console.log("Menu => ", menu)
   return (
-    <Accordion type="single" collapsible className="w-full">
+    <Accordion defaultValue={String(menu.id)} className="w-full">
       <AccordionItem
         className="border-b-15 mt-4 px-2 first:mt-0"
         id={String(menu.id)}
         value={String(menu.id)}
       >
         <AccordionTrigger className="text-lg font-bold capitalize !no-underline">
-          {menu.categoryName} - ({menu.Item.length})
+          {menu.categoryName} ({menu.Item.length})
         </AccordionTrigger>
 
         <AccordionContent className="flex flex-col gap-y-1">
