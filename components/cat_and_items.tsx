@@ -17,23 +17,18 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 
-import NonVegIcon from "./icons/nonveg"
-import VegIcon from "./icons/veg"
-import { Label } from "./ui/label"
+import SearchAndFilter from "./search-filter"
 import { Separator } from "./ui/separator"
-import { Switch } from "./ui/switch"
+import VegOrNonVeg from "./veg-or-nonveg"
 
-const ViewPrices = ({ data }: { data: PriceItemMapI[] }) => {
-  if (!data) return null
-  return (
-    <ul>
-      {data.map((price: any) => (
-        <li key={price.id}>
-          {price.portion != "" ? price.portion + " - " : ""} {price.price}
-        </li>
-      ))}
-    </ul>
-  )
+const getLowestPrice = (data: PriceItemMapI[]) => {
+  if (!data) return "N/A"
+  return data.reduce((acc, curr) => {
+    if (acc.price > curr.price) {
+      return curr
+    }
+    return acc
+  }).price
 }
 
 type PropsData = {
@@ -43,8 +38,6 @@ type PropsData = {
 }
 
 const MenuView = ({ data }: { data: PropsData[] }) => {
-  console.log("data=>", data)
-
   const { food: foodItems, bar: barItems } = useMemo(
     () =>
       data.reduce(
@@ -66,24 +59,21 @@ const MenuView = ({ data }: { data: PropsData[] }) => {
   const itemsToRender = isFood ? foodItems : barItems
 
   return (
-    <div className="mt-4 flex flex-col content-center">
-      <Separator className="my-4" />
-      <div className="flex items-center space-x-2">
-        <Label htmlFor="menu-toggle">Bar menu 🥂</Label>
-        <Switch
-          checked={!isFood}
-          onCheckedChange={() => setIsFood(!isFood)}
-          id="menu-toggle"
-          aria-label="Toggle between Bar and Food menus"
-          className="text-base"
-        />
-      </div>
-      <Separator className="my-4" />
+    <div className="mt-2 flex flex-col content-center">
+      <Separator className="mb-2 mt-4" />
+      <SearchAndFilter isFood={isFood} setIsFood={setIsFood} />
+      <Separator className="mb-4 mt-2" />
 
       {itemsToRender.map((category) => (
-        <Accordion key={String(category.id)} type="multiple" className="w-full">
+        <Accordion
+          key={String(category.id)}
+          defaultValue={String(category.id)}
+          collapsible
+          type="single"
+          className="w-full "
+        >
           <AccordionItem
-            className="border-b-15 mt-4 px-2 first:mt-0"
+            className="mt-4 border-none first:mt-0"
             id={String(category.id)}
             value={String(category.id)}
           >
@@ -91,24 +81,26 @@ const MenuView = ({ data }: { data: PropsData[] }) => {
               {category.categoryName} - ({category.Item.length})
             </AccordionTrigger>
 
-            <AccordionContent className="flex flex-col gap-y-1">
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
-                {category.Item.map((item) => (
-                  <AccordionContent
-                    className="flex flex-col gap-y-1"
-                    key={item.id}
-                  >
-                    <span className="flex gap-2">
-                      <h2 className="text-lg font-bold">{item.dish} </h2>
-                      {item.foodOrBar ? (item.isVeg ? "🟢" : "🔴") : null}
-                      <ViewPrices data={item.PriceItemMap!} />
-                    </span>
-                    <p className="mt-2.5 text-sm text-opacity-75">
-                      {item.description}
-                    </p>
-                  </AccordionContent>
-                ))}
-              </div>
+            <AccordionContent className="flex flex-col gap-y-4 p-0 ">
+              {category.Item.map((item) => (
+                <AccordionContent
+                  className="flex items-center justify-between gap-2 border-b border-gray-200 pb-3"
+                  key={item.id}
+                >
+                  <h2 className="flex w-8/12 items-start text-base font-semibold text-gray-700">
+                    {item.foodOrBar ? (
+                      <VegOrNonVeg
+                        className="mr-1.5 mt-1 shrink-0 scale-75"
+                        isVeg={item.isVeg}
+                      />
+                    ) : null}
+                    {item.dish}
+                  </h2>
+                  <span className="block w-4/12 shrink-0 text-right">
+                    {getLowestPrice(item.PriceItemMap!)}
+                  </span>
+                </AccordionContent>
+              ))}
             </AccordionContent>
           </AccordionItem>
         </Accordion>

@@ -27,9 +27,8 @@ const MenuList = ({
   }
   restroId: string
 }) => {
-  console.log("Menu => ", menu)
   return (
-    <Accordion defaultValue={String(menu.id)} className="w-full">
+    <Accordion defaultValue={String(menu.id)} type="single" className="w-full">
       <AccordionItem
         className="border-b-15 mt-4 px-2 first:mt-0"
         id={String(menu.id)}

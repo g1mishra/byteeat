@@ -17,9 +17,6 @@ const RestaurantDetails = async ({ params }: any) => {
     includePrice: true,
   })
 
-  console.log("Restaurant response")
-  console.log(JSON.stringify(response, null, 2))
-
   if (!response) throw new Error("Network response was not ok.")
 
   return (

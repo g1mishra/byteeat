@@ -1,36 +1,49 @@
+import { notFound } from "next/navigation"
 import { MenuItemI, fetchPrice } from "@/services/menuService"
-import { fetchRestaurant, fetchRestaurantBySlug } from "@/services/restaurantService"
+import { FullAdress, fetchRestaurantBySlug } from "@/services/restaurantService"
+import { MenuIcon } from "lucide-react"
 
-import { Button } from "@/components/ui/button"
+import { formatAddress } from "@/lib/string"
 import MenuView from "@/components/cat_and_items"
+import LogoOrAvtar from "@/components/logo-or-avtar"
+import { Sidebar } from "@/components/sidebar"
 
 export interface OrganizedMenu {
   [category: string]: MenuItemI[]
 }
 
-async function addPrices(parsedMenu: OrganizedMenu) {
-  for (const categ in parsedMenu) {
-    for (const idx in parsedMenu[categ]) {
-      const itemObj: any = parsedMenu[categ][idx]
-      itemObj["prices"] = await fetchPrice(itemObj.id)
-    }
+const Welcome = async ({
+  params,
+}: {
+  params: {
+    slug: string
   }
-  return parsedMenu
-}
-
-const Welcome = async ({ params }: any) => {
+}) => {
   const response = await fetchRestaurantBySlug(params.slug, {
     includeMenuItems: true,
     includePrice: true,
   })
-  console.log("here's the restro=>", JSON.stringify(response, null, 2))
+
+  if (!response) {
+    notFound()
+  }
+
+  const address = formatAddress(response as FullAdress)
 
   return (
-    <div className="container gap-y-2 py-4 sm:py-8">
-      <h1 className="text-2xl font-bold">{response?.name}</h1>
-      <p className="text-sm font-light">{response?.address_string}</p>
+    <div className="container relative flex flex-col gap-y-2 py-4 sm:py-8">
+      <Sidebar name={response?.name} address={address} />
+      <div className="flex items-center justify-center">
+        <LogoOrAvtar name={response?.name} />
+      </div>
+      <div className="flex flex-col items-center justify-center">
+        <h1 className="text-2xl font-bold">{response?.name}</h1>
+        <p className="text-sm font-light">{address}</p>
+      </div>
 
-      {response?.ItemCategory && <MenuView data={response?.ItemCategory} />}
+      {response?.ItemCategory ? (
+        <MenuView data={response?.ItemCategory} />
+      ) : null}
     </div>
   )
 }
