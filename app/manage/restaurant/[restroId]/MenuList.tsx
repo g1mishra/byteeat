@@ -29,7 +29,7 @@ const MenuList = ({
 }) => {
   console.log("Menu => ", menu)
   return (
-    <Accordion type="single" collapsible className="w-full">
+    <Accordion defaultValue={String(menu.id)} className="w-full">
       <AccordionItem
         className="border-b-15 mt-4 px-2 first:mt-0"
         id={String(menu.id)}

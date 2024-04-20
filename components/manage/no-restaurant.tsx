@@ -9,7 +9,7 @@ const NoRestaurant = ({ className = "" }: { className?: string }) => {
       >
         <div className="flex flex-col items-center gap-4 py-5">
           <div className="flex flex-col items-center">
-            <p className="font-inter text-center text-2xl font-semibold leading-tight text-white lg:text-3xl">
+            <p className="font-inter text-center text-2xl font-semibold leading-tight dark:text-white lg:text-3xl">
               You don&apos;t have any restaurant yet
             </p>
           </div>
