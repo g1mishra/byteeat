@@ -23,7 +23,7 @@ const RestaurantDetails = async ({ params }: any) => {
   if (!response) throw new Error("Network response was not ok.")
 
   return (
-    <div className="flex flex-col gap-y-6 text-white">
+    <div className="flex flex-col gap-y-6 dark:text-white">
       <div>
         <h1 className="text-4xl font-bold">{response.name}</h1>
         <p>{response.address_string}</p>

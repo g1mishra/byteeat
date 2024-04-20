@@ -26,7 +26,7 @@ const Restaurant = async () => {
 
   return (
     <div className="flex flex-col gap-y-6">
-      <h1 className="text-4xl font-bold text-white">Restaurants</h1>
+      <h1 className="text-4xl font-bold dark:text-white">Restaurants</h1>
       {restroResponse.length === 0 ? (
         <NoRestaurant />
       ) : (
