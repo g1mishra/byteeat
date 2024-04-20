@@ -1,5 +1,5 @@
 import { MenuItemI, fetchPrice } from "@/services/menuService"
-import { fetchRestaurant } from "@/services/restaurantService"
+import { fetchRestaurant, fetchRestaurantBySlug } from "@/services/restaurantService"
 
 import { Button } from "@/components/ui/button"
 import MenuView from "@/components/cat_and_items"
@@ -19,7 +19,7 @@ async function addPrices(parsedMenu: OrganizedMenu) {
 }
 
 const Welcome = async ({ params }: any) => {
-  const response = await fetchRestaurant(params.restroId, {
+  const response = await fetchRestaurantBySlug(params.slug, {
     includeMenuItems: true,
     includePrice: true,
   })

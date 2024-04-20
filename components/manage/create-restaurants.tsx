@@ -42,6 +42,7 @@ const restaurantFormSchema = z.object({
   city: z.string().default("Jalandhar"),
   state: z.string(),
   country: z.string().default("India"),
+
 })
 
 type RestaurantFormValues = z.infer<typeof restaurantFormSchema>
@@ -67,14 +68,15 @@ export default function RestaurantCreateForm({
         title: "Restaurant created successfully.",
       })
       router.refresh()
+      /*
       form.reset({
         name: "",
         tableSize: 0,
         address_string: "",
         city: "",
         state: "",
-        country: "India",
       })
+      */
       closeModal?.()
     } catch (error) {
       console.error(error)
@@ -138,7 +140,6 @@ export default function RestaurantCreateForm({
               <FormLabel>State</FormLabel>
               <Select
                 onValueChange={(value) => field.onChange(value)}
-                defaultValue="Punjab"
               >
                 <FormControl>
                   <SelectTrigger>

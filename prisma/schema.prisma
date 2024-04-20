@@ -17,10 +17,11 @@ model Restaurant {
   id             String         @id @default(uuid())
   name           String
   tableSize      Int
-  address_string String
+  address_string String         
   city           String
   state          String
   country        String         @default("India")
+  slug           String         @unique
   ItemCategory   ItemCategory[]
 }
 

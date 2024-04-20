@@ -11,10 +11,11 @@ interface RestaurantI {
   address_string: string
   city: string
   state: string
-  country: string
+  country: string,
+  slug?: string
 }
 
-const fetchRestaurants = async (): Promise<RestaurantI[]> => {
+const fetchRestaurants = async () => {
   try {
     return await prisma.restaurant.findMany()
   } catch (error) {
@@ -22,6 +23,42 @@ const fetchRestaurants = async (): Promise<RestaurantI[]> => {
   }
 }
 
+const fetchRestaurantBySlug = async (
+  restaurantSlug: string,
+  options?: {
+    includeMenuItems: boolean
+    includePrice: boolean
+  }
+) => {
+  if (!restaurantSlug) {
+    throw new Error("Restaurant slug is required")
+  }
+
+  try {
+    return await prisma.restaurant.findUnique({
+      where: {
+        slug: restaurantSlug,
+      },
+      include: {
+        ItemCategory: {
+          include: {
+            Item: options?.includeMenuItems
+              ? {
+                  include: options?.includePrice
+                    ? {
+                        PriceItemMap: true,
+                      }
+                    : {},
+                }
+              : false,
+          },
+        },
+      },
+    })
+  } catch (error) {
+    throw error
+  }
+}
 const fetchRestaurant = async (
   restaurantId: string,
   options?: {
@@ -52,6 +89,7 @@ const fetchRestaurant = async (
               : false,
           },
         },
+
       },
     })
   } catch (error) {
@@ -61,6 +99,7 @@ const fetchRestaurant = async (
 
 const addRestaurant = async (restaurantData: RestaurantI) => {
   try {
+    restaurantData['slug'] = `${restaurantData.name}-${restaurantData.city}`.toLowerCase()
     return await prisma.restaurant.create({
       data: restaurantData,
     })
@@ -100,4 +139,5 @@ export {
   fetchRestaurant,
   fetchRestaurants,
   updateRestaurant,
+  fetchRestaurantBySlug
 }
