@@ -8,7 +8,7 @@ function QRMenu({params}: any) {
   const { Canvas } = useQRCode();
   const root_url = window.location.origin
    
-  const url_to_render = `${root_url}/${params.restroId}`
+  const url_to_render = `${root_url}/${params.slug}`
 
   return (
     <div>

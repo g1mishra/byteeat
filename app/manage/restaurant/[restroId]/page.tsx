@@ -41,10 +41,10 @@ const RestaurantDetails = async ({ params }: any) => {
         </Card>
       </WithCreateMenuDialog>
 
-      <Link href={`/${response.id}`}>
+      <Link href={`/${response.slug}`}>
         <Button>view menu</Button>
       </Link>
-      <Link href={`/${response.id}/menu`}>
+      <Link href={`/${response.slug}/menuqr`}>
         <Button>view QR</Button>
       </Link>
     </div>
