@@ -5,7 +5,7 @@ import { MenuIcon } from "lucide-react"
 
 import { formatAddress } from "@/lib/string"
 import MenuView from "@/components/cat_and_items"
-import LogoOrAvtar from "@/components/logo-or-avtar"
+import LogoOrAvatar from "@/components/logo-or-avatar"
 import { Sidebar } from "@/components/sidebar"
 
 export interface OrganizedMenu {
@@ -34,7 +34,10 @@ const Welcome = async ({
     <div className="container relative flex flex-col gap-y-2 py-4 sm:py-8">
       <Sidebar name={response?.name} address={address} />
       <div className="flex items-center justify-center">
-        <LogoOrAvtar name={response?.name} />
+        <LogoOrAvatar
+          src={response?.logoUrl}
+          name={response?.name}
+        />
       </div>
       <div className="flex flex-col items-center justify-center">
         <h1 className="text-2xl font-bold">{response?.name}</h1>

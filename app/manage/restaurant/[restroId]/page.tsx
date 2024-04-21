@@ -1,10 +1,11 @@
 import Link from "next/link"
-import { fetchCategoryById } from "@/services/menuService"
-import { fetchRestaurant } from "@/services/restaurantService"
+import { FullAdress, fetchRestaurant } from "@/services/restaurantService"
 import { PlusIcon } from "lucide-react"
 
+import { formatAddress } from "@/lib/string"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
+import LogoOrAvatar from "@/components/logo-or-avatar"
 import { WithCreateMenuDialog } from "@/components/manage/create-menu"
 
 import MenuList from "./MenuList"
@@ -21,10 +22,25 @@ const RestaurantDetails = async ({ params }: any) => {
 
   return (
     <div className="flex flex-col gap-y-6 dark:text-white">
-      <div>
-        <h1 className="text-4xl font-bold">{response.name}</h1>
-        <p>{response.address_string}</p>
-        <p>Table size: {response.tableSize}</p>
+      <div className="flex justify-between gap-4 max-sm:flex-col">
+        <div className="flex flex-col items-start gap-y-0.5">
+          <LogoOrAvatar
+            name={response?.name}
+            src={response?.logoUrl || ""}
+            className="object-left"
+          />
+          <h1 className="mt-2 text-4xl font-bold">{response.name}</h1>
+          <p>{formatAddress(response as FullAdress)}</p>
+          <p>Table size: {response.tableSize}</p>
+        </div>
+        <div className="flex flex-wrap gap-4 sm:gap-6">
+          <Link href={`/manage/restaurant/${restroId}/edit`}>
+            <Button>Edit restaurant</Button>
+          </Link>
+          <Link href={`/${response.slug}`}>
+            <Button>View menu</Button>
+          </Link>
+        </div>
       </div>
 
       <div>
@@ -37,13 +53,6 @@ const RestaurantDetails = async ({ params }: any) => {
           <PlusIcon size={24} />
         </Card>
       </WithCreateMenuDialog>
-
-      <Link href={`/${response.slug}`}>
-        <Button>view menu</Button>
-      </Link>
-      <Link href={`/${response.slug}/menuqr`}>
-        <Button>view QR</Button>
-      </Link>
     </div>
   )
 }

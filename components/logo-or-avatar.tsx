@@ -1,19 +1,28 @@
+"use client"
+
 import React from "react"
 import Image from "next/image"
 
 import { avatarName } from "@/lib/string"
+import { cn } from "@/lib/utils"
 
 type Props = {
   name: string
   src?: string
+  className?: string
 }
-const LogoOrAvtar = ({ name, src }: Props) => {
-  if (src) {
+const LogoOrAvatar = ({ name, src, className = "" }: Props) => {
+  const [error, setError] = React.useState(false)
+
+  if (src && !error) {
     return (
       <Image
-        className="max-h-32 w-full rounded-full object-contain"
+        width={500}
+        height={500}
+        className={cn("max-h-32 w-full object-contain", className)}
         src={src}
         alt={name}
+        onError={() => setError(true)}
       />
     )
   }
@@ -27,4 +36,4 @@ const LogoOrAvtar = ({ name, src }: Props) => {
   )
 }
 
-export default LogoOrAvtar
+export default LogoOrAvatar

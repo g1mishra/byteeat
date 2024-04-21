@@ -17,11 +17,12 @@ model Restaurant {
   id             String         @id @default(uuid())
   name           String
   tableSize      Int
-  address_string String         
+  address_string String
   city           String
   state          String
   country        String         @default("India")
   slug           String         @unique
+  logoUrl        String         @default("")
   ItemCategory   ItemCategory[]
 }
 
@@ -38,8 +39,6 @@ model Item {
   id           String         @id @default(uuid())
   category     ItemCategory   @relation(fields: [categoryId], references: [id])
   categoryId   String
-  // foodOrBar    String         @default("Food")
-  // make it boolean
   isVeg        Boolean        @default(true)
   foodOrBar    Boolean        @default(true)
   description  String         @default("")
