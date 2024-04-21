@@ -27,6 +27,7 @@ const Welcome = async ({ params }: any) => {
 
   return (
     <div className="container gap-y-2 py-4 sm:py-8">
+      <img src={`https://byte-eat-staticfiles.s3.amazonaws.com/${params.slug}/logo.png`}></img>
       <h1 className="text-2xl font-bold">{response?.name}</h1>
       <p className="text-sm font-light">{response?.address_string}</p>
 

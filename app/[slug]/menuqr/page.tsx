@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 
 function QRMenu({params}: any) {
   const { Canvas } = useQRCode();
-  const root_url = window.location.origin
+  const root_url = "localhost:3000"
    
   const url_to_render = `${root_url}/${params.slug}`
 
