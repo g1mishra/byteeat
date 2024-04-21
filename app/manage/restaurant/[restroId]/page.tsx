@@ -46,6 +46,9 @@ const RestaurantDetails = async ({ params }: any) => {
       </Link>
       <Link href={`/${response.slug}/menuqr`}>
         <Button>view QR</Button>
+      <Link href={`/${response.slug}/addlogo`}>
+        <Button>Add logo</Button>
+      </Link>
       </Link>
     </div>
   )
