@@ -39,16 +39,27 @@ export const menuFormSchema = z.object({
     z.boolean().optional()
   ),
   foodOrBar: z.preprocess((x) => x === "true" || x === true, z.boolean()),
-  priceMap: z.array(
-    z.object({
-      price: z.preprocess(
-        (x) => Number(x),
-        z.number().int().min(1, { message: "Price must be at least 1." })
-      ),
-      portion: z.string().optional(),
-      id: z.string().optional(),
-    })
-  ),
+  priceMap: z
+    .array(
+      z.object({
+        price: z.preprocess(
+          (x) => Number(x),
+          z.number().int().min(1, { message: "Price must be at least 1." })
+        ),
+        portion: z.string(),
+        id: z.string().optional(),
+        itemId: z.string().optional(),
+      })
+    )
+    .refine(
+      (items) => {
+        const portions = items.map((i) => i.portion)
+        return new Set(portions).size === items.length
+      },
+      {
+        message: "Portions must be unique.",
+      }
+    ),
 })
 export type MenuFormValues = z.infer<typeof menuFormSchema>
 
@@ -82,11 +93,10 @@ export default function MenuCreateForm({
 
   form.watch(["foodOrBar", "priceMap"])
 
-  const onSubmit = async (data: MenuFormValues) => {
-    console.log(data)
-    try {
-      console.log(data)
+  const errors = form.formState.errors
 
+  const onSubmit = async (data: MenuFormValues) => {
+    try {
       await addMenuItemHelper(data, restaurantId)
       toast({
         title: `Menu created successfully.`,
@@ -272,19 +282,26 @@ export default function MenuCreateForm({
             />
 
             {idx === form.getValues().priceMap.length - 1 ? (
-              <Button
-                type="button"
-                variant="outline"
-                size="icon"
-                onClick={() =>
-                  form.setValue("priceMap", [
-                    ...form.getValues().priceMap,
-                    { portion: "", price: 0 },
-                  ])
-                }
-              >
-                <PlusIcon size={22} />
-              </Button>
+              <>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={() =>
+                    form.setValue("priceMap", [
+                      ...form.getValues().priceMap,
+                      { portion: "", price: 0 },
+                    ])
+                  }
+                >
+                  <PlusIcon size={22} />
+                </Button>
+                <FormMessage className="absolute bottom-[-22px]">
+                  {errors.priceMap && (
+                    <p role="alert">{errors.priceMap?.root?.message}</p>
+                  )}
+                </FormMessage>
+              </>
             ) : (
               <Button
                 type="button"

@@ -40,33 +40,34 @@ const addMenuItemHelper = async (
 const updateMenuItemHelper = async (
   data: MenuFormValues & MenuItemI
 ): Promise<void> => {
-  console.log(
-    "data",
-    data,
-    data.id,
-    data.categoryId,
-    data.category,
-    data.priceMap
-  )
   try {
     if (!data.id) throw new Error("Menu item id is required")
     let categoryId = data.categoryId
 
     await updateCategory(data.category, categoryId)
 
-    const menuResp = await updateMenuItem({
+    await updateMenuItem({
       ...data,
       categoryId,
     })
 
-    const payload: Partial<PriceItemMapI>[] = data?.priceMap?.map((price) => ({
-      price: price.price,
-      portion: price.portion || "",
-      id : price.id
-    }))
+    const pricesToBeAdded: PriceItemMapI[] = []
+    const pricesToBeUpdate: Partial<PriceItemMapI>[] = []
 
-    if (payload) {
-      await updateItemPrice(payload)
+    data?.priceMap?.forEach((priceObj) => {
+      if (priceObj.id) {
+        pricesToBeUpdate.push(priceObj)
+      } else {
+        pricesToBeAdded.push(priceObj as PriceItemMapI)
+      }
+    })
+
+    if (pricesToBeUpdate.length) {
+      await updateItemPrice(pricesToBeUpdate)
+    }
+
+    if (pricesToBeAdded.length) {
+      addItemPrice(pricesToBeAdded)
     }
   } catch (error) {
     throw error

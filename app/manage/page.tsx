@@ -21,7 +21,6 @@ const Dashboard = () => {
 
 const Restaurant = async () => {
   const restroResponse = await fetchRestaurants()
-  console.log(restroResponse)
   if (!restroResponse) throw new Error("Network response was not ok.")
 
   return (

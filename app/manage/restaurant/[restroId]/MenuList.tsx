@@ -27,11 +27,15 @@ const MenuList = ({
   }
   restroId: string
 }) => {
-  console.log("Menu => ", menu)
   return (
-    <Accordion defaultValue={String(menu.id)} className="w-full">
+    <Accordion
+      defaultValue={String(menu.id)}
+      type="single"
+      collapsible
+      className="w-full"
+    >
       <AccordionItem
-        className="border-b-15 mt-4 px-2 first:mt-0"
+        className="mt-4 first:mt-0"
         id={String(menu.id)}
         value={String(menu.id)}
       >
@@ -55,7 +59,16 @@ const MenuList = ({
                 <Card>
                   <CardHeader>
                     <CardTitle>{item.dish}</CardTitle>
-                    <CardDescription>{item.description}</CardDescription>
+                    <CardDescription>
+                      {item.description}
+                      {item?.PriceItemMap?.map((price) => (
+                        <span className="block" key={price.id}>
+                          {!price.portion
+                            ? `₹ ${price.price}`
+                            : `${price.portion} - ₹ ${price.price}`}
+                        </span>
+                      ))}
+                    </CardDescription>
                   </CardHeader>
                 </Card>
               </WithUpdateMenuDialog>

@@ -1,17 +1,20 @@
 "use server"
 
 import prisma from "@/lib/prisma"
+import { Slugify } from "@/lib/string"
 
 import { MenuItemI } from "./menuService"
 
-interface RestaurantI {
-  id?: string
-  name: string
-  tableSize: number
+export type FullAdress = {
   address_string: string
   city: string
   state: string
-  country: string,
+  country: string
+}
+interface RestaurantI extends FullAdress {
+  id?: string
+  name: string
+  tableSize: number
   slug?: string
 }
 
@@ -89,19 +92,23 @@ const fetchRestaurant = async (
               : false,
           },
         },
-
       },
     })
   } catch (error) {
+    console.error("error", error)
     throw error
   }
 }
 
 const addRestaurant = async (restaurantData: RestaurantI) => {
   try {
-    restaurantData['slug'] = `${restaurantData.name}-${restaurantData.city}`.toLowerCase()
+    restaurantData["slug"] = Slugify(
+      `${restaurantData.name} ${restaurantData.city}`
+    )
     return await prisma.restaurant.create({
-      data: restaurantData,
+      data: restaurantData as RestaurantI & {
+        slug: string
+      },
     })
   } catch (error) {
     throw error
@@ -139,5 +146,5 @@ export {
   fetchRestaurant,
   fetchRestaurants,
   updateRestaurant,
-  fetchRestaurantBySlug
+  fetchRestaurantBySlug,
 }

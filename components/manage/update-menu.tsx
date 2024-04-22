@@ -52,20 +52,18 @@ export default function MenuUpdateForm({
     },
   })
 
+  const errors = form.formState.errors
+
   form.watch(["foodOrBar", "priceMap"])
 
-  useEffect(
-    () => {
-      fetch("/api/price/"+itemData.id).then(
-        res => res.json()
-      ).then(
-    data => {
-      if (!data) throw new Error("API error");
-      form.setValue("priceMap" ,data)
-    }
-      )
-    }, []
-  )
+  useEffect(() => {
+    fetch("/api/price/" + itemData.id)
+      .then((res) => res.json())
+      .then((data) => {
+        if (!data) throw new Error("API error")
+        form.setValue("priceMap", data)
+      })
+  }, [itemData.id])
 
   const onSubmit = async (data: MenuFormValues) => {
     try {
@@ -84,7 +82,6 @@ export default function MenuUpdateForm({
     }
   }
 
-  
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -218,12 +215,11 @@ export default function MenuUpdateForm({
         />
 
         {form.getValues().priceMap.map((price, idx) => (
-          <div key={idx} className="flex items-end gap-4">
+          <div key={idx} className="relative flex items-end gap-4">
             <FormField
               control={form.control}
               name={`priceMap.${idx}.portion`}
               render={({ field }) => (
-                
                 <FormItem>
                   <FormLabel>Portion</FormLabel>
                   <FormControl>
@@ -256,19 +252,26 @@ export default function MenuUpdateForm({
             />
 
             {idx === form.getValues().priceMap.length - 1 ? (
-              <Button
-                type="button"
-                variant="outline"
-                size="icon"
-                onClick={() =>
-                  form.setValue("priceMap", [
-                    ...form.getValues().priceMap,
-                    { portion: "", price: 0 },
-                  ])
-                }
-              >
-                <PlusIcon size={22} />
-              </Button>
+              <>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={() =>
+                    form.setValue("priceMap", [
+                      ...form.getValues().priceMap,
+                      { portion: "", price: 0, itemId: itemData.id },
+                    ])
+                  }
+                >
+                  <PlusIcon size={22} />
+                </Button>
+                <FormMessage className="absolute bottom-[-22px]">
+                  {errors.priceMap && (
+                    <p role="alert">{errors.priceMap?.root?.message}</p>
+                  )}
+                </FormMessage>
+              </>
             ) : (
               <Button
                 type="button"
