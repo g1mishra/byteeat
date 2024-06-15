@@ -1,9 +1,8 @@
 "use client"
 
-import { useMemo, useState } from "react"
 import { MenuItemI, PriceItemMapI } from "@/services/menuService"
+import { useMemo, useState } from "react"
 
-import { cn } from "@/lib/utils"
 import {
   Accordion,
   AccordionContent,
@@ -16,6 +15,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
+import { cn } from "@/lib/utils"
 
 import SearchAndFilter from "./search-filter"
 import { Separator } from "./ui/separator"
@@ -38,6 +38,11 @@ type PropsData = {
 }
 
 const MenuView = ({ data }: { data: PropsData[] }) => {
+  const [filters, setFilters] = useState({
+    isFood: true,
+    searchValue: "",
+  })
+
   const { food: foodItems, bar: barItems } = useMemo(
     () =>
       data.reduce(
@@ -54,14 +59,30 @@ const MenuView = ({ data }: { data: PropsData[] }) => {
     [data]
   )
 
-  const [isFood, setIsFood] = useState(true)
+  const itemsToRender = useMemo(() => {
+    const applyFilter = () => {
+      let items = filters.isFood ? [...foodItems] : [...barItems]
+      console.log("items", items, filters)
+      let q = filters.searchValue.trim().toLowerCase()
+      if (q === "") {
+        return items
+      }
+      const filteredItems = items.map((category) => {
+        const filteredItems = category.Item.filter((item) =>
+          item.dish.toLowerCase().includes(q.toLowerCase())
+        )
+        return { ...category, Item: filteredItems }
+      })
 
-  const itemsToRender = isFood ? foodItems : barItems
+      return filteredItems
+    }
+    return applyFilter()
+  }, [filters, foodItems, barItems])
 
   return (
     <div className="mt-2 flex flex-col content-center">
       <Separator className="mb-2 mt-4" />
-      <SearchAndFilter isFood={isFood} setIsFood={setIsFood} />
+      <SearchAndFilter filters={filters} setFilters={setFilters} />
       <Separator className="mb-4 mt-2" />
 
       {itemsToRender.map((category) => (

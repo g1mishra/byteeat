@@ -100,7 +100,9 @@ const fetchRestaurant = async (
   }
 }
 
-const addRestaurant = async (restaurantData: RestaurantI) => {
+const addRestaurant = async (restaurantData: RestaurantI & {
+  userId: string
+}) => {
   try {
     restaurantData["slug"] = Slugify(
       `${restaurantData.name} ${restaurantData.city}`
@@ -108,6 +110,7 @@ const addRestaurant = async (restaurantData: RestaurantI) => {
     return await prisma.restaurant.create({
       data: restaurantData as RestaurantI & {
         slug: string
+        userId: string
       },
     })
   } catch (error) {
