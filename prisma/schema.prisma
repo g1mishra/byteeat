@@ -31,12 +31,12 @@ model Restaurant {
 }
 
 model ItemCategory {
-  id               String             @id @default(uuid())
-  restaurant       Restaurant         @relation(fields: [restaurantId], references: [id])
-  restaurantId     String
-  categoryName     String             @unique
-  Item             Item[]
-  CategoryPosition CategoryPosition[]
+  id           String     @id @default(uuid())
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+  restaurantId String
+  categoryName String     @unique
+  Item         Item[]
+  position     Int        @default(autoincrement())
 }
 
 model Item {
@@ -49,7 +49,7 @@ model Item {
   imgPath      String         @default("")
   dish         String
   PriceItemMap PriceItemMap[]
-  ItemPosition ItemPosition[]
+  position     Int            @default(autoincrement())
 }
 
 model PriceItemMap {
@@ -58,20 +58,6 @@ model PriceItemMap {
   itemId  String
   price   Float
   portion String @default("null")
-}
-
-model CategoryPosition {
-  id         String       @id @default(uuid())
-  catPos     Int          @default(autoincrement())
-  category   ItemCategory @relation(fields: [categoryId], references: [id])
-  categoryId String
-}
-
-model ItemPosition {
-  id      String @id @default(uuid())
-  itemPos Int    @default(autoincrement())
-  item    Item   @relation(fields: [itemId], references: [id])
-  itemId  String
 }
 
 model Account {

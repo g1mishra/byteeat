@@ -36,6 +36,7 @@ const Welcome = async ({
         <LogoOrAvatar
           src={response?.logoUrl}
           name={response?.name}
+          className="max-w-52"
         />
       </div>
       <div className="flex flex-col items-center justify-center">
