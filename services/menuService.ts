@@ -2,6 +2,8 @@
 
 import prisma from "@/lib/prisma"
 
+import { checkAuth } from "./utils.service"
+
 export interface MenuItemI {
   PriceItemMap?: PriceItemMapI[]
   id?: string
@@ -48,6 +50,8 @@ const fetchMenuItem = async (menuId: string): Promise<MenuItemI | null> => {
 
 const addMenuItem = async (menuData: MenuItemI) => {
   try {
+    checkAuth("You are not authorized to add a menu item")
+
     return await prisma.item.create({
       data: {
         dish: menuData.dish,
@@ -64,7 +68,12 @@ const addMenuItem = async (menuData: MenuItemI) => {
 }
 
 const updateMenuItem = async (menuData: MenuItemI): Promise<MenuItemI> => {
+  if (!menuData.id) {
+    throw new Error("Menu item id is required")
+  }
+
   try {
+    checkAuth("You are not authorized to update this menu item")
     return await prisma.item.update({
       where: {
         id: menuData.id,
@@ -85,6 +94,10 @@ const updateMenuItem = async (menuData: MenuItemI): Promise<MenuItemI> => {
 
 const deleteMenuItem = async (menuId: string): Promise<void> => {
   try {
+    if (!menuId) {
+      throw new Error("Menu ID is required")
+    }
+    checkAuth("You are not authorized to delete this menu item")
     await prisma.item.delete({
       where: {
         id: menuId,
@@ -135,6 +148,8 @@ const addOrFetchCategory = async (
       return category
     }
 
+    checkAuth("You are not authorized to add a category")
+
     return await prisma.itemCategory.create({
       data: {
         categoryName,
@@ -160,6 +175,7 @@ const updateCategory = async (
     .trim()
 
   try {
+    checkAuth("You are not authorized to update a category")
     return await prisma.itemCategory.update({
       where: {
         id: categoryId,

@@ -2,7 +2,10 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    domains: ["byte-eat-staticfiles.s3.amazonaws.com"],
+    domains: [
+      "byte-eat-staticfiles.s3.amazonaws.com",
+      "lh3.googleusercontent.com",
+    ],
   },
 }
 

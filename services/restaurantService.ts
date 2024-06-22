@@ -1,9 +1,10 @@
 "use server"
 
+
 import prisma from "@/lib/prisma"
 import { Slugify } from "@/lib/string"
 
-import { MenuItemI } from "./menuService"
+import { checkAuth } from "./utils.service"
 
 export type FullAdress = {
   address_string: string
@@ -100,13 +101,16 @@ const fetchRestaurant = async (
   }
 }
 
-const addRestaurant = async (restaurantData: RestaurantI & {
-  userId: string
-}) => {
+const addRestaurant = async (
+  restaurantData: RestaurantI & {
+    userId: string
+  }
+) => {
   try {
     restaurantData["slug"] = Slugify(
       `${restaurantData.name} ${restaurantData.city}`
     )
+    checkAuth("You are not authorized to create a restaurant")
     return await prisma.restaurant.create({
       data: restaurantData as RestaurantI & {
         slug: string
@@ -120,6 +124,11 @@ const addRestaurant = async (restaurantData: RestaurantI & {
 
 const updateRestaurant = async (restaurantData: RestaurantI) => {
   try {
+    if (!restaurantData.id) {
+      throw new Error("Restaurant ID is required")
+    }
+    checkAuth("You are not authorized to update this restaurant")
+
     return await prisma.restaurant.update({
       where: {
         id: restaurantData.id,
@@ -133,6 +142,10 @@ const updateRestaurant = async (restaurantData: RestaurantI) => {
 
 const deleteRestaurant = async (restaurantId: string): Promise<void> => {
   try {
+    if (!restaurantId) {
+      throw new Error("Restaurant ID is required")
+    }
+    checkAuth("You are not authorized to delete this restaurant")
     await prisma.restaurant.delete({
       where: {
         id: restaurantId,
@@ -147,7 +160,8 @@ export {
   addRestaurant,
   deleteRestaurant,
   fetchRestaurant,
-  fetchRestaurants,
-  updateRestaurant,
   fetchRestaurantBySlug,
+  fetchRestaurants,
+  updateRestaurant
 }
+
