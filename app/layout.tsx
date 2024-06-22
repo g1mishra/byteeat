@@ -6,6 +6,8 @@ import { fontSans } from "@/lib/fonts"
 import { cn } from "@/lib/utils"
 import { ThemeProvider } from "@/components/theme-provider"
 
+import AuthContext from "./AuthContext"
+
 export const metadata: Metadata = {
   title: {
     default: siteConfig.name,
@@ -38,9 +40,9 @@ export default function RootLayout({ children }: RootLayoutProps) {
           )}
         >
           <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
-            <div className="relative flex min-h-screen flex-col">
-              {children}
-            </div>
+            <main className="relative flex min-h-screen flex-col">
+              <AuthContext>{children}</AuthContext>
+            </main>
           </ThemeProvider>
         </body>
       </html>

@@ -34,7 +34,7 @@ export async function POST(request: Request) {
       where: { slug: slug as string },
       data: { logoUrl: url },
     })
-    return NextResponse.json(updatedRestaurant)
+    return NextResponse.json(updatedRestaurant.logoUrl)
   } catch (error) {
     console.error("Error uploading file: ", error)
     return NextResponse.json({ error: "Error uploading file" }, { status: 500 })

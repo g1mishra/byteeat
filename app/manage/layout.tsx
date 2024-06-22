@@ -1,6 +1,10 @@
 import { Metadata } from "next"
+import { getServerSession } from "next-auth"
 
 import { Separator } from "@/components/ui/separator"
+
+import { redirect } from "next/navigation"
+import { authOptions } from "../api/auth/[...nextauth]/route"
 
 export const metadata: Metadata = {
   title: "Restaurant Settings - ByteEat 🍔",
@@ -11,7 +15,15 @@ interface SettingsLayoutProps {
   children: React.ReactNode
 }
 
-export default function SettingsLayout({ children }: SettingsLayoutProps) {
+export default async function SettingsLayout({
+  children,
+}: SettingsLayoutProps) {
+  const serverSession = await getServerSession(authOptions)
+
+  if (!serverSession) {
+    // auth/signin
+    return redirect("/api/auth/signin?callbackUrl=/manage")
+  }
   return (
     <div className="flex flex-1 flex-col space-y-6 p-4 pb-6 sm:p-10 sm:pb-16">
       <div className="space-y-0.5">

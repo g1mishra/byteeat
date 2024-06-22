@@ -1,12 +1,11 @@
-import { notFound } from "next/navigation"
-import { MenuItemI, fetchPrice } from "@/services/menuService"
+import { MenuItemI } from "@/services/menuService"
 import { FullAdress, fetchRestaurantBySlug } from "@/services/restaurantService"
-import { MenuIcon } from "lucide-react"
+import { notFound } from "next/navigation"
 
-import { formatAddress } from "@/lib/string"
 import MenuView from "@/components/cat_and_items"
 import LogoOrAvatar from "@/components/logo-or-avatar"
 import { Sidebar } from "@/components/sidebar"
+import { formatAddress } from "@/lib/string"
 
 export interface OrganizedMenu {
   [category: string]: MenuItemI[]

@@ -90,7 +90,7 @@ export function Sidebar({ className, name, ...props }: SidebarProps) {
       >
         <MenuIcon
           onClick={() => setOpen(!open)}
-          className="absolute left-4 top-4 size-6 text-gray-800 dark:text-white"
+          className="size-6 text-gray-800 dark:text-white"
         />
       </div>
     </>

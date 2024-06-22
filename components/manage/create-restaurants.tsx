@@ -1,9 +1,10 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { use, useState } from "react"
 import { useRouter } from "next/navigation"
 import { addRestaurant } from "@/services/restaurantService"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { useSession } from "next-auth/react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
@@ -42,7 +43,6 @@ const restaurantFormSchema = z.object({
   city: z.string().default("Jalandhar"),
   state: z.string(),
   country: z.string().default("India"),
-
 })
 
 type RestaurantFormValues = z.infer<typeof restaurantFormSchema>
@@ -58,25 +58,21 @@ export default function RestaurantCreateForm({
     resolver: zodResolver(restaurantFormSchema),
     mode: "onChange",
   })
-
+  const session = useSession()
+  const sessionData = session.data as any
   const router = useRouter()
 
   const onSubmit = async (data: RestaurantFormValues) => {
     try {
-      const resp = await addRestaurant(data)
+      if (!sessionData?.user?.userId) throw new Error("User not found")
+      const resp = await addRestaurant({
+        ...data,
+        userId: sessionData?.user?.userId,
+      })
       toast({
         title: "Restaurant created successfully.",
       })
       router.refresh()
-      /*
-      form.reset({
-        name: "",
-        tableSize: 0,
-        address_string: "",
-        city: "",
-        state: "",
-      })
-      */
       closeModal?.()
     } catch (error) {
       console.error(error)
@@ -138,9 +134,7 @@ export default function RestaurantCreateForm({
           render={({ field }) => (
             <FormItem>
               <FormLabel>State</FormLabel>
-              <Select
-                onValueChange={(value) => field.onChange(value)}
-              >
+              <Select onValueChange={(value) => field.onChange(value)}>
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="Find your state" />
