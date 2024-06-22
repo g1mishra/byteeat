@@ -19,7 +19,7 @@ const LogoOrAvatar = ({ name, src, className = "" }: Props) => {
       <Image
         width={500}
         height={500}
-        className={cn("max-h-32 w-full object-contain", className)}
+        className={cn("w-full object-contain", className)}
         src={src}
         alt={name}
         onError={() => setError(true)}
@@ -28,7 +28,7 @@ const LogoOrAvatar = ({ name, src, className = "" }: Props) => {
   }
 
   return (
-    <div className="flex size-14 items-center justify-center rounded-full bg-gray-200">
+    <div className="flex size-14 max-h-max items-center justify-center rounded-full bg-gray-200">
       <span className="font-bold uppercase text-gray-600">
         {avatarName(name)}
       </span>

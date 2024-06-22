@@ -7,12 +7,13 @@ const EditRestaurant = async ({ params }: any) => {
   const response = await fetchRestaurant(restroId)
 
   return (
-    <div>
+    <>
       <p>
         Need to add all sort of editing, like changing name, logo, address, etc.
       </p>
+
       {response && <EditPage response={response} />}
-    </div>
+    </>
   )
 }
 
