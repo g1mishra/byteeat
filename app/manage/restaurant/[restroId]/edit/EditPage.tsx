@@ -2,6 +2,8 @@
 
 import React, { useState } from "react"
 import { ItemCategory, Restaurant } from "@prisma/client"
+import PhoneInput from 'react-phone-input-2'
+import 'react-phone-input-2/lib/style.css'
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -63,11 +65,11 @@ export default function EditPage({
       <form className="space-y-6" onSubmit={handleSubmit}>
         <div className="grid gap-6 sm:grid-cols-2">
           <div className="space-y-2">
-            <Label htmlFor="name">Restaurant Name</Label>
+            <Label htmlFor="ig_url">Instagram URL</Label>
             <Input
-              id="name"
-              placeholder="Enter restaurant name"
-              value={response.name}
+              id="ig_url"
+              placeholder="Enter Instagram URL"
+              //value={response.name}
             />
           </div>
           <div className="space-y-2">
@@ -83,64 +85,28 @@ export default function EditPage({
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="tableSize">Table Size</Label>
-            <Input
-              id="tableSize"
-              placeholder="Enter table size"
-              type="number"
-              value={response.tableSize}
-            />
+            <Label htmlFor="whatsapp_ph_no">Whatsapp phone number</Label>
+            <PhoneInput country={'in'}>
+              <Input
+                id="whatsapp_ph_no"
+                placeholder="Whatsapp phone number"
+                type="number"
+                value={response.tableSize}
+              />
+            </PhoneInput>
+            
           </div>
           <div className="space-y-2">
-            <Label htmlFor="address_string">Address</Label>
+            <Label htmlFor="address_string">Twitter URL</Label>
             <Input
-              id="address_string"
-              placeholder="Enter address"
+              id="twitter_url"
+              placeholder="Enter Twitter URL"
               value={response.address_string}
             />
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="city">City</Label>
-            <Input id="city" placeholder="Enter city" value={response.city} />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="state">State</Label>
-            <Input
-              id="state"
-              placeholder="Enter state"
-              value={response.state}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="country">Country</Label>
-            <Input
-              id="country"
-              placeholder="Enter country"
-              value={response.country}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="theme">Theme</Label>
-            <Select>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select theme" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="light">Light</SelectItem>
-                <SelectItem value="dark">Dark</SelectItem>
-                <SelectItem value="custom">Custom</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="fonts">Fonts</Label>
-            <Input id="fonts" placeholder="Enter fonts" />
-          </div>
+ 
         </div>
-        <div className="space-y-2">
-          <Label htmlFor="categoryOrder">Category Order</Label>
-          <CategoryTable itemCategory={response.ItemCategory} />
-        </div>
+
         <Button className="mt-4">Save</Button>
       </form>
     </>
