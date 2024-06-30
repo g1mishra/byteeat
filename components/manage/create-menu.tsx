@@ -20,6 +20,8 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { toast } from "@/components/ui/use-toast"
+import { Label } from "@/components/ui/label"
+
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog"
 import {
@@ -60,17 +62,20 @@ export const menuFormSchema = z.object({
         message: "Portions must be unique.",
       }
     ),
+  imagePath: z.optional().string()
 })
 export type MenuFormValues = z.infer<typeof menuFormSchema>
 
 interface MenuCreateFormProps {
   closeModal?: () => void
-  restaurantId: string
+  restaurantId: string,
+  slug: string
 }
 
 export default function MenuCreateForm({
   closeModal,
   restaurantId,
+  slug
 }: MenuCreateFormProps) {
   const router = useRouter()
   const form = useForm<MenuFormValues>({
@@ -88,19 +93,38 @@ export default function MenuCreateForm({
       description: "",
       isVeg: true,
       foodOrBar: true,
+      
     },
   })
 
   form.watch(["foodOrBar", "priceMap"])
 
   const errors = form.formState.errors
-
+  const [file, setItemImage] = useState<File>()
   const onSubmit = async (data: MenuFormValues) => {
     try {
+      console.log(file)
+      if (file && file.name != null) {
+        const formData = new FormData()
+        
+        formData.append("slug", `${slug}/${data.dish}.png`)
+        formData.append("file", file)
+        console.log("Form data-------------")
+        console.log(formData)
+        fetch("/api/image-upload", {
+          method: "POST",
+          body: formData,
+        })
+      }
+        
+      
+  
       await addMenuItemHelper(data, restaurantId)
+
       toast({
         title: `Menu created successfully.`,
       })
+      
       router.refresh()
       form.reset({})
       closeModal?.()
@@ -317,8 +341,31 @@ export default function MenuCreateForm({
                 <Trash2 size={22} />
               </Button>
             )}
+            
           </div>
+          
         ))}
+        <FormField
+          control={form.control}
+          name="image"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Upload item image</FormLabel>
+              <FormControl>
+                <Input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    if (e.target.files) {
+                      setItemImage(e.target.files[0])
+                    }
+                  }}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
         <Button type="submit">
           {form.formState.isSubmitting ? "Creating Menu..." : "Create Menu"}
@@ -330,12 +377,14 @@ export default function MenuCreateForm({
 
 type WithCreateMenuDialogProps = {
   children: React.ReactElement
-  restaurantId: string
+  restaurantId: string,
+  slug: string
 }
 
 export function WithCreateMenuDialog({
   children,
   restaurantId,
+  slug
 }: WithCreateMenuDialogProps): React.ReactElement {
   const [isOpen, setIsOpen] = useState(false)
   const openDialog = () => setIsOpen(true)
@@ -355,6 +404,7 @@ export function WithCreateMenuDialog({
           </DialogHeader>
           <MenuCreateForm
             restaurantId={restaurantId}
+            slug = {slug}
             closeModal={onCloseModal}
           />
         </DialogContent>

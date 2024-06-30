@@ -17,7 +17,7 @@ const RestaurantDetails = async ({ params }: any) => {
     includeMenuItems: true,
     includePrice: true,
   })
-
+  console.log(response)
   if (!response) throw new Error("Network response was not ok.")
 
   return (
@@ -48,7 +48,7 @@ const RestaurantDetails = async ({ params }: any) => {
           <MenuList key={menu.id} menu={menu} restroId={restroId} />
         ))}
       </div>
-      <WithCreateMenuDialog restaurantId={restroId}>
+      <WithCreateMenuDialog restaurantId={restroId} slug={response.slug}>
         <Card className="flex items-center justify-center hover:cursor-pointer">
           <PlusIcon size={24} />
         </Card>

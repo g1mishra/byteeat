@@ -18,7 +18,7 @@ export async function POST(request: Request) {
   try {
     const params = {
       Bucket: "byte-eat-staticfiles",
-      Key: `${slug}/logo.png`,
+      Key: `${slug}`,
       Body: Buffer.from(await file.arrayBuffer()),
     }
     const resp = await s3.upload(params).promise()

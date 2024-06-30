@@ -38,7 +38,7 @@ export default function EditPage({
     event.preventDefault()
     if (file && file.name != null) {
       const formData = new FormData()
-      formData.append("slug", response?.slug)
+      formData.append("slug", `${response?.slug}/logo.png`)
       formData.append("file", file)
 
       fetch("/api/image-upload", {
