@@ -1,6 +1,5 @@
 "use server"
 
-
 import prisma from "@/lib/prisma"
 import { Slugify } from "@/lib/string"
 
@@ -93,6 +92,7 @@ const fetchRestaurant = async (
               : false,
           },
         },
+        SocialLinks: true,
       },
     })
   } catch (error) {
@@ -100,6 +100,30 @@ const fetchRestaurant = async (
     throw error
   }
 }
+
+const getRestaurantSlug = async (restaurantId: string) => {
+  if (!restaurantId) {
+    throw new Error("Restaurant ID is required")
+  }
+
+  try {
+    return await prisma.restaurant.findUnique({
+      where: {
+        id: restaurantId,
+      },
+      select: {
+        slug: true,
+      },
+    })
+  } catch (error) {
+    console.error("error", error)
+    throw error
+  }
+}
+
+export type FetchRestaurantReturnType = Awaited<
+  ReturnType<typeof fetchRestaurant>
+>
 
 const addRestaurant = async (
   restaurantData: RestaurantI & {
@@ -122,7 +146,7 @@ const addRestaurant = async (
   }
 }
 
-const updateRestaurant = async (restaurantData: RestaurantI) => {
+const updateRestaurant = async (restaurantData: Partial<RestaurantI>) => {
   try {
     if (!restaurantData.id) {
       throw new Error("Restaurant ID is required")
@@ -156,12 +180,45 @@ const deleteRestaurant = async (restaurantId: string): Promise<void> => {
   }
 }
 
+const addOrUpdateSocialLinks = async (
+  restaurantId: string,
+  socialLinks: any
+) => {
+  if (!restaurantId) {
+    throw new Error("Restaurant ID is required")
+  }
+
+  checkAuth("You are not authorized to update this restaurant")
+
+  try {
+    return await prisma.socialLinks.upsert({
+      where: {
+        restaurantId: restaurantId,
+      },
+      create: {
+        ...socialLinks,
+        restaurantId: restaurantId,
+      },
+      update: {
+        ...socialLinks,
+      },
+    })
+  } catch (error) {
+    console.error("Failed to add or update social links:", error)
+    throw new Error(
+      "An error occurred while updating social links. Please try again."
+    )
+  }
+}
+
 export {
   addRestaurant,
   deleteRestaurant,
   fetchRestaurant,
   fetchRestaurantBySlug,
   fetchRestaurants,
-  updateRestaurant
-}
+  getRestaurantSlug,
+  updateRestaurant,
 
+  addOrUpdateSocialLinks,
+}

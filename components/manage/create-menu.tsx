@@ -1,9 +1,8 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useRef, useState } from "react"
 import { useRouter } from "next/navigation"
 import { addMenuItemHelper } from "@/services/helper.service"
-import { MenuItemI, addMenuItem, updateMenuItem } from "@/services/menuService"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { PlusIcon, Trash2 } from "lucide-react"
 import { useForm } from "react-hook-form"
@@ -19,7 +18,7 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { toast } from "@/components/ui/use-toast"
+import { useToast } from "@/components/ui/use-toast"
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog"
 import {
@@ -29,6 +28,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select"
+import UploadItemImage from "./upload-item-image"
+import uploadImage from "./utils/uploadImage"
 
 export const menuFormSchema = z.object({
   dish: z.string().min(3, { message: "Name is required." }),
@@ -39,7 +40,7 @@ export const menuFormSchema = z.object({
     z.boolean().optional()
   ),
   foodOrBar: z.preprocess((x) => x === "true" || x === true, z.boolean()),
-  priceMap: z
+  PriceItemMap: z
     .array(
       z.object({
         price: z.preprocess(
@@ -61,24 +62,29 @@ export const menuFormSchema = z.object({
       }
     ),
 })
-export type MenuFormValues = z.infer<typeof menuFormSchema>
+export type MenuFormValues = z.infer<typeof menuFormSchema> & {
+  imagePath?: string
+}
 
 interface MenuCreateFormProps {
   closeModal?: () => void
   restaurantId: string
+  slug: string
 }
 
 export default function MenuCreateForm({
   closeModal,
   restaurantId,
+  slug,
 }: MenuCreateFormProps) {
+  const imagesRef = useRef<(File | string)[]>([])
   const router = useRouter()
   const form = useForm<MenuFormValues>({
     resolver: zodResolver(menuFormSchema),
     mode: "onChange",
     defaultValues: {
       dish: "",
-      priceMap: [
+      PriceItemMap: [
         {
           price: 0,
           portion: "",
@@ -91,24 +97,77 @@ export default function MenuCreateForm({
     },
   })
 
-  form.watch(["foodOrBar", "priceMap"])
-
+  form.watch(["foodOrBar", "PriceItemMap"])
+  const { toast } = useToast()
   const errors = form.formState.errors
-
   const onSubmit = async (data: MenuFormValues) => {
     try {
+      const imagePath = await saveImages(data.dish)
+      if (imagePath) {
+        data.imagePath = imagePath
+      }
       await addMenuItemHelper(data, restaurantId)
       toast({
         title: `Menu created successfully.`,
       })
+
       router.refresh()
       form.reset({})
       closeModal?.()
     } catch (error) {
       toast({
+        variant: "destructive",
         title: `Error creating menu.`,
       })
       console.error(error)
+    }
+  }
+
+  const saveImages = async (dishName: string) => {
+    const images = imagesRef.current
+    if (!images || images.length === 0) return null
+
+    const files = images.filter((i) => i instanceof File) as File[]
+    if (files.length === 0) return null
+
+    const uploadPromises = files.map((file) =>
+      uploadImage(
+        file,
+        `${Date.now().toString()}-${slug}/${dishName}/${file.name}`
+      )
+        .then((result) => ({ success: true, result }))
+        .catch((error) => ({ success: false, error: error.message }))
+    )
+
+    const uploadedImages = await Promise.all(uploadPromises)
+
+    const successUploads = uploadedImages
+      .filter((res) => res.success)
+      .map((res) => (res as { success: true; result: string }).result)
+
+    const failedUploads = uploadedImages
+      .filter((res) => !res.success)
+      .map((res) => (res as { success: false; error: string }).error)
+
+    if (successUploads.length === 0) {
+      toast({
+        variant: "destructive",
+        title: `Error uploading images.`,
+        description: failedUploads.join(";"),
+      })
+      return null
+    } else if (failedUploads.length > 0) {
+      toast({
+        variant: "destructive",
+        title: `Some images failed to upload.`,
+        description: failedUploads.join(";"),
+      })
+      return successUploads.join(";")
+    } else {
+      toast({
+        title: `Images uploaded successfully.`,
+      })
+      return successUploads.join(";")
     }
   }
 
@@ -244,11 +303,11 @@ export default function MenuCreateForm({
           )}
         />
 
-        {form.getValues().priceMap.map((price, idx) => (
+        {form.getValues().PriceItemMap.map((price, idx) => (
           <div key={idx} className="flex items-end gap-4">
             <FormField
               control={form.control}
-              name={`priceMap.${idx}.portion`}
+              name={`PriceItemMap.${idx}.portion`}
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Portion</FormLabel>
@@ -269,7 +328,7 @@ export default function MenuCreateForm({
             />
             <FormField
               control={form.control}
-              name={`priceMap.${idx}.price`}
+              name={`PriceItemMap.${idx}.price`}
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Price</FormLabel>
@@ -281,15 +340,15 @@ export default function MenuCreateForm({
               )}
             />
 
-            {idx === form.getValues().priceMap.length - 1 ? (
+            {idx === form.getValues().PriceItemMap.length - 1 ? (
               <>
                 <Button
                   type="button"
                   variant="outline"
                   size="icon"
                   onClick={() =>
-                    form.setValue("priceMap", [
-                      ...form.getValues().priceMap,
+                    form.setValue("PriceItemMap", [
+                      ...form.getValues().PriceItemMap,
                       { portion: "", price: 0 },
                     ])
                   }
@@ -297,8 +356,8 @@ export default function MenuCreateForm({
                   <PlusIcon size={22} />
                 </Button>
                 <FormMessage className="absolute bottom-[-22px]">
-                  {errors.priceMap && (
-                    <p role="alert">{errors.priceMap?.root?.message}</p>
+                  {errors.PriceItemMap && (
+                    <p role="alert">{errors.PriceItemMap?.root?.message}</p>
                   )}
                 </FormMessage>
               </>
@@ -309,8 +368,8 @@ export default function MenuCreateForm({
                 size="icon"
                 onClick={() => {
                   form.setValue(
-                    "priceMap",
-                    form.getValues().priceMap.filter((_, i) => i !== idx)
+                    "PriceItemMap",
+                    form.getValues().PriceItemMap.filter((_, i) => i !== idx)
                   )
                 }}
               >
@@ -319,7 +378,7 @@ export default function MenuCreateForm({
             )}
           </div>
         ))}
-
+        <UploadItemImage imagesRef={imagesRef} uploadItemImage={""} />
         <Button type="submit">
           {form.formState.isSubmitting ? "Creating Menu..." : "Create Menu"}
         </Button>
@@ -331,11 +390,13 @@ export default function MenuCreateForm({
 type WithCreateMenuDialogProps = {
   children: React.ReactElement
   restaurantId: string
+  slug: string
 }
 
 export function WithCreateMenuDialog({
   children,
   restaurantId,
+  slug,
 }: WithCreateMenuDialogProps): React.ReactElement {
   const [isOpen, setIsOpen] = useState(false)
   const openDialog = () => setIsOpen(true)
@@ -349,12 +410,16 @@ export function WithCreateMenuDialog({
     <>
       {cloneChildren}
       <Dialog open={isOpen} onOpenChange={onCloseModal} modal>
-        <DialogContent>
+        <DialogContent
+          data-radix-scroll-area-viewport=""
+          className="max-h-[90vh] overflow-y-auto"
+        >
           <DialogHeader>
             <DialogTitle>Create Menu</DialogTitle>
           </DialogHeader>
           <MenuCreateForm
             restaurantId={restaurantId}
+            slug={slug}
             closeModal={onCloseModal}
           />
         </DialogContent>
