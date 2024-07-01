@@ -24,10 +24,10 @@ model Restaurant {
   slug           String         @unique
   logoUrl        String         @default("")
   ItemCategory   ItemCategory[]
-
+  SocialLinks    SocialLinks?
   // user
-  user   User   @relation(fields: [userId], references: [id])
-  userId String
+  user           User           @relation(fields: [userId], references: [id])
+  userId         String
 }
 
 model ItemCategory {
@@ -58,6 +58,16 @@ model PriceItemMap {
   itemId  String
   price   Float
   portion String @default("null")
+}
+
+model SocialLinks {
+  id           String     @id @default(uuid())
+  facebook     String     @default("")
+  instagram    String     @default("")
+  twitter      String     @default("")
+  whatsapp     String     @default("")
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+  restaurantId String     @unique
 }
 
 model Account {

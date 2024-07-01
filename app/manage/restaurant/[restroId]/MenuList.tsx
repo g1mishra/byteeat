@@ -18,14 +18,12 @@ import { WithUpdateMenuDialog } from "@/components/manage/update-menu"
 
 const MenuList = ({
   menu,
-  restroId,
 }: {
   menu: {
     id: string
     categoryName: string
     Item: MenuItemI[]
   }
-  restroId: string
 }) => {
   return (
     <Accordion
@@ -50,10 +48,10 @@ const MenuList = ({
                 key={item.id}
                 itemData={{
                   ...item,
-                  priceMap: [],
                   categoryId: menu.id,
                   category: menu.categoryName,
                   description: item.description || "",
+                  PriceItemMap: item.PriceItemMap || [],
                 }}
               >
                 <Card>

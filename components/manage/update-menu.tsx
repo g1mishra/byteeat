@@ -1,9 +1,10 @@
 "use client"
 
-import React, { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
+import React, { useEffect, useRef, useState } from "react"
+import { useParams, useRouter } from "next/navigation"
 import { updateMenuItemHelper } from "@/services/helper.service"
-import { MenuItemI, fetchPrice, fetchPriceMap } from "@/services/menuService"
+import { MenuItemI } from "@/services/menuService"
+import { getRestaurantSlug } from "@/services/restaurantService"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { PlusIcon, Trash2 } from "lucide-react"
 import { useForm } from "react-hook-form"
@@ -19,7 +20,7 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { toast } from "@/components/ui/use-toast"
+import { useToast } from "@/components/ui/use-toast"
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog"
 import {
@@ -30,6 +31,8 @@ import {
   SelectValue,
 } from "../ui/select"
 import { menuFormSchema } from "./create-menu"
+import UploadItemImage from "./upload-item-image"
+import uploadImage from "./utils/uploadImage"
 
 export type MenuFormValues = z.infer<typeof menuFormSchema>
 
@@ -43,7 +46,9 @@ export default function MenuUpdateForm({
   itemData,
 }: MenuUpdateFormProps) {
   const router = useRouter()
-
+  const params = useParams()
+  const { toast } = useToast()
+  const imagesRef = useRef<(File | string)[]>([])
   const form = useForm<MenuFormValues>({
     resolver: zodResolver(menuFormSchema),
     mode: "onChange",
@@ -54,20 +59,24 @@ export default function MenuUpdateForm({
 
   const errors = form.formState.errors
 
-  form.watch(["foodOrBar", "priceMap"])
-
-  useEffect(() => {
-    fetch("/api/price/" + itemData.id)
-      .then((res) => res.json())
-      .then((data) => {
-        if (!data) throw new Error("API error")
-        form.setValue("priceMap", data)
-      })
-  }, [itemData.id])
+  form.watch(["foodOrBar", "PriceItemMap"])
 
   const onSubmit = async (data: MenuFormValues) => {
     try {
-      await updateMenuItemHelper({ ...itemData, ...data })
+      const imagePath = await saveImages(data.dish)
+      if (imagePath) {
+        itemData.imgPath = imagePath
+      }
+      const updatedItemData = {
+        ...itemData,
+        ...data,
+        PriceItemMap: data.PriceItemMap.map((priceItem) => ({
+          ...priceItem,
+          itemId: itemData.id || "",
+        })),
+      }
+
+      await updateMenuItemHelper(updatedItemData)
 
       toast({
         title: `Menu ${itemData ? "updated" : "created"} successfully.`,
@@ -77,8 +86,94 @@ export default function MenuUpdateForm({
       closeModal?.()
     } catch (error) {
       toast({
+        variant: "destructive",
         title: `Error ${itemData ? "updating" : "creating"} menu.`,
       })
+    }
+  }
+
+  const saveImages = async (dishName: string) => {
+    const images = imagesRef.current
+    if (images.length === 0) return null
+
+    const files = images.filter((i) => i instanceof File)
+    if (files.length === 0) return null
+
+    const alreadyUploadedImages = images.filter((i) => typeof i === "string")
+
+    let slug = "common"
+
+    try {
+      const slugRes = await getRestaurantSlug(params.restroId as string)
+      if (slugRes) {
+        slug = slugRes.slug
+      }
+    } catch (error) {
+      console.error("Failed to get restaurant slug:", error)
+    }
+
+    try {
+      const uploadedImages = await Promise.all(
+        files.map(async (file) => {
+          try {
+            const uploadedPath = await uploadImage(
+              file as File,
+              `${Date.now().toString()}-${slug}/${dishName}/${file.name}`
+            )
+            return { success: true, file, uploadedPath }
+          } catch (error) {
+            if (error instanceof Error) {
+              return { success: false, file, message: error.message }
+            }
+            return {
+              success: false,
+              file,
+              message: "An unexpected error occurred.",
+            }
+          }
+        })
+      )
+
+      // Separate successful uploads from failed uploads
+      const successUploads = uploadedImages.filter((result) => result.success)
+      const failedUploads = uploadedImages.filter((result) => !result.success)
+
+      if (successUploads.length === 0) {
+        toast({
+          variant: "destructive",
+          title: `Error uploading images.`,
+          description: `All images failed to upload.`,
+        })
+        return null
+      } else if (failedUploads.length > 0) {
+        toast({
+          variant: "destructive",
+          title: `Error uploading some images:`,
+          description: failedUploads
+            .map((result) => `${result.file.name}: ${result.message}`)
+            .join(";"),
+        })
+        return [
+          ...alreadyUploadedImages,
+          successUploads.map((result) => result.uploadedPath),
+        ].join(";")
+      } else {
+        toast({
+          title: `All images uploaded successfully.`,
+        })
+        return [
+          ...alreadyUploadedImages,
+          successUploads.map((result) => result.uploadedPath),
+        ].join(";")
+      }
+    } catch (error) {
+      console.error("Failed to upload images:", error)
+      toast({
+        variant: "destructive",
+        title: `Error uploading images.`,
+        description: `An unexpected error occurred. Please try again.`,
+      })
+      return null
     }
   }
 
@@ -214,11 +309,11 @@ export default function MenuUpdateForm({
           )}
         />
 
-        {form.getValues().priceMap.map((price, idx) => (
+        {form.getValues().PriceItemMap.map((price, idx) => (
           <div key={idx} className="relative flex items-end gap-4">
             <FormField
               control={form.control}
-              name={`priceMap.${idx}.portion`}
+              name={`PriceItemMap.${idx}.portion`}
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Portion</FormLabel>
@@ -239,7 +334,7 @@ export default function MenuUpdateForm({
             />
             <FormField
               control={form.control}
-              name={`priceMap.${idx}.price`}
+              name={`PriceItemMap.${idx}.price`}
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Price</FormLabel>
@@ -251,15 +346,15 @@ export default function MenuUpdateForm({
               )}
             />
 
-            {idx === form.getValues().priceMap.length - 1 ? (
+            {idx === form.getValues().PriceItemMap.length - 1 ? (
               <>
                 <Button
                   type="button"
                   variant="outline"
                   size="icon"
                   onClick={() =>
-                    form.setValue("priceMap", [
-                      ...form.getValues().priceMap,
+                    form.setValue("PriceItemMap", [
+                      ...form.getValues().PriceItemMap,
                       { portion: "", price: 0, itemId: itemData.id },
                     ])
                   }
@@ -267,8 +362,8 @@ export default function MenuUpdateForm({
                   <PlusIcon size={22} />
                 </Button>
                 <FormMessage className="absolute bottom-[-22px]">
-                  {errors.priceMap && (
-                    <p role="alert">{errors.priceMap?.root?.message}</p>
+                  {errors.PriceItemMap && (
+                    <p role="alert">{errors.PriceItemMap?.root?.message}</p>
                   )}
                 </FormMessage>
               </>
@@ -279,8 +374,8 @@ export default function MenuUpdateForm({
                 size="icon"
                 onClick={() => {
                   form.setValue(
-                    "priceMap",
-                    form.getValues().priceMap.filter((_, i) => i !== idx)
+                    "PriceItemMap",
+                    form.getValues().PriceItemMap.filter((_, i) => i !== idx)
                   )
                 }}
               >
@@ -289,6 +384,11 @@ export default function MenuUpdateForm({
             )}
           </div>
         ))}
+
+        <UploadItemImage
+          imagesRef={imagesRef}
+          uploadItemImage={itemData?.imgPath?.trim() || ""}
+        />
 
         <Button type="submit">
           {form.formState.isSubmitting
@@ -320,7 +420,10 @@ export function WithUpdateMenuDialog({
     <>
       {cloneChildren}
       <Dialog open={isOpen} onOpenChange={onCloseModal} modal>
-        <DialogContent>
+        <DialogContent
+          data-radix-scroll-area-viewport=""
+          className="max-h-[90vh] overflow-y-auto"
+        >
           <DialogHeader>
             <DialogTitle>Update Menu</DialogTitle>
           </DialogHeader>

@@ -1,8 +1,10 @@
 "use client"
 
-import { MenuItemI, PriceItemMapI } from "@/services/menuService"
 import { useMemo, useState } from "react"
+import Image from "next/image"
+import { MenuItemI, PriceItemMapI } from "@/services/menuService"
 
+import { cn } from "@/lib/utils"
 import {
   Accordion,
   AccordionContent,
@@ -15,7 +17,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-import { cn } from "@/lib/utils"
 
 import SearchAndFilter from "./search-filter"
 import { Separator } from "./ui/separator"
@@ -62,7 +63,6 @@ const MenuView = ({ data }: { data: PropsData[] }) => {
   const itemsToRender = useMemo(() => {
     const applyFilter = () => {
       let items = filters.isFood ? [...foodItems] : [...barItems]
-      console.log("items", items, filters)
       let q = filters.searchValue.trim().toLowerCase()
       if (q === "") {
         return items
@@ -103,25 +103,49 @@ const MenuView = ({ data }: { data: PropsData[] }) => {
             </AccordionTrigger>
 
             <AccordionContent className="flex flex-col gap-y-4 p-0 ">
-              {category.Item.map((item) => (
-                <AccordionContent
-                  className="flex items-center justify-between gap-2 border-b border-gray-200 pb-3"
-                  key={item.id}
-                >
-                  <h2 className="flex w-8/12 items-start text-base font-semibold text-gray-700">
-                    {item.foodOrBar ? (
-                      <VegOrNonVeg
-                        className="mr-1.5 mt-1 shrink-0 scale-75"
-                        isVeg={item.isVeg}
-                      />
-                    ) : null}
-                    {item.dish}
-                  </h2>
-                  <span className="block w-4/12 shrink-0 text-right">
-                    {getLowestPrice(item.PriceItemMap!)}
-                  </span>
-                </AccordionContent>
-              ))}
+              {category.Item.map((item) => {
+                const imgPath = item?.imgPath?.trim()
+                const images = imgPath ? imgPath.split(";") : []
+                return (
+                  <AccordionContent
+                    className="flex flex-col border-b border-gray-200 pb-3"
+                    key={item.id}
+                  >
+                    <div className="flex items-center justify-between gap-2 ">
+                      <h2 className="flex w-8/12 items-start text-base font-semibold text-gray-700">
+                        {item.foodOrBar ? (
+                          <VegOrNonVeg
+                            className="mr-1.5 mt-1 shrink-0 scale-75"
+                            isVeg={item.isVeg}
+                          />
+                        ) : null}
+                        {item.dish}
+                      </h2>
+                      <span className="block w-4/12 shrink-0 text-right">
+                        {getLowestPrice(item.PriceItemMap!)}
+                      </span>
+                    </div>
+                    <div className="mt-1 text-justify">
+                      {images?.length ? (
+                        <>
+                          <Image
+                            src={images[0]}
+                            alt={item.dish}
+                            width={200}
+                            height={100}
+                            className="float-left mb-1 mr-1 max-h-28 rounded object-cover"
+                            loading="lazy"
+                          />
+
+                          <span className="line-clamp-6 text-sm text-gray-600">
+                            {item.description}
+                          </span>
+                        </>
+                      ) : null}
+                    </div>
+                  </AccordionContent>
+                )
+              })}
             </AccordionContent>
           </AccordionItem>
         </Accordion>

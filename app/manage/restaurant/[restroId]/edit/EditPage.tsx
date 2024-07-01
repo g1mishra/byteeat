@@ -1,13 +1,30 @@
 "use client"
 
-import React, { useState } from "react"
-import { ItemCategory, Restaurant } from "@prisma/client"
-import PhoneInput from 'react-phone-input-2'
-import 'react-phone-input-2/lib/style.css'
+import { useState } from "react"
+import {
+  FetchRestaurantReturnType,
+  addOrUpdateSocialLinks,
+  updateRestaurant,
+} from "@/services/restaurantService"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { ItemCategory } from "@prisma/client"
+import { Pencil } from "lucide-react"
+import { useForm } from "react-hook-form"
+
+import "react-phone-input-2/lib/style.css"
+import { useRouter } from "next/navigation"
+import { z } from "zod"
 
 import { Button } from "@/components/ui/button"
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import {
   Select,
   SelectContent,
@@ -18,102 +35,321 @@ import {
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
-  TableFooter,
-  TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { useToast } from "@/components/ui/use-toast"
 import LogoOrAvatar from "@/components/logo-or-avatar"
+import state2city from "@/components/manage/utils/cities"
+import uploadImage from "@/components/manage/utils/uploadImage"
+
+const editRestaurantFormSchema = z.object({
+  logoUrl: z.string().url().optional(),
+  tableSize: z.preprocess(
+    (x) => Number(x),
+    z.number().int().min(1, { message: "Table size must be at least 1." })
+  ),
+  address_string: z
+    .string()
+    .min(1, { message: "Ex. 123 Main Street, Anytown" }),
+  city: z.string().default("Jalandhar"),
+  state: z.string(),
+  country: z.string().default("India"),
+
+  SocialLinks: z.object({
+    instagram: z.string().url().optional().or(z.literal("")),
+    twitter: z.string().url().optional().or(z.literal("")),
+    facebook: z.string().url().optional().or(z.literal("")),
+    whatsapp: z.string().optional(),
+  }),
+})
+
+export type EditRestaurantFormValues = z.infer<
+  typeof editRestaurantFormSchema
+> & {
+  id?: string
+  imagePath?: string
+}
 
 export default function EditPage({
   response,
 }: {
-  response: Restaurant & { ItemCategory: ItemCategory[] }
+  response: FetchRestaurantReturnType
 }) {
-  const [file, setFile] = useState<File>()
-
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    if (file && file.name != null) {
-      const formData = new FormData()
-      formData.append("slug", `${response?.slug}/logo.png`)
-      formData.append("file", file)
-
-      fetch("/api/image-upload", {
-        method: "POST",
-        body: formData,
+  const form = useForm<EditRestaurantFormValues>({
+    resolver: zodResolver(editRestaurantFormSchema),
+    mode: "onSubmit",
+    defaultValues: {
+      logoUrl: response?.logoUrl,
+      tableSize: response?.tableSize,
+      address_string: response?.address_string,
+      city: response?.city,
+      state: response?.state,
+      country: response?.country,
+      SocialLinks: {
+        instagram: response?.SocialLinks?.instagram || "",
+        twitter: response?.SocialLinks?.twitter || "",
+        facebook: response?.SocialLinks?.facebook || "",
+        whatsapp: response?.SocialLinks?.whatsapp || "",
+      },
+    },
+  })
+  const router = useRouter()
+  const { toast } = useToast()
+  const [file, setFile] = useState<File | null>(null)
+  const onSubmit = async (data: EditRestaurantFormValues) => {
+    if (
+      JSON.stringify(data) ===
+      JSON.stringify({
+        logoUrl: response?.logoUrl,
+        tableSize: response?.tableSize,
+        address_string: response?.address_string,
+        city: response?.city,
+        state: response?.state,
+        country: response?.country,
+        SocialLinks: {
+          instagram: response?.SocialLinks?.instagram || "",
+          twitter: response?.SocialLinks?.twitter || "",
+          facebook: response?.SocialLinks?.facebook || "",
+          whatsapp: response?.SocialLinks?.whatsapp || "",
+        },
       })
-        .then((res) => res.json())
-        .then((data) => {
-          console.log(data)
-        })
-        .catch((error) => {
-          console.error("Error:", error)
-        })
+    ) {
+      toast({
+        title: `No changes made.`,
+      })
+      return
+    }
+
+    try {
+      const uploadedUrl = await uploadImage(file, `${response?.slug}/logo.png`)
+      if (uploadedUrl) {
+        data.imagePath = uploadedUrl
+      }
+
+      data["id"] = response?.id
+
+      const dataWithOutSocialLinks = {
+        ...data,
+        SocialLinks: undefined,
+      }
+
+      if (!response?.id) {
+        throw new Error("Restaurant ID is required")
+      }
+
+      await Promise.all([
+        addOrUpdateSocialLinks(response?.id as string, data.SocialLinks as any),
+        updateRestaurant(dataWithOutSocialLinks),
+      ])
+
+      toast({
+        title: `Menu created successfully.`,
+      })
+
+      router.refresh()
+      form.reset({})
+    } catch (error) {
+      toast({
+        title: `Error creating menu.`,
+        variant: "destructive",
+      })
+      console.error(error)
     }
   }
 
   return (
     <>
-      <LogoOrAvatar
-        name={response.name}
-        src={response?.logoUrl || ""}
-        className="size-32"
-      />
-      <form className="space-y-6" onSubmit={handleSubmit}>
-        <div className="grid gap-6 sm:grid-cols-2">
-          <div className="space-y-2">
-            <Label htmlFor="ig_url">Instagram URL</Label>
-            <Input
-              id="ig_url"
-              placeholder="Enter Instagram URL"
-              //value={response.name}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="logo">Upload Logo</Label>
-            <Input
-              id="logo"
-              type="file"
-              onChange={(e) => {
-                if (e.target.files) {
-                  setFile(e.target.files[0])
-                }
-              }}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="whatsapp_ph_no">Whatsapp phone number</Label>
-            <PhoneInput country={'in'}>
-              <Input
-                id="whatsapp_ph_no"
-                placeholder="Whatsapp phone number"
-                type="number"
-                value={response.tableSize}
-              />
-            </PhoneInput>
-            
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="address_string">Twitter URL</Label>
-            <Input
-              id="twitter_url"
-              placeholder="Enter Twitter URL"
-              value={response.address_string}
-            />
-          </div>
- 
+      <div className="relative max-w-max">
+        <LogoOrAvatar
+          name={response?.name || ""}
+          src={form.watch("logoUrl") || response?.logoUrl}
+          className="size-32"
+        />
+        <input
+          type="file"
+          accept="image/*"
+          className="absolute inset-0 z-10 size-full cursor-pointer opacity-0"
+          onChange={(e) => {
+            if (e.target.files && e.target.files[0]) {
+              setFile(e.target.files[0])
+            }
+          }}
+        />
+        <div className="absolute right-0 top-0 cursor-pointer rounded-full border bg-white p-1">
+          <Pencil size={16} />
         </div>
+      </div>
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="mt-6 grid gap-6 sm:grid-cols-2"
+        >
+          <FormField
+            control={form.control}
+            name="tableSize"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Table Size</FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    {...field}
+                    placeholder="Enter max table size"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <Button className="mt-4">Save</Button>
-      </form>
+          <FormField
+            control={form.control}
+            name="address_string"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Address</FormLabel>
+                <FormControl>
+                  <Input {...field} placeholder="Enter address" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="state"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>State</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Find your state" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {Object.keys(state2city).map((state: any) => (
+                      <SelectItem value={String(state)} key={state}>
+                        {state}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="city"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>City</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder={"Select city"} />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {(form.getValues().state != undefined
+                      ? state2city[form.getValues().state]
+                      : state2city["Punjab"]
+                    ).map((city: any) => (
+                      <SelectItem value={String(city)} key={city}>
+                        {city}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="SocialLinks.instagram"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Instagram URL</FormLabel>
+                <FormControl>
+                  <Input {...field} placeholder="Enter Instagram URL" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="SocialLinks.twitter"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Twitter URL</FormLabel>
+                <FormControl>
+                  <Input {...field} placeholder="Enter Twitter URL" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="SocialLinks.facebook"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Facebook URL</FormLabel>
+                <FormControl>
+                  <Input {...field} placeholder="Enter Facebook URL" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="SocialLinks.whatsapp"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Whatsapp phone number</FormLabel>
+                <FormControl>
+                  <Input {...field} placeholder="Enter Whatsapp phone number" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <div className="col-span-2">
+            <CategoryTable itemCategory={response?.ItemCategory} />
+          </div>
+
+          <Button className="col-span-2 mx-auto mt-4 w-full max-w-52">
+            Save
+          </Button>
+        </form>
+      </Form>
     </>
   )
 }
 
-const CategoryTable = ({ itemCategory }: { itemCategory: ItemCategory[] }) => {
+const CategoryTable = ({ itemCategory }: { itemCategory?: ItemCategory[] }) => {
+  if (!itemCategory) return null
   return (
     <Table>
       <TableHeader>

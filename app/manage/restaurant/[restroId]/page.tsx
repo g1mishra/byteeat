@@ -17,7 +17,6 @@ const RestaurantDetails = async ({ params }: any) => {
     includeMenuItems: true,
     includePrice: true,
   })
-  console.log(response)
   if (!response) throw new Error("Network response was not ok.")
 
   return (
@@ -45,7 +44,7 @@ const RestaurantDetails = async ({ params }: any) => {
 
       <div>
         {response?.ItemCategory?.map((menu) => (
-          <MenuList key={menu.id} menu={menu} restroId={restroId} />
+          <MenuList key={menu.id} menu={menu} />
         ))}
       </div>
       <WithCreateMenuDialog restaurantId={restroId} slug={response.slug}>

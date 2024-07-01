@@ -77,6 +77,16 @@
 
   body {
     @apply bg-background text-foreground;
-    font-feature-settings: "rlig" 1, "calt" 1;
+    font-feature-settings: "rlig"1, "calt"1;
+  }
+
+  [data-radix-scroll-area-viewport] {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  [data-radix-scroll-area-viewport]::-webkit-scrollbar {
+    display: none
   }
 }

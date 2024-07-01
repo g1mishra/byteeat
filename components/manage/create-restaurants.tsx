@@ -1,6 +1,6 @@
 "use client"
 
-import React, { use, useState } from "react"
+import React, { useState } from "react"
 import { useRouter } from "next/navigation"
 import { addRestaurant } from "@/services/restaurantService"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -18,7 +18,7 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { toast } from "@/components/ui/use-toast"
+import { toast, useToast } from "@/components/ui/use-toast"
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog"
 import {
@@ -54,6 +54,7 @@ interface RestaurantCreateFormProps {
 export default function RestaurantCreateForm({
   closeModal,
 }: RestaurantCreateFormProps) {
+  const { toast } = useToast()
   const form = useForm<RestaurantFormValues>({
     resolver: zodResolver(restaurantFormSchema),
     mode: "onChange",
@@ -77,6 +78,7 @@ export default function RestaurantCreateForm({
     } catch (error) {
       console.error(error)
       toast({
+        variant: "destructive",
         title: "Error creating restaurant.",
       })
     }

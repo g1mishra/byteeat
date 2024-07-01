@@ -22,9 +22,10 @@ const addMenuItemHelper = async (
     const menuResp = await addMenuItem({
       ...data,
       categoryId: categoryResp.id as string,
+      PriceItemMap: [],
     })
 
-    const payload = data.priceMap.map((price) => ({
+    const payload = data.PriceItemMap.map((price) => ({
       price: price.price,
       portion: price.portion || "",
       itemId: menuResp.id,
@@ -54,7 +55,7 @@ const updateMenuItemHelper = async (
     const pricesToBeAdded: PriceItemMapI[] = []
     const pricesToBeUpdate: Partial<PriceItemMapI>[] = []
 
-    data?.priceMap?.forEach((priceObj) => {
+    data?.PriceItemMap?.forEach((priceObj) => {
       if (priceObj.id) {
         pricesToBeUpdate.push(priceObj)
       } else {
