@@ -39,6 +39,7 @@ type PropsData = {
 }
 
 const MenuView = ({ data }: { data: PropsData[] }) => {
+  console.log(data)
   const [filters, setFilters] = useState({
     isFood: true,
     searchValue: "",
@@ -62,6 +63,7 @@ const MenuView = ({ data }: { data: PropsData[] }) => {
 
   const itemsToRender = useMemo(() => {
     const applyFilter = () => {
+
       let items = filters.isFood ? [...foodItems] : [...barItems]
       let q = filters.searchValue.trim().toLowerCase()
       if (q === "") {
@@ -78,7 +80,7 @@ const MenuView = ({ data }: { data: PropsData[] }) => {
     }
     return applyFilter()
   }, [filters, foodItems, barItems])
-
+  console.log(itemsToRender)
   return (
     <div className="mt-2 flex flex-col content-center">
       <Separator className="mb-2 mt-4" />
@@ -122,7 +124,13 @@ const MenuView = ({ data }: { data: PropsData[] }) => {
                         {item.dish}
                       </h2>
                       <span className="block w-4/12 shrink-0 text-right">
-                        {getLowestPrice(item.PriceItemMap!)}
+                      <ul>
+                        {item.PriceItemMap?.map(
+                          (price) => <li>
+                            {price.portion!=""?`${price.portion} - ${price.price}`:`${price.price}`}
+                          </li>
+                        )}
+                        </ul>
                       </span>
                     </div>
                     <div className="mt-1 text-justify">

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react"
 import { useParams, useRouter } from "next/navigation"
-import { updateMenuItemHelper } from "@/services/helper.service"
+import { updateMenuItemHelper, deleteMenuItemHelper } from "@/services/helper.service"
 import { MenuItemI } from "@/services/menuService"
 import { getRestaurantSlug } from "@/services/restaurantService"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -57,16 +57,42 @@ export default function MenuUpdateForm({
     },
   })
 
+
   const errors = form.formState.errors
 
   form.watch(["foodOrBar", "PriceItemMap"])
 
+  const [isDelete, setIsDelete] = useState(false);
+
+  const onDeleteSubmit = async (data: MenuFormValues) => {
+    try{
+      await deleteMenuItemHelper(itemData.id, itemData.categoryId)
+    }
+    catch(error){
+      throw(error)
+    }
+  }
+
   const onSubmit = async (data: MenuFormValues) => {
     try {
+
+      if(isDelete){
+        await deleteMenuItemHelper(itemData.id, itemData.categoryId)
+      }
+      else{
+      
       const imagePath = await saveImages(data.dish)
+      
+
       if (imagePath) {
         itemData.imgPath = imagePath
       }
+      
+      else{
+        itemData.imgPath = ''
+      }
+      
+
       const updatedItemData = {
         ...itemData,
         ...data,
@@ -83,7 +109,7 @@ export default function MenuUpdateForm({
       })
       router.refresh()
       form.reset({})
-      closeModal?.()
+      closeModal?.()}
     } catch (error) {
       toast({
         variant: "destructive",
@@ -94,8 +120,9 @@ export default function MenuUpdateForm({
 
   const saveImages = async (dishName: string) => {
     const images = imagesRef.current
-    if (images.length === 0) return null
 
+
+    if (images.length === 0) return null
     const files = images.filter((i) => i instanceof File)
     if (files.length === 0) return null
 
@@ -116,11 +143,12 @@ export default function MenuUpdateForm({
       const uploadedImages = await Promise.all(
         files.map(async (file) => {
           try {
-            const uploadedPath = await uploadImage(
+            if(typeof file !== 'string')
+            {const uploadedPath = await uploadImage(
               file as File,
               `${Date.now().toString()}-${slug}/${dishName}/${file.name}`
             )
-            return { success: true, file, uploadedPath }
+            return { success: true, file, uploadedPath }}
           } catch (error) {
             if (error instanceof Error) {
               return { success: false, file, message: error.message }
@@ -135,8 +163,8 @@ export default function MenuUpdateForm({
       )
 
       // Separate successful uploads from failed uploads
-      const successUploads = uploadedImages.filter((result) => result.success)
-      const failedUploads = uploadedImages.filter((result) => !result.success)
+      const successUploads = uploadedImages.filter((result) => result?.success)
+      const failedUploads = uploadedImages.filter((result) => !result?.success)
 
       if (successUploads.length === 0) {
         toast({
@@ -150,12 +178,12 @@ export default function MenuUpdateForm({
           variant: "destructive",
           title: `Error uploading some images:`,
           description: failedUploads
-            .map((result) => `${result.file.name}: ${result.message}`)
+            .map((result) => `${result?.file.name}: ${result?.message}`)
             .join(";"),
         })
         return [
           ...alreadyUploadedImages,
-          successUploads.map((result) => result.uploadedPath),
+          successUploads.map((result) => result?.uploadedPath),
         ].join(";")
       } else {
         toast({
@@ -163,7 +191,7 @@ export default function MenuUpdateForm({
         })
         return [
           ...alreadyUploadedImages,
-          successUploads.map((result) => result.uploadedPath),
+          successUploads.map((result) => result?.uploadedPath),
         ].join(";")
       }
     } catch (error) {
@@ -379,7 +407,7 @@ export default function MenuUpdateForm({
                   )
                 }}
               >
-                <Trash2 size={22} />
+                <Trash2 size={22}/>
               </Button>
             )}
           </div>
@@ -395,6 +423,14 @@ export default function MenuUpdateForm({
             ? `${itemData ? "Updating" : "Creating"} Menu...`
             : `${itemData ? "Update" : "Create"} Menu`}
         </Button>
+
+        <Button type="submit" variant="destructive" onClick={() =>{
+          setIsDelete(true)
+        }}>
+              Delete Item
+        </Button>
+
+       
       </form>
     </Form>
   )
