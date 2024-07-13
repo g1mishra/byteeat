@@ -39,7 +39,6 @@ type PropsData = {
 }
 
 const MenuView = ({ data }: { data: PropsData[] }) => {
-  console.log(data)
   const [filters, setFilters] = useState({
     isFood: true,
     searchValue: "",
@@ -63,7 +62,6 @@ const MenuView = ({ data }: { data: PropsData[] }) => {
 
   const itemsToRender = useMemo(() => {
     const applyFilter = () => {
-
       let items = filters.isFood ? [...foodItems] : [...barItems]
       let q = filters.searchValue.trim().toLowerCase()
       if (q === "") {
@@ -80,7 +78,6 @@ const MenuView = ({ data }: { data: PropsData[] }) => {
     }
     return applyFilter()
   }, [filters, foodItems, barItems])
-  console.log(itemsToRender)
   return (
     <div className="mt-2 flex flex-col content-center">
       <Separator className="mb-2 mt-4" />
@@ -124,32 +121,44 @@ const MenuView = ({ data }: { data: PropsData[] }) => {
                         {item.dish}
                       </h2>
                       <span className="block w-4/12 shrink-0 text-right">
-                      <ul>
-                        {item.PriceItemMap?.map(
-                          (price) => <li>
-                            {price.portion!=""?`${price.portion} - ${price.price}`:`${price.price}`}
-                          </li>
-                        )}
+                        <ul>
+                          {item.PriceItemMap?.map((price) => (
+                            <li>
+                              {price.portion != ""
+                                ? `${price.portion} - ${price.price}`
+                                : `${price.price}`}
+                            </li>
+                          ))}
                         </ul>
                       </span>
                     </div>
+
                     <div className="mt-1 text-justify">
                       {images?.length ? (
                         <>
-                          <Image
-                            src={images[0]}
-                            alt={item.dish}
-                            width={200}
-                            height={100}
-                            className="float-left mb-1 mr-1 max-h-28 rounded object-cover"
-                            loading="lazy"
-                          />
+                          <div className="mb-1 flex gap-1 overflow-hidden">
+                            {images.map((img, i) => (
+                              <div key={img} className={cn("relative size-32")}>
+                                <Image
+                                  src={img}
+                                  layout="fill"
+                                  objectFit="cover"
+                                  className="rounded-md"
+                                  alt={item.dish}
+                                />
+                              </div>
+                            ))}
+                          </div>
 
-                          <span className="line-clamp-6 text-sm text-gray-600">
+                          <span className="line-clamp-3 text-sm text-gray-600">
                             {item.description}
                           </span>
                         </>
-                      ) : null}
+                      ) : (
+                        <span className="line-clamp-3 text-sm text-gray-600">
+                          {item.description}
+                        </span>
+                      )}
                     </div>
                   </AccordionContent>
                 )

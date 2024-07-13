@@ -7,36 +7,28 @@ import { MenuIcon, X } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 const SocailIconMap = {
-  facabook: dynamic(() => import("@/components/icons/facebook")),
+  facebook: dynamic(() => import("@/components/icons/facebook")),
   twitter: dynamic(() => import("@/components/icons/twitter")),
   instagram: dynamic(() => import("@/components/icons/instagram")),
+  whatsapp: dynamic(() => import("@/components/icons/whatsapp")),
 }
 
 interface SidebarProps extends React.HTMLAttributes<HTMLElement> {
   name: string
   address?: string
-  socials?: {
-    url: string
-    type: keyof typeof SocailIconMap
-  }[]
+  socials: {
+    id: string
+    facebook: string
+    instagram: string
+    twitter: string
+    whatsapp: string
+    restaurantId: string
+  } | null
 }
 
-const socials = [
-  {
-    url: "https://facebook.com",
-    type: "facabook",
-  },
-  {
-    url: "https://twitter.com",
-    type: "twitter",
-  },
-  {
-    url: "https://instagram.com",
-    type: "instagram",
-  },
-]
+const Social_Map = ["facebook", "twitter", "instagram", "whatsapp"]
 
-export function Sidebar({ className, name, ...props }: SidebarProps) {
+export function Sidebar({ className, socials, name, ...props }: SidebarProps) {
   const [open, setOpen] = React.useState(false)
 
   return (
@@ -66,16 +58,21 @@ export function Sidebar({ className, name, ...props }: SidebarProps) {
             </p>
           </div>
           <div className="flex justify-center gap-x-6">
-            {socials?.map((social) => {
-              const Icon =
-                SocailIconMap[social.type as keyof typeof SocailIconMap]
+            {Social_Map?.map((social) => {
+              const Icon = SocailIconMap[social as keyof typeof SocailIconMap]
+              const url = socials?.[social as keyof typeof socials].trim()
+              if (!url) return null
               return (
                 <a
-                  key={social.url}
-                  href={social.url}
+                  key={url}
+                  href={url}
                   className="text-gray-800 hover:underline dark:text-white"
                 >
-                  <Icon className="size-8" />
+                  <Icon
+                    className={cn("size-9", {
+                      "p-0.5": social !== "whatsapp",
+                    })}
+                  />
                 </a>
               )
             })}

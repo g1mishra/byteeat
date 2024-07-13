@@ -1,11 +1,11 @@
+import { notFound } from "next/navigation"
 import { MenuItemI } from "@/services/menuService"
 import { FullAdress, fetchRestaurantBySlug } from "@/services/restaurantService"
-import { notFound } from "next/navigation"
 
+import { formatAddress } from "@/lib/string"
 import MenuView from "@/components/cat_and_items"
 import LogoOrAvatar from "@/components/logo-or-avatar"
 import { Sidebar } from "@/components/sidebar"
-import { formatAddress } from "@/lib/string"
 
 export interface OrganizedMenu {
   [category: string]: MenuItemI[]
@@ -31,7 +31,11 @@ const Welcome = async ({
 
   return (
     <div className="container relative flex flex-col gap-y-2 py-4 sm:py-8">
-      <Sidebar name={response?.name} address={address} />
+      <Sidebar
+        name={response?.name}
+        socials={response.SocialLinks}
+        address={address}
+      />
       <div className="flex items-center justify-center">
         <LogoOrAvatar
           src={response?.logoUrl}
