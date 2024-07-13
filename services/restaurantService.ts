@@ -56,6 +56,7 @@ const fetchRestaurantBySlug = async (
               : false,
           },
         },
+        SocialLinks: true,
       },
     })
   } catch (error) {

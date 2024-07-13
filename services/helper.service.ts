@@ -11,6 +11,8 @@ import {
   updateCategory,
   updateItemPrice,
   updateMenuItem,
+  deleteMenuItem,
+  deletePriceItem
 } from "./menuService"
 
 const addMenuItemHelper = async (
@@ -75,4 +77,19 @@ const updateMenuItemHelper = async (
   }
 }
 
-export { addMenuItemHelper, updateMenuItemHelper }
+
+const deleteMenuItemHelper = async(
+  itemId: any, categoryId: any
+): Promise<void> => {
+    try{
+      await deletePriceItem(itemId)
+
+      await deleteMenuItem(itemId,categoryId)
+    }
+    catch (error) {
+      throw error
+    }
+}
+
+
+export { addMenuItemHelper, updateMenuItemHelper, deleteMenuItemHelper }
