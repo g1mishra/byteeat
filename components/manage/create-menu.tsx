@@ -63,7 +63,7 @@ export const menuFormSchema = z.object({
     ),
 })
 export type MenuFormValues = z.infer<typeof menuFormSchema> & {
-  imagePath?: string
+  imgPath?: string
 }
 
 interface MenuCreateFormProps {
@@ -102,9 +102,9 @@ export default function MenuCreateForm({
   const errors = form.formState.errors
   const onSubmit = async (data: MenuFormValues) => {
     try {
-      const imagePath = await saveImages(data.dish)
-      if (imagePath) {
-        data.imagePath = imagePath
+      const imgPath = await saveImages(data.dish)
+      if (imgPath) {
+        data.imgPath = imgPath
       }
       await addMenuItemHelper(data, restaurantId)
       toast({

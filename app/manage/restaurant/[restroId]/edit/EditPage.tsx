@@ -69,7 +69,7 @@ export type EditRestaurantFormValues = z.infer<
   typeof editRestaurantFormSchema
 > & {
   id?: string
-  imagePath?: string
+  imgPath?: string
 }
 
 export default function EditPage({
@@ -125,7 +125,7 @@ export default function EditPage({
     try {
       const uploadedUrl = await uploadImage(file, `${response?.slug}/logo.png`)
       if (uploadedUrl) {
-        data.imagePath = uploadedUrl
+        data.logoUrl = uploadedUrl
       }
 
       data["id"] = response?.id
@@ -359,9 +359,9 @@ const CategoryTable = ({ itemCategory }: { itemCategory?: ItemCategory[] }) => {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {itemCategory.map((category) => (
+        {itemCategory.map((category, index) => (
           <TableRow key={category.id}>
-            <TableCell>{category.position}</TableCell>
+            <TableCell>{index + 1}</TableCell>
             <TableCell>{category.categoryName}</TableCell>
           </TableRow>
         ))}

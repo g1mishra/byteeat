@@ -84,9 +84,9 @@ export default function MenuUpdateForm({
 
   const onSubmit = async (data: MenuFormValues) => {
     try {
-      const imagePath = await saveImages(data.dish)
-      if (imagePath !== null) {
-        itemData.imgPath = imagePath
+      const imgPath = await saveImages(data.dish)
+      if (imgPath !== null) {
+        itemData.imgPath = imgPath
       }
 
       const updatedItemData = {
