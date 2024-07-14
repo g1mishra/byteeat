@@ -42,7 +42,10 @@ export default function UploadItemImage({
       <div className="grid grid-cols-3 gap-2">
         {images.length < MAX_IMAGES && (
           <>
-            <button className="bg-muted relative flex aspect-square items-center justify-center rounded-md border border-dashed">
+            <button
+              type="button"
+              className="bg-muted relative flex aspect-square items-center justify-center rounded-md border border-dashed"
+            >
               <PlusIcon className="text-muted-foreground size-6" />
               <input
                 type="file"
@@ -79,7 +82,10 @@ export default function UploadItemImage({
               fill
               className="object-cover"
             />
-            <button className="bg-background/80 hover:bg-background absolute right-2 top-2 rounded-full p-1">
+            <button
+              type="button"
+              className="bg-background/80 hover:bg-background absolute right-2 top-2 rounded-full p-1"
+            >
               <XIcon
                 className="text-destructive size-4"
                 onClick={() => handleRemoveImage(index)}

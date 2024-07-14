@@ -15,6 +15,7 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { WithUpdateMenuDialog } from "@/components/manage/update-menu"
+import VegOrNonVeg from "@/components/veg-or-nonveg"
 
 const MenuList = ({
   menu,
@@ -56,16 +57,31 @@ const MenuList = ({
               >
                 <Card>
                   <CardHeader>
-                    <CardTitle>{item.dish}</CardTitle>
+                    <CardTitle className="flex items-center gap-x-1 text-base">
+                      {item.foodOrBar ? (
+                        <VegOrNonVeg
+                          className="shrink-0 scale-90"
+                          isVeg={item.isVeg}
+                        />
+                      ) : null}
+                      {item.dish}{" "}
+                    </CardTitle>
                     <CardDescription>
-                      {item.description}
-                      {item?.PriceItemMap?.map((price) => (
-                        <span className="block" key={price.id}>
-                          {!price.portion
-                            ? `₹ ${price.price}`
-                            : `${price.portion} - ₹ ${price.price}`}
-                        </span>
-                      ))}
+                      <span className="line-clamp-2">{item.description}</span>
+                      <span className="mt-0.5">
+                        {item?.PriceItemMap?.map((price) => (
+                          <span className="block" key={price.id}>
+                            {!price.portion ? (
+                              <strong>₹ {price.price}</strong>
+                            ) : (
+                              <span>
+                                {price.portion} :{" "}
+                                <strong>₹ {price.price}</strong>
+                              </span>
+                            )}
+                          </span>
+                        ))}
+                      </span>
                     </CardDescription>
                   </CardHeader>
                 </Card>

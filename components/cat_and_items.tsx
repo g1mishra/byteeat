@@ -1,10 +1,8 @@
 "use client"
 
-import { useMemo, useState } from "react"
-import Image from "next/image"
 import { MenuItemI, PriceItemMapI } from "@/services/menuService"
+import { useMemo, useState } from "react"
 
-import { cn } from "@/lib/utils"
 import {
   Accordion,
   AccordionContent,
@@ -17,10 +15,11 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
+import { cn } from "@/lib/utils"
 
+import MenuItem from "./MenuItem"
 import SearchAndFilter from "./search-filter"
 import { Separator } from "./ui/separator"
-import VegOrNonVeg from "./veg-or-nonveg"
 
 const getLowestPrice = (data: PriceItemMapI[]) => {
   if (!data) return "N/A"
@@ -107,59 +106,10 @@ const MenuView = ({ data }: { data: PropsData[] }) => {
                 const images = imgPath ? imgPath.split(";") : []
                 return (
                   <AccordionContent
-                    className="flex flex-col border-b border-gray-200 pb-3"
+                    className="flex flex-col pb-2"
                     key={item.id}
                   >
-                    <div className="flex items-center justify-between gap-2 ">
-                      <h2 className="flex w-8/12 items-start text-base font-semibold text-gray-700">
-                        {item.foodOrBar ? (
-                          <VegOrNonVeg
-                            className="mr-1.5 mt-1 shrink-0 scale-75"
-                            isVeg={item.isVeg}
-                          />
-                        ) : null}
-                        {item.dish}
-                      </h2>
-                      <span className="block w-4/12 shrink-0 text-right">
-                        <ul>
-                          {item.PriceItemMap?.map((price) => (
-                            <li>
-                              {price.portion != ""
-                                ? `${price.portion} - ${price.price}`
-                                : `${price.price}`}
-                            </li>
-                          ))}
-                        </ul>
-                      </span>
-                    </div>
-
-                    <div className="mt-1 text-justify">
-                      {images?.length ? (
-                        <>
-                          <div className="mb-1 flex gap-1 overflow-hidden">
-                            {images.map((img, i) => (
-                              <div key={img} className={cn("relative size-32")}>
-                                <Image
-                                  src={img}
-                                  layout="fill"
-                                  objectFit="cover"
-                                  className="rounded-md"
-                                  alt={item.dish}
-                                />
-                              </div>
-                            ))}
-                          </div>
-
-                          <span className="line-clamp-3 text-sm text-gray-600">
-                            {item.description}
-                          </span>
-                        </>
-                      ) : (
-                        <span className="line-clamp-3 text-sm text-gray-600">
-                          {item.description}
-                        </span>
-                      )}
-                    </div>
+                    <MenuItem item={item} images={images} />
                   </AccordionContent>
                 )
               })}

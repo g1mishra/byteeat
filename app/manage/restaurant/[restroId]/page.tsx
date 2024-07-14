@@ -32,7 +32,7 @@ const RestaurantDetails = async ({ params }: any) => {
           <p>{formatAddress(response as FullAdress)}</p>
           <p>Table size: {response.tableSize}</p>
         </div>
-        <div className="flex flex-wrap gap-4 sm:gap-6">
+        <div className="flex flex-wrap justify-between gap-4 self-start sm:gap-x-6">
           <Link href={`/manage/restaurant/${restroId}/edit`}>
             <Button>Edit restaurant</Button>
           </Link>
@@ -48,7 +48,7 @@ const RestaurantDetails = async ({ params }: any) => {
         ))}
       </div>
       <WithCreateMenuDialog restaurantId={restroId} slug={response.slug}>
-        <Card className="flex items-center justify-center hover:cursor-pointer">
+        <Card className="mx-auto flex w-full max-w-24 items-center justify-center p-6 hover:cursor-pointer">
           <PlusIcon size={24} />
         </Card>
       </WithCreateMenuDialog>
