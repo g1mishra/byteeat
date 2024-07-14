@@ -80,6 +80,29 @@
     font-feature-settings: "rlig"1, "calt"1;
   }
 
+  .subtitle-2 {
+    font-size: .875rem;
+    font-weight: 600;
+    line-height: 1.25rem;
+  }
+
+  .subtitle-3 {
+    font-size: .75rem;
+    font-weight: 700;
+    line-height: 1rem;
+  }
+
+  .body-2, .body-3 {
+    font-size: .75rem;
+    line-height: 1rem;
+  }
+
+  .material-symbols-outlined.text-lg {
+    height: 1.125rem;
+    line-height: 1.125rem;
+    width: 1.125rem;
+  }
+
   [data-radix-scroll-area-viewport] {
     scrollbar-width: none;
     -ms-overflow-style: none;
