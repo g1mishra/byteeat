@@ -4,12 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "prisma generate && prisma migrate deploy && next build",
     "start": "next start",
     "lint": "next lint",
     "migrate": "prisma migrate dev",
-    "prittier": "prettier --write .",
-    "postinstall": "prisma generate"
+    "prittier": "prettier --write ."
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.4",
