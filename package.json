@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "migrate": "prisma migrate dev",
-    "prittier": "prettier --write ."
+    "prittier": "prettier --write .",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.4",
