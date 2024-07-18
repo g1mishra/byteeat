@@ -34,9 +34,11 @@ model ItemCategory {
   id           String     @id @default(uuid())
   restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
   restaurantId String
-  categoryName String     @unique
+  categoryName String
   Item         Item[]
   position     Int        @default(autoincrement())
+
+  @@unique([restaurantId, categoryName])
 }
 
 model Item {
