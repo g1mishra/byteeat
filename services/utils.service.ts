@@ -1,10 +1,17 @@
-import { authOptions } from "@/app/api/auth/authOption"
 import { getServerSession } from "next-auth"
 
+import { authOptions } from "@/app/api/auth/authOption"
 
-export function checkAuth(msg?: string) {
-  const user = getServerSession(authOptions)
-  if (!user) {
+export async function checkAuth(msg?: string): Promise<{
+  name: string
+  email: string
+  image: string
+  phone: string
+  userId: string
+}> {
+  const session = await getServerSession(authOptions)
+  if (!session || !session.user) {
     throw new Error(msg || "Your are not authorized to perform this action")
   }
+  return session?.user
 }

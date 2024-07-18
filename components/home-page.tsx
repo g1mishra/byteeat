@@ -44,44 +44,36 @@ export default function HomePage() {
         </nav>
       </header>
       <main className="flex-1">
-        <section className="w-full py-12 md:py-24 lg:py-32">
-          <div className="container px-4 md:px-6">
-            <div className="grid gap-6 lg:grid-cols-[1fr_400px] lg:gap-12 xl:grid-cols-[1fr_600px]">
-              <div className="flex flex-col justify-center space-y-4">
-                <div className="space-y-2">
-                  <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none">
-                    Revolutionize Your Restaurant Experience with ByteEat
-                  </h1>
-                  <p className="text-muted-foreground max-w-[600px] md:text-xl">
-                    Discover the power of digital menus and table QR-based
-                    ordering with ByteEat, the ultimate solution for modern
-                    restaurants.
-                  </p>
-                </div>
-                <div className="flex flex-col gap-2 min-[400px]:flex-row">
-                  <Link
-                    href="/manage"
-                    className="bg-primary text-primary-foreground hover:bg-primary/90 focus-visible:ring-ring inline-flex h-10 items-center justify-center rounded-md px-8 text-sm font-medium shadow transition-colors focus-visible:outline-none focus-visible:ring-1 disabled:pointer-events-none disabled:opacity-50"
-                    prefetch={false}
-                  >
-                    Get Started
-                  </Link>
-                  {/* <Link
-                    href="#"
-                    className="border-input bg-background hover:bg-accent hover:text-accent-foreground focus-visible:ring-ring inline-flex h-10 items-center justify-center rounded-md border px-8 text-sm font-medium shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 disabled:pointer-events-none disabled:opacity-50"
-                    prefetch={false}
-                  >
-                    Visit Website
-                  </Link> */}
-                </div>
+        <section className="flex min-h-[65vh] w-full items-center  py-12 md:py-24 lg:py-32">
+          <div className="container flex size-full flex-col items-center justify-center px-4 md:px-6">
+            {/* <div className="grid gap-6 lg:grid-cols-[1fr_400px] lg:gap-12 xl:grid-cols-[1fr_600px]"> */}
+            <div className="flex max-w-screen-lg flex-col items-center justify-center space-y-6">
+              <div className="flex flex-col items-center space-y-4 text-center">
+                <h1 className="text-3xl font-bold sm:text-5xl xl:text-6xl/none">
+                  Revolutionize Your Restaurant Experience with ByteEat
+                </h1>
+                <p className="text-muted-foreground max-w-screen-sm md:text-xl">
+                  Discover the power of digital menus and table QR-based
+                  ordering with ByteEat, the ultimate solution for modern
+                  restaurants.
+                </p>
               </div>
-              <SVGComponent className="mx-auto aspect-video overflow-hidden rounded-xl object-cover sm:w-full lg:order-last lg:aspect-square" />
+              <div className="flex flex-col gap-2 min-[400px]:flex-row">
+                <Link
+                  href="/manage"
+                  className="bg-primary text-primary-foreground hover:bg-primary/90 focus-visible:ring-ring inline-flex items-center justify-center rounded-lg px-8 py-2.5 text-lg font-medium shadow transition-colors focus-visible:outline-none focus-visible:ring-1 disabled:pointer-events-none disabled:opacity-50"
+                  prefetch={false}
+                >
+                  Get Started
+                </Link>
+              </div>
             </div>
+            {/* </div> */}
           </div>
         </section>
         <section
           id="features"
-          className="bg-muted w-full py-12 md:py-24 lg:py-32"
+          className="bg-muted w-full py-12 md:pt-24"
         >
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
@@ -132,13 +124,13 @@ export default function HomePage() {
                   </li>
                 </ul>
               </div>
-              <Features className="mx-auto aspect-video overflow-hidden rounded-xl object-cover object-center sm:w-full lg:order-last" />
+              <Features className="w-full overflow-hidden rounded-xl object-cover object-center lg:order-last" />
             </div>
           </div>
         </section>
         <section
           id="pricing"
-          className="bg-muted w-full py-12 md:py-24 lg:py-32"
+          className="bg-muted w-full pb-12"
         >
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">

@@ -39,12 +39,12 @@ const MenuList = ({
         value={String(menu.id)}
       >
         <AccordionTrigger className="text-lg font-bold capitalize !no-underline">
-          {menu.categoryName} ({menu.Item.length})
+          {menu?.categoryName} ({menu?.Item?.length})
         </AccordionTrigger>
 
         <AccordionContent className="flex flex-col gap-y-1">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
-            {menu.Item.map((item) => (
+            {menu?.Item?.map((item) => (
               <WithUpdateMenuDialog
                 key={item.id}
                 itemData={{

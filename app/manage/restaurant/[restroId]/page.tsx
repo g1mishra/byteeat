@@ -1,23 +1,34 @@
 import Link from "next/link"
 import { FullAdress, fetchRestaurant } from "@/services/restaurantService"
 import { PlusIcon } from "lucide-react"
+import { getServerSession } from "next-auth"
 
 import { formatAddress } from "@/lib/string"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
+import UnAuthorized from "@/components/UnAuthorized"
 import LogoOrAvatar from "@/components/logo-or-avatar"
 import { WithCreateMenuDialog } from "@/components/manage/create-menu"
+import { authOptions } from "@/app/api/auth/authOption"
 
 import MenuList from "./MenuList"
 
 const RestaurantDetails = async ({ params }: any) => {
   const { restroId } = params
 
-  const response = await fetchRestaurant(restroId, {
+  const session = await getServerSession(authOptions)
+  if (!session || !session.user) return <UnAuthorized />
+  let response = await fetchRestaurant(restroId, session?.user?.userId, {
     includeMenuItems: true,
     includePrice: true,
   })
   if (!response) throw new Error("Network response was not ok.")
+
+  if (!response) {
+    return <UnAuthorized />
+  }
+
+  console.log(JSON.stringify(response, null, 2))
 
   return (
     <div className="flex flex-col gap-y-6 dark:text-white">
