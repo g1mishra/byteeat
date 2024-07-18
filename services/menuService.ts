@@ -50,7 +50,7 @@ const fetchMenuItem = async (menuId: string): Promise<MenuItemI | null> => {
 
 const addMenuItem = async (menuData: MenuItemI) => {
   try {
-    checkAuth("You are not authorized to add a menu item")
+    await checkAuth("You are not authorized to add a menu item")
 
     return await prisma.item.create({
       data: {
@@ -74,7 +74,7 @@ const updateMenuItem = async (menuData: MenuItemI): Promise<MenuItemI> => {
   }
 
   try {
-    checkAuth("You are not authorized to update this menu item")
+    await checkAuth("You are not authorized to update this menu item")
     return await prisma.item.update({
       where: {
         id: menuData.id,
@@ -98,7 +98,7 @@ const deleteMenuItem = async (menuId: string, categoryId: string): Promise<void>
     if (!menuId) {
       throw new Error("Menu ID is required")
     }
-    checkAuth("You are not authorized to delete this menu item")
+    await checkAuth("You are not authorized to delete this menu item")
     const cat_size = await getCatIdNums(categoryId)
    
     await prisma.item.delete({
@@ -122,7 +122,7 @@ const deletePriceItem = async (menuId: string): Promise<void> => {
     if (!menuId) {
       throw new Error("Menu ID is required")
     }
-    checkAuth("You are not authorized to delete this menu item")
+    await checkAuth("You are not authorized to delete this menu item")
     await prisma.priceItemMap.deleteMany({
       where: {
         itemId: menuId,
@@ -175,7 +175,7 @@ const addOrFetchCategory = async (
       return category
     }
 
-    checkAuth("You are not authorized to add a category")
+    await checkAuth("You are not authorized to add a category")
 
     return await prisma.itemCategory.create({
       data: {
@@ -202,7 +202,7 @@ const updateCategory = async (
     .trim()
 
   try {
-    checkAuth("You are not authorized to update a category")
+    await checkAuth("You are not authorized to update a category")
     return await prisma.itemCategory.update({
       where: {
         id: categoryId,
@@ -250,7 +250,7 @@ const deleteCategory = async (id: string): Promise<void> => {
     if (!id) {
       throw new Error("Menu ID is required")
     }
-    checkAuth("You are not authorized to delete this menu item")
+    await checkAuth("You are not authorized to delete this menu item")
     await prisma.itemCategory.deleteMany({
       where: {
         id: id,

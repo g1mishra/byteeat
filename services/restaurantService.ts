@@ -18,9 +18,16 @@ interface RestaurantI extends FullAdress {
   slug?: string
 }
 
-const fetchRestaurants = async () => {
+const fetchRestaurants = async (userId: string) => {
+  if (!userId) {
+    throw new Error("User ID is required")
+  }
   try {
-    return await prisma.restaurant.findMany()
+    return await prisma.restaurant.findMany({
+      where: {
+        userId: userId,
+      },
+    })
   } catch (error) {
     throw error
   }
@@ -65,19 +72,28 @@ const fetchRestaurantBySlug = async (
 }
 const fetchRestaurant = async (
   restaurantId: string,
+  userId: string,
   options?: {
     includeMenuItems: boolean
     includePrice: boolean
   }
 ) => {
+  console.log("restaurantId", restaurantId)
+  console.log("userId", userId)
+
   if (!restaurantId) {
     throw new Error("Restaurant ID is required")
+  }
+
+  if (!userId) {
+    throw new Error("User ID is required")
   }
 
   try {
     return await prisma.restaurant.findUnique({
       where: {
         id: restaurantId,
+        userId: userId,
       },
       include: {
         ItemCategory: {
@@ -132,10 +148,10 @@ const addRestaurant = async (
   }
 ) => {
   try {
+    await checkAuth("You are not authorized to create a restaurant")
     restaurantData["slug"] = Slugify(
       `${restaurantData.name} ${restaurantData.city}`
     )
-    checkAuth("You are not authorized to create a restaurant")
     return await prisma.restaurant.create({
       data: restaurantData as RestaurantI & {
         slug: string
@@ -152,11 +168,14 @@ const updateRestaurant = async (restaurantData: Partial<RestaurantI>) => {
     if (!restaurantData.id) {
       throw new Error("Restaurant ID is required")
     }
-    checkAuth("You are not authorized to update this restaurant")
+    const user = await checkAuth(
+      "You are not authorized to update this restaurant"
+    )
 
     return await prisma.restaurant.update({
       where: {
         id: restaurantData.id,
+        userId: user?.userId,
       },
       data: restaurantData,
     })
@@ -170,10 +189,13 @@ const deleteRestaurant = async (restaurantId: string): Promise<void> => {
     if (!restaurantId) {
       throw new Error("Restaurant ID is required")
     }
-    checkAuth("You are not authorized to delete this restaurant")
+    const user = await checkAuth(
+      "You are not authorized to delete this restaurant"
+    )
     await prisma.restaurant.delete({
       where: {
         id: restaurantId,
+        userId: user?.userId,
       },
     })
   } catch (error) {
@@ -189,7 +211,7 @@ const addOrUpdateSocialLinks = async (
     throw new Error("Restaurant ID is required")
   }
 
-  checkAuth("You are not authorized to update this restaurant")
+  await checkAuth("You are not authorized to update this restaurant")
 
   try {
     return await prisma.socialLinks.upsert({
@@ -220,6 +242,5 @@ export {
   fetchRestaurants,
   getRestaurantSlug,
   updateRestaurant,
-
   addOrUpdateSocialLinks,
 }
