@@ -45,7 +45,7 @@ import state2city from "@/components/manage/utils/cities"
 import uploadImage from "@/components/manage/utils/uploadImage"
 
 const editRestaurantFormSchema = z.object({
-  logoUrl: z.string().url().optional(),
+  logoUrl: z.string().url().optional().or(z.literal("")),
   tableSize: z.preprocess(
     (x) => Number(x),
     z.number().int().min(1, { message: "Table size must be at least 1." })
@@ -79,7 +79,7 @@ export default function EditPage({
 }) {
   const form = useForm<EditRestaurantFormValues>({
     resolver: zodResolver(editRestaurantFormSchema),
-    mode: "onSubmit",
+    mode: "onChange",
     defaultValues: {
       logoUrl: response?.logoUrl,
       tableSize: response?.tableSize,
@@ -145,14 +145,14 @@ export default function EditPage({
       ])
 
       toast({
-        title: `Menu created successfully.`,
+        title: `Restaurant updated successfully.`,
       })
 
       router.refresh()
       form.reset({})
     } catch (error) {
       toast({
-        title: `Error creating menu.`,
+        title: `Error while updating restaurant.`,
         variant: "destructive",
       })
       console.error(error)
@@ -191,7 +191,9 @@ export default function EditPage({
       </div>
       <Form {...form}>
         <form
-          onSubmit={form.handleSubmit(onSubmit)}
+          onSubmit={form.handleSubmit(onSubmit, (errors) => {
+            console.log("Error while submitting form", errors)
+          })}
           className="mt-6 grid gap-6 sm:grid-cols-2"
         >
           <FormField
@@ -347,7 +349,10 @@ export default function EditPage({
             <CategoryTable itemCategory={response?.ItemCategory} />
           </div>
 
-          <Button className="col-span-2 mx-auto mt-4 w-full max-w-52">
+          <Button
+            type="submit"
+            className="col-span-2 mx-auto mt-4 w-full max-w-52"
+          >
             Save
           </Button>
         </form>

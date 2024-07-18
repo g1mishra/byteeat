@@ -173,7 +173,12 @@ export default function MenuCreateForm({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <form
+        onSubmit={form.handleSubmit(onSubmit, (errors) => {
+          console.log("Error while submitting form", errors)
+        })}
+        className="space-y-8"
+      >
         <FormField
           control={form.control}
           name="dish"
@@ -380,7 +385,7 @@ export default function MenuCreateForm({
         ))}
         <UploadItemImage imagesRef={imagesRef} uploadItemImage={""} />
         <Button type="submit">
-          {form.formState.isSubmitting ? "Creating Menu..." : "Create Menu"}
+          {form.formState.isSubmitting ? "Adding Item..." : "Add Item"}
         </Button>
       </form>
     </Form>
@@ -415,7 +420,7 @@ export function WithCreateMenuDialog({
           className="max-h-[90vh] overflow-y-auto"
         >
           <DialogHeader>
-            <DialogTitle>Create Menu</DialogTitle>
+            <DialogTitle>Add New Item</DialogTitle>
           </DialogHeader>
           <MenuCreateForm
             restaurantId={restaurantId}

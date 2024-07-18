@@ -33,7 +33,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select"
-import { menuFormSchema } from "./create-menu"
+import { menuFormSchema } from "./create-menu-item"
 import UploadItemImage from "./upload-item-image"
 import uploadImage from "./utils/uploadImage"
 
@@ -68,7 +68,7 @@ export default function MenuUpdateForm({
     try {
       await deleteMenuItemHelper(itemData.id, itemData.categoryId)
       toast({
-        title: `Menu Deleted successfully.`,
+        title: `Item Deleted successfully.`,
       })
       router.refresh()
       form.reset({})
@@ -77,7 +77,7 @@ export default function MenuUpdateForm({
       console.log(error)
       toast({
         variant: "destructive",
-        title: `Error Deleting menu.`,
+        title: `Error Deleting Item.`,
       })
     }
   }
@@ -101,7 +101,7 @@ export default function MenuUpdateForm({
       await updateMenuItemHelper(updatedItemData)
 
       toast({
-        title: `Menu ${itemData ? "updated" : "created"} successfully.`,
+        title: `Item ${itemData ? "updated" : "created"} successfully.`,
       })
       router.refresh()
       form.reset({})
@@ -109,7 +109,7 @@ export default function MenuUpdateForm({
     } catch (error) {
       toast({
         variant: "destructive",
-        title: `Error ${itemData ? "updating" : "creating"} menu.`,
+        title: `Error ${itemData ? "updating" : "creating"} Item.`,
       })
     }
   }
@@ -202,7 +202,12 @@ export default function MenuUpdateForm({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <form
+        onSubmit={form.handleSubmit(onSubmit, (errors) => {
+          console.log("Error while submitting form", errors)
+        })}
+        className="space-y-8"
+      >
         <FormField
           control={form.control}
           name="dish"
@@ -415,8 +420,8 @@ export default function MenuUpdateForm({
 
         <Button type="submit" className="mr-2">
           {form.formState.isSubmitting
-            ? `${itemData ? "Updating" : "Creating"} Menu...`
-            : `${itemData ? "Update" : "Create"} Menu`}
+            ? `${itemData ? "Updating" : "Adding"} Item...`
+            : `${itemData ? "Update" : "Add"} Item`}
         </Button>
 
         <Button
@@ -458,7 +463,7 @@ export function WithUpdateMenuDialog({
           className="max-h-[90vh] overflow-y-auto"
         >
           <DialogHeader>
-            <DialogTitle>Update Menu</DialogTitle>
+            <DialogTitle>Update Item</DialogTitle>
           </DialogHeader>
           <MenuUpdateForm itemData={itemData} closeModal={onCloseModal} />
         </DialogContent>

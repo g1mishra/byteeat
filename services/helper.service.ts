@@ -1,6 +1,6 @@
 "use server"
 
-import { MenuFormValues } from "@/components/manage/create-menu"
+import { MenuFormValues } from "@/components/manage/create-menu-item"
 
 import {
   MenuItemI,

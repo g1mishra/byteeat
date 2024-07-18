@@ -86,7 +86,12 @@ export default function RestaurantCreateForm({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <form
+        onSubmit={form.handleSubmit(onSubmit, (errors) => {
+          console.log("Error while submitting form", errors)
+        })}
+        className="space-y-8"
+      >
         <FormField
           control={form.control}
           name="name"

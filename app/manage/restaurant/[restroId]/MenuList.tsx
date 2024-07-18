@@ -14,7 +14,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { WithUpdateMenuDialog } from "@/components/manage/update-menu"
+import { WithUpdateMenuDialog } from "@/components/manage/update-menu-item"
 import VegOrNonVeg from "@/components/veg-or-nonveg"
 
 const MenuList = ({
