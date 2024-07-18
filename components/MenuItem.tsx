@@ -29,9 +29,11 @@ const MenuItem = ({
     <div className="flex flex-wrap justify-between">
       <div className="w-8/12">
         <div className="flex flex-wrap items-center gap-2">
-          <div className="h-4">
-            {item.foodOrBar ? <VegOrNonVeg isVeg={item.isVeg} /> : null}
-          </div>
+          {item.foodOrBar ? (
+            <div className="h-4">
+              <VegOrNonVeg isVeg={item.isVeg} />
+            </div>
+          ) : null}
           {item?.labels?.map((label, index) => (
             <div
               key={index}
@@ -57,11 +59,7 @@ const MenuItem = ({
                 )
               )}
             </p>
-            <p
-              className={cn("body-3 text-gray-60 break-all leading-relaxed", {
-                hidden: !images?.length,
-              })}
-            >
+            <p className={cn("body-3 text-gray-60 break-all leading-relaxed")}>
               {item.description}
             </p>
           </div>

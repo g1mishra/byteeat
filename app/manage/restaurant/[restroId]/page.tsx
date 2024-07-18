@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import UnAuthorized from "@/components/UnAuthorized"
 import LogoOrAvatar from "@/components/logo-or-avatar"
-import { WithCreateMenuDialog } from "@/components/manage/create-menu"
+import { WithCreateMenuDialog } from "@/components/manage/create-menu-item"
 import { authOptions } from "@/app/api/auth/authOption"
 
 import MenuList from "./MenuList"
