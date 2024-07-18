@@ -4,10 +4,13 @@ import Link from "next/link"
 
 import { Button } from "@/components/ui/button"
 
+import Features from "./icons/features"
+import SVGComponent from "./icons/hero"
+
 export default function HomePage() {
   return (
     <div className="flex min-h-dvh flex-col">
-      <header className="flex h-14 items-center px-4 lg:px-6">
+      <header className="container  flex h-14 items-center px-4 lg:px-6">
         <Link
           href="#"
           className="flex items-center justify-center"
@@ -18,21 +21,21 @@ export default function HomePage() {
         </Link>
         <nav className="ml-auto flex gap-4 sm:gap-6">
           <Link
-            href="#"
+            href="#features"
             className="text-sm font-medium underline-offset-4 hover:underline"
             prefetch={false}
           >
             Features
           </Link>
           <Link
-            href="#"
+            href="#pricing"
             className="text-sm font-medium underline-offset-4 hover:underline"
             prefetch={false}
           >
             Pricing
           </Link>
           <Link
-            href="#"
+            href="#testimonials"
             className="text-sm font-medium underline-offset-4 hover:underline"
             prefetch={false}
           >
@@ -72,13 +75,7 @@ export default function HomePage() {
                   </Link> */}
                 </div>
               </div>
-              <Image
-                width={600}
-                height={400}
-                src="/placeholder.svg"
-                alt="Hero"
-                className="mx-auto aspect-video overflow-hidden rounded-xl object-cover sm:w-full lg:order-last lg:aspect-square"
-              />
+              <SVGComponent className="mx-auto aspect-video overflow-hidden rounded-xl object-cover sm:w-full lg:order-last lg:aspect-square" />
             </div>
           </div>
         </section>
@@ -135,13 +132,7 @@ export default function HomePage() {
                   </li>
                 </ul>
               </div>
-              <Image
-                width={600}
-                height={400}
-                src="/placeholder.svg"
-                alt="Features"
-                className="mx-auto aspect-video overflow-hidden rounded-xl object-cover object-center sm:w-full lg:order-last"
-              />
+              <Features className="mx-auto aspect-video overflow-hidden rounded-xl object-cover object-center sm:w-full lg:order-last" />
             </div>
           </div>
         </section>
@@ -291,21 +282,15 @@ export default function HomePage() {
         </p>
         <nav className="flex gap-4 sm:ml-auto sm:gap-6">
           <Link
-            href="#"
+            href="/about"
             className="text-xs underline-offset-4 hover:underline"
             prefetch={false}
           >
             About
           </Link>
+
           <Link
-            href="#"
-            className="text-xs underline-offset-4 hover:underline"
-            prefetch={false}
-          >
-            Contact
-          </Link>
-          <Link
-            href="#"
+            href="/privacy"
             className="text-xs underline-offset-4 hover:underline"
             prefetch={false}
           >

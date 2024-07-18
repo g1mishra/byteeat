@@ -1,0 +1,26 @@
+import Link from "next/link"
+
+export default function AboutPage() {
+  return (
+    <div className="container mx-auto px-4 py-12">
+      <h1 className="mb-4 text-3xl font-bold">About ByteEat</h1>
+      <p className="text-muted-foreground mb-6 text-lg">
+        ByteEat is revolutionizing the restaurant experience with innovative
+        digital menus and table QR-based ordering. Our mission is to enhance the
+        efficiency and satisfaction of restaurant operations through
+        cutting-edge technology.
+      </p>
+      <p className="text-muted-foreground mb-6 text-lg">
+        Founded in 2024, ByteEat has quickly become a trusted partner for
+        restaurants looking to modernize their services and provide a seamless
+        dining experience for their customers.
+      </p>
+      <Link
+        href="/"
+        className="text-primary font-medium underline-offset-4 hover:underline"
+      >
+        Back to Home
+      </Link>
+    </div>
+  )
+}
