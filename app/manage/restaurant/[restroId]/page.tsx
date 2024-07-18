@@ -22,13 +22,8 @@ const RestaurantDetails = async ({ params }: any) => {
     includeMenuItems: true,
     includePrice: true,
   })
-  if (!response) throw new Error("Network response was not ok.")
 
-  if (!response) {
-    return <UnAuthorized />
-  }
-
-  console.log(JSON.stringify(response, null, 2))
+  if (!response) return <UnAuthorized />
 
   return (
     <div className="flex flex-col gap-y-6 dark:text-white">
@@ -47,7 +42,7 @@ const RestaurantDetails = async ({ params }: any) => {
           <Link href={`/manage/restaurant/${restroId}/edit`}>
             <Button>Edit restaurant</Button>
           </Link>
-          <Link href={`/${response.slug}`}>
+          <Link href={`/${response.slug}`} target="_blank">
             <Button>View menu</Button>
           </Link>
         </div>

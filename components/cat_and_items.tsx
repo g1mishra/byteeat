@@ -1,8 +1,9 @@
 "use client"
 
-import { MenuItemI, PriceItemMapI } from "@/services/menuService"
 import { useMemo, useState } from "react"
+import { MenuItemI, PriceItemMapI } from "@/services/menuService"
 
+import { cn } from "@/lib/utils"
 import {
   Accordion,
   AccordionContent,
@@ -15,7 +16,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-import { cn } from "@/lib/utils"
 
 import MenuItem from "./MenuItem"
 import SearchAndFilter from "./search-filter"
@@ -135,11 +135,11 @@ export function MenuPopover({ itemsToRender }: { itemsToRender: PropsData[] }) {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button className="rounded-full" variant="outline">
+        <Button className="rounded-full bg-white" variant="outline">
           Browse menu
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-80">
+      <PopoverContent className="w-80 p-1.5">
         <div className="grid gap-4">
           {itemsToRender.map((category) => (
             <div
@@ -150,9 +150,9 @@ export function MenuPopover({ itemsToRender }: { itemsToRender: PropsData[] }) {
                   el.scrollIntoView({ behavior: "smooth" })
                 }
               }}
-              className="cursor-pointer rounded-md p-2 hover:bg-gray-200"
+              className="cursor-pointer rounded-md px-3 py-1.5 hover:bg-gray-200"
             >
-              <h3 className="text-lg font-bold capitalize">
+              <h3 className="text-base font-bold capitalize">
                 {category.categoryName} - ({category.Item.length})
               </h3>
             </div>
