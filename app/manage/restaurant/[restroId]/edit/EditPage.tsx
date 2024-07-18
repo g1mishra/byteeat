@@ -161,25 +161,33 @@ export default function EditPage({
 
   return (
     <>
-      <div className="relative max-w-max">
-        <LogoOrAvatar
-          name={response?.name || ""}
-          src={form.watch("logoUrl") || response?.logoUrl}
-          className="size-32"
-        />
-        <input
-          type="file"
-          accept="image/*"
-          className="absolute inset-0 z-10 size-full cursor-pointer opacity-0"
-          onChange={(e) => {
-            if (e.target.files && e.target.files[0]) {
-              setFile(e.target.files[0])
-            }
-          }}
-        />
-        <div className="absolute right-0 top-0 cursor-pointer rounded-full border bg-white p-1">
-          <Pencil size={16} />
+      <div className="flex w-full justify-between">
+        <div className="relative max-w-max">
+          <LogoOrAvatar
+            name={response?.name || ""}
+            src={form.watch("logoUrl") || response?.logoUrl}
+            className="size-32"
+          />
+          <input
+            type="file"
+            accept="image/*"
+            className="absolute inset-0 z-10 size-full cursor-pointer opacity-0"
+            onChange={(e) => {
+              if (e.target.files && e.target.files[0]) {
+                setFile(e.target.files[0])
+              }
+            }}
+          />
+          <div className="absolute right-0 top-0 cursor-pointer rounded-full border bg-white p-1">
+            <Pencil size={16} />
+          </div>
         </div>
+        {/* // back button */}
+        <Button
+          onClick={() => router.push(`/manage/restaurant/${response?.id}`)}
+        >
+          Back
+        </Button>
       </div>
       <Form {...form}>
         <form

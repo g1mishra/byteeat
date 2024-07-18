@@ -23,14 +23,12 @@ const Welcome = async ({
     includePrice: true,
   })
 
-  if (!response) {
-    notFound()
-  }
+  if (!response) return notFound()
 
   const address = formatAddress(response as FullAdress)
 
   return (
-    <div className="container relative flex flex-col gap-y-2 py-4 sm:py-8">
+    <div className="container relative flex min-h-screen max-w-screen-sm flex-col gap-y-2 bg-white py-4 sm:border sm:py-8 sm:shadow-xl">
       <Sidebar
         name={response?.name}
         socials={response.SocialLinks}

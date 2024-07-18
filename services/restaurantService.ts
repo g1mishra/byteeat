@@ -78,9 +78,6 @@ const fetchRestaurant = async (
     includePrice: boolean
   }
 ) => {
-  console.log("restaurantId", restaurantId)
-  console.log("userId", userId)
-
   if (!restaurantId) {
     throw new Error("Restaurant ID is required")
   }
