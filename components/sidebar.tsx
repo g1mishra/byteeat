@@ -2,11 +2,14 @@
 
 import React from "react"
 import dynamic from "next/dynamic"
-import { MenuIcon, X } from "lucide-react"
+import Link from "next/link"
+import { useParams } from "next/navigation"
+import { ChevronLeft, MenuIcon, ShoppingCart, StepBack, X } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
 import LogoOrAvatar from "./logo-or-avatar"
+import { Button } from "./ui/button"
 
 const SocailIconMap = {
   facebook: dynamic(() => import("@/components/icons/facebook")),
@@ -27,12 +30,21 @@ interface SidebarProps extends React.HTMLAttributes<HTMLElement> {
     whatsapp: string
     restaurantId: string
   } | null
+
+  addBackButton?: boolean
 }
 
 const Social_Map = ["facebook", "twitter", "instagram", "whatsapp"]
 
-export function Sidebar({ className, socials, name, ...props }: SidebarProps) {
+export function Sidebar({
+  className,
+  socials,
+  name,
+  addBackButton = false,
+  ...props
+}: SidebarProps) {
   const [open, setOpen] = React.useState(false)
+  const params = useParams()
 
   return (
     <>
@@ -87,7 +99,7 @@ export function Sidebar({ className, socials, name, ...props }: SidebarProps) {
         </div>
       </div>
       <div
-        className={cn("flex flex-col gap-y-2", className, {
+        className={cn("flex items-center justify-between", className, {
           hidden: open,
         })}
         {...props}
@@ -96,6 +108,12 @@ export function Sidebar({ className, socials, name, ...props }: SidebarProps) {
           onClick={() => setOpen(!open)}
           className="size-7 cursor-pointer text-gray-800 dark:text-white"
         />
+
+        <div className="flex items-center justify-end gap-2">
+          <Link href={`/${params?.slug}/view-cart`}>
+            <ShoppingCart className="size-7 cursor-pointer text-gray-800 dark:text-white" />
+          </Link>
+        </div>
       </div>
     </>
   )

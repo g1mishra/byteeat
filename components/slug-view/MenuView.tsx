@@ -1,6 +1,7 @@
 "use client"
 
 import { useMemo, useState } from "react"
+import Link from "next/link"
 import { MenuItemI, PriceItemMapI } from "@/services/menuService"
 
 import { cn } from "@/lib/utils"
@@ -11,18 +12,17 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion"
 import { Button } from "@/components/ui/button"
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover"
 
+import SearchAndFilter from "../search-filter"
+import { Separator } from "../ui/separator"
+import Cart from "./Cart"
 import MenuItem from "./MenuItem"
-import SearchAndFilter from "./search-filter"
-import { Separator } from "./ui/separator"
+import { MenuPopover } from "./MenuPopover"
+import { ItemsForOrder, ItemsToRender } from "./type"
 
 const getLowestPrice = (data: PriceItemMapI[]) => {
-  if (!data) return "N/A"
+  if (!data) return -1
+  if (data.length === 1) return -1
   return data.reduce((acc, curr) => {
     if (acc.price > curr.price) {
       return curr
@@ -31,29 +31,32 @@ const getLowestPrice = (data: PriceItemMapI[]) => {
   }).price
 }
 
-type PropsData = {
-  id: string
-  categoryName: string
-  Item: MenuItemI[]
+type MenuViewProps = {
+  data: ItemsToRender[]
+  tableNo: number
+  restaurantId?: string | undefined
 }
 
-const MenuView = ({ data }: { data: PropsData[] }) => {
+const MenuView: React.FC<MenuViewProps> = ({ data, tableNo }) => {
   const [filters, setFilters] = useState({
     isFood: true,
     searchValue: "",
   })
 
+  const [cart, setCart] = useState<ItemsForOrder[]>([])
+
   const { food: foodItems, bar: barItems } = useMemo(
     () =>
       data.reduce(
         (acc, menu) => {
-          const foodOrBar = menu.Item[0].foodOrBar ? "food" : "bar"
+          if (!menu.Item) return acc
+          const foodOrBar = menu?.Item[0]?.foodOrBar ? "food" : "bar"
           acc[foodOrBar].push(menu)
           return acc
         },
         {
-          food: [] as PropsData[],
-          bar: [] as PropsData[],
+          food: [] as ItemsToRender[],
+          bar: [] as ItemsToRender[],
         }
       ),
     [data]
@@ -67,7 +70,7 @@ const MenuView = ({ data }: { data: PropsData[] }) => {
         return items
       }
       const filteredItems = items.map((category) => {
-        const filteredItems = category.Item.filter((item) =>
+        const filteredItems = category?.Item?.filter((item) =>
           item.dish.toLowerCase().includes(q.toLowerCase())
         )
         return { ...category, Item: filteredItems }
@@ -82,7 +85,6 @@ const MenuView = ({ data }: { data: PropsData[] }) => {
       <Separator className="mb-2 mt-4" />
       <SearchAndFilter filters={filters} setFilters={setFilters} />
       <Separator className="mb-4 mt-2" />
-
       {itemsToRender.map((category) => (
         <Accordion
           key={String(category.id)}
@@ -97,20 +99,23 @@ const MenuView = ({ data }: { data: PropsData[] }) => {
             value={String(category.id)}
           >
             <AccordionTrigger className="text-lg font-bold capitalize !no-underline">
-              {category.categoryName} - ({category.Item.length})
+              {category.categoryName} - ({category?.Item?.length})
             </AccordionTrigger>
 
-            <AccordionContent className="flex flex-col gap-y-4 p-0 ">
-              {category.Item.map((item) => {
+            <AccordionContent className="grid gap-6">
+              {category?.Item?.map((item) => {
                 const imgPath = item?.imgPath?.trim()
                 const images = imgPath ? imgPath.split(";") : []
                 return (
-                  <AccordionContent
-                    className="flex flex-col pb-2"
+                  <MenuItem
                     key={item.id}
-                  >
-                    <MenuItem item={item} images={images} />
-                  </AccordionContent>
+                    item={item}
+                    images={images}
+                    showAddToCart={tableNo > 0}
+                    lowestPrice={getLowestPrice(
+                      item.PriceItemMap as PriceItemMapI[]
+                    )}
+                  />
                 )
               })}
             </AccordionContent>
@@ -130,35 +135,3 @@ const MenuView = ({ data }: { data: PropsData[] }) => {
 }
 
 export default MenuView
-
-export function MenuPopover({ itemsToRender }: { itemsToRender: PropsData[] }) {
-  return (
-    <Popover>
-      <PopoverTrigger asChild>
-        <Button className="rounded-full bg-white" variant="outline">
-          Browse menu
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-80 p-1.5">
-        <div className="grid gap-4">
-          {itemsToRender.map((category) => (
-            <div
-              key={"goto-" + category}
-              onClick={() => {
-                const el = document.getElementById(category.id.toString())
-                if (el) {
-                  el.scrollIntoView({ behavior: "smooth" })
-                }
-              }}
-              className="cursor-pointer rounded-md px-3 py-1.5 hover:bg-gray-200"
-            >
-              <h3 className="text-base font-bold capitalize">
-                {category.categoryName} - ({category.Item.length})
-              </h3>
-            </div>
-          ))}
-        </div>
-      </PopoverContent>
-    </Popover>
-  )
-}
