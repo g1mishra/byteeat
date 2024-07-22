@@ -28,19 +28,15 @@ export interface ItemCategoryI {
   restaurantId: string
 }
 
-const fetchMenuItems = async (): Promise<MenuItemI[]> => {
+const fetchMenuItem = async (menuId: string) => {
   try {
-    return await prisma.item.findMany()
-  } catch (error) {
-    throw error
-  }
-}
-
-const fetchMenuItem = async (menuId: string): Promise<MenuItemI | null> => {
-  try {
+    checkAuth("You are not authorized to view this menu item")
     return await prisma.item.findUnique({
       where: {
         id: menuId,
+      },
+      include: {
+        PriceItemMap: true,
       },
     })
   } catch (error) {
@@ -67,7 +63,6 @@ const addMenuItem = async (menuData: MenuItemI) => {
   }
 }
 
-
 const updateMenuItem = async (menuData: MenuItemI): Promise<MenuItemI> => {
   if (!menuData.id) {
     throw new Error("Menu item id is required")
@@ -93,25 +88,26 @@ const updateMenuItem = async (menuData: MenuItemI): Promise<MenuItemI> => {
   }
 }
 
-const deleteMenuItem = async (menuId: string, categoryId: string): Promise<void> => {
+const deleteMenuItem = async (
+  menuId: string,
+  categoryId: string
+): Promise<void> => {
   try {
     if (!menuId) {
       throw new Error("Menu ID is required")
     }
     await checkAuth("You are not authorized to delete this menu item")
     const cat_size = await getCatIdNums(categoryId)
-   
+
     await prisma.item.delete({
       where: {
         id: menuId,
       },
     })
 
-    if (cat_size === 1){
+    if (cat_size === 1) {
       await deleteCategory(categoryId)
     }
-
-   
   } catch (error) {
     throw error
   }
@@ -132,8 +128,6 @@ const deletePriceItem = async (menuId: string): Promise<void> => {
     throw error
   }
 }
-
-
 
 // category
 const fetchAllCategories = async (restaurantId: string): Promise<string[]> => {
@@ -231,17 +225,15 @@ const fetchCategoryById = async (
 }
 
 async function getCatIdNums(catId: string) {
-  try{
-    const res = await prisma.item.findMany(
-      {
-        where: {
-          categoryId: catId
-        }
-      }
-    )
+  try {
+    const res = await prisma.item.findMany({
+      where: {
+        categoryId: catId,
+      },
+    })
     return res.length
-  } catch(error){
-    throw(error)
+  } catch (error) {
+    throw error
   }
 }
 
@@ -323,14 +315,11 @@ export {
   fetchAllCategories,
   fetchCategoryById,
   fetchMenuItem,
-  fetchMenuItems,
   updateItemPrice,
   fetchPrice,
   fetchPriceMap,
   updateMenuItem,
   updateCategory,
   deletePriceItem,
-  getCatIdNums
+  getCatIdNums,
 }
-
-

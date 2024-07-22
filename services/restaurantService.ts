@@ -50,19 +50,19 @@ const fetchRestaurantBySlug = async (
         slug: restaurantSlug,
       },
       include: {
-        ItemCategory: {
-          include: {
-            Item: options?.includeMenuItems
-              ? {
+        ItemCategory: options?.includeMenuItems
+          ? {
+              include: {
+                Item: {
                   include: options?.includePrice
                     ? {
                         PriceItemMap: true,
                       }
                     : {},
-                }
-              : false,
-          },
-        },
+                },
+              },
+            }
+          : false,
         SocialLinks: true,
       },
     })

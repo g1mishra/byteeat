@@ -1,11 +1,11 @@
-import { notFound } from "next/navigation"
+import { notFound, redirect } from "next/navigation"
 import { MenuItemI } from "@/services/menuService"
 import { FullAdress, fetchRestaurantBySlug } from "@/services/restaurantService"
 
 import { formatAddress } from "@/lib/string"
-import MenuView from "@/components/cat_and_items"
 import LogoOrAvatar from "@/components/logo-or-avatar"
 import { Sidebar } from "@/components/sidebar"
+import MenuView from "@/components/slug-view/MenuView"
 
 export interface OrganizedMenu {
   [category: string]: MenuItemI[]
@@ -13,9 +13,13 @@ export interface OrganizedMenu {
 
 const Welcome = async ({
   params,
+  searchParams,
 }: {
   params: {
     slug: string
+  }
+  searchParams: {
+    tableNumber: string
   }
 }) => {
   const response = await fetchRestaurantBySlug(params.slug, {
@@ -23,12 +27,15 @@ const Welcome = async ({
     includePrice: true,
   })
 
+  const tableNumber = Number(searchParams.tableNumber)
   if (!response) return notFound()
-
+  if (tableNumber === 0 || tableNumber > response?.tableSize) {
+    return redirect(`/${params.slug}`)
+  }
   const address = formatAddress(response as FullAdress)
 
   return (
-    <div className="container relative flex min-h-screen max-w-screen-sm flex-col gap-y-2 bg-white py-4 sm:border sm:py-8 sm:shadow-xl">
+    <>
       <Sidebar
         name={response?.name}
         socials={response.SocialLinks}
@@ -47,9 +54,9 @@ const Welcome = async ({
       </div>
 
       {response?.ItemCategory ? (
-        <MenuView data={response?.ItemCategory} />
+        <MenuView data={response?.ItemCategory} tableNo={tableNumber} />
       ) : null}
-    </div>
+    </>
   )
 }
 
