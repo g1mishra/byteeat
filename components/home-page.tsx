@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 
 import Features from "./icons/features"
 import SVGComponent from "./icons/hero"
+import AnimatingEmoji from "./rolling_emojis"
 
 export default function HomePage() {
   return (
@@ -50,11 +51,11 @@ export default function HomePage() {
             <div className="flex max-w-screen-lg flex-col items-center justify-center space-y-6">
               <div className="flex flex-col items-center space-y-4 text-center">
                 <h1 className="text-3xl font-bold sm:text-5xl xl:text-6xl/none">
-                  Revolutionize Your Restaurant Experience with ByteEat
+                ByteEat, The Better Way to Serve <AnimatingEmoji/>
                 </h1>
                 <p className="text-muted-foreground max-w-screen-sm md:text-xl">
-                  Discover the power of digital menus and table QR-based
-                  ordering with ByteEat, the ultimate solution for modern
+                  Discover the power of digital menus and QR-based
+                  contactless ordering with ByteEat, the ultimate solution for modern
                   restaurants.
                 </p>
               </div>
@@ -103,11 +104,11 @@ export default function HomePage() {
                   <li>
                     <div className="grid gap-1">
                       <h3 className="text-xl font-bold">
-                        Table QR-based Ordering
+                        QR-based Contactless Ordering
                       </h3>
                       <p className="text-muted-foreground">
                         Empower your customers to order directly from their
-                        phones, reducing wait times and improving efficiency.
+                        phones at the table, reducing wait times, improving efficiency and freeing up staff.
                       </p>
                     </div>
                   </li>
@@ -148,71 +149,71 @@ export default function HomePage() {
                   <div className="grid gap-1">
                     <h3 className="text-xl font-bold">Starter</h3>
                     <p className="text-muted-foreground">
-                      Perfect for small restaurants
+                      If you just want the sassy Menus!
                     </p>
                   </div>
                   <div className="grid gap-1">
-                    <h4 className="text-4xl font-bold">$49</h4>
-                    <p className="text-muted-foreground">per month</p>
+                    <h4 className="text-4xl font-bold">	
+                    &#8377; 2,999</h4>
+                    <p className="text-muted-foreground">per year</p>
                   </div>
                   <ul className="text-muted-foreground grid gap-2">
                     <li>Digital Menu</li>
-                    <li>Table QR-based Ordering</li>
-                    <li>Basic Reporting</li>
                   </ul>
-                  <Button variant="outline" className="w-full">
+                   {/*<Button variant="outline" className="w-full">
                     Get Started
-                  </Button>
+                  </Button>*/}
                 </div>
                 <div className="bg-background flex flex-col justify-center space-y-4 rounded-lg p-6 shadow-md">
                   <div className="grid gap-1">
                     <h3 className="text-xl font-bold">Pro</h3>
                     <p className="text-muted-foreground">
-                      Ideal for medium-sized restaurants
+                      The complete package for small to medium restaurants
                     </p>
                   </div>
                   <div className="grid gap-1">
-                    <h4 className="text-4xl font-bold">$99</h4>
-                    <p className="text-muted-foreground">per month</p>
+                    <h4 className="text-4xl font-bold">&#8377; 3,999</h4>
+                    <p className="text-muted-foreground">per year</p>
                   </div>
                   <ul className="text-muted-foreground grid gap-2">
                     <li>Digital Menu</li>
-                    <li>Table QR-based Ordering</li>
+                    <li>QR-based Contactless Ordering</li>
                     <li>Real-time Order Tracking</li>
-                    <li>Advanced Reporting</li>
+                    <li>Analytics</li>
                   </ul>
-                  <Button variant="outline" className="w-full">
+                   {/*<Button variant="outline" className="w-full">
                     Get Started
-                  </Button>
+                  </Button>*/}
                 </div>
                 <div className="bg-background flex flex-col justify-center space-y-4 rounded-lg p-6 shadow-md">
                   <div className="grid gap-1">
                     <h3 className="text-xl font-bold">Enterprise</h3>
                     <p className="text-muted-foreground">
-                      Tailored for large restaurant chains
+                      Customised solutions for large restaurant chains
                     </p>
                   </div>
                   <div className="grid gap-1">
-                    <h4 className="text-4xl font-bold">$199</h4>
-                    <p className="text-muted-foreground">per month</p>
+                    <h4 className="text-4xl font-bold">Contact us!</h4>
+                    <p className="text-muted-foreground">Custom pricing</p>
                   </div>
                   <ul className="text-muted-foreground grid gap-2">
-                    <li>Digital Menu</li>
-                    <li>Table QR-based Ordering</li>
+                  <li>Digital Menu</li>
+                    <li>QR-based Contactless Ordering</li>
                     <li>Real-time Order Tracking</li>
-                    <li>Advanced Reporting</li>
-                    <li>Customized Branding</li>
-                    <li>Dedicated Support</li>
+                    <li>Analytics</li>
+                    <li>Payments</li>
+                    <li>POS Integration</li>
+                    <li>And more...</li>
                   </ul>
-                  <Button variant="outline" className="w-full">
+                  {/*<Button variant="outline" className="w-full">
                     Get Started
-                  </Button>
+                  </Button>*/}
                 </div>
               </div>
             </div>
           </div>
         </section>
-        <section id="testimonials" className="w-full py-12 md:py-24 lg:py-32">
+        {/*<section id="testimonials" className="w-full py-12 md:py-24 lg:py-32">
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-2">
@@ -262,7 +263,7 @@ export default function HomePage() {
               </div>
             </div>
           </div>
-        </section>
+        </section>*/}
       </main>
       <footer className="flex w-full shrink-0 flex-col items-center gap-2 border-t px-4 py-6 sm:flex-row md:px-6">
         <div className="flex items-center">
