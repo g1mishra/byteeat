@@ -33,7 +33,7 @@ export function MenuPopover({
               className="cursor-pointer rounded-md px-3 py-1.5 hover:bg-gray-200"
             >
               <h3 className="text-base font-bold capitalize">
-                {category.categoryName} - ({category.Item.length})
+                {category?.categoryName} - ({category?.Item?.length})
               </h3>
             </div>
           ))}
