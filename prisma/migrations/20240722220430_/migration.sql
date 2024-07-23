@@ -24,8 +24,26 @@ CREATE TABLE IF NOT EXISTS "Order" (
     CONSTRAINT "Order_pkey" PRIMARY KEY ("id")
 );
 
--- AddForeignKey
-ALTER TABLE "OrderItem" ADD CONSTRAINT "OrderItem_orderId_fkey" FOREIGN KEY ("orderId") REFERENCES "Order"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+-- AddForeignKey only if it doesn't already exist
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.table_constraints
+        WHERE constraint_type = 'FOREIGN KEY'
+        AND constraint_name = 'OrderItem_orderId_fkey'
+    ) THEN
+        ALTER TABLE "OrderItem" ADD CONSTRAINT "OrderItem_orderId_fkey" FOREIGN KEY ("orderId") REFERENCES "Order"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+    END IF;
+END $$;
 
--- AddForeignKey
-ALTER TABLE "Order" ADD CONSTRAINT "Order_restaurantId_fkey" FOREIGN KEY ("restaurantId") REFERENCES "Restaurant"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+-- AddForeignKey only if it doesn't already exist
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.table_constraints
+        WHERE constraint_type = 'FOREIGN KEY'
+        AND constraint_name = 'Order_restaurantId_fkey'
+    ) THEN
+        ALTER TABLE "Order" ADD CONSTRAINT "Order_restaurantId_fkey" FOREIGN KEY ("restaurantId") REFERENCES "Restaurant"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+    END IF;
+END $$;
