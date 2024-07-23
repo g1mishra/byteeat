@@ -4,8 +4,8 @@ import { Metadata } from "next"
 import { siteConfig } from "@/config/site"
 import { fontSans } from "@/lib/fonts"
 import { cn } from "@/lib/utils"
-import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/toaster"
+import { ThemeProvider } from "@/components/theme-provider"
 
 import AuthContext from "./AuthContext"
 
@@ -44,7 +44,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
             <main className="relative flex min-h-screen flex-col">
               <AuthContext>{children}</AuthContext>
             </main>
-           <Toaster />
+            <Toaster />
           </ThemeProvider>
         </body>
       </html>
