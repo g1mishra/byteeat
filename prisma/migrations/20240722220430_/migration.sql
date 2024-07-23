@@ -1,5 +1,5 @@
 -- CreateTable
-CREATE TABLE "OrderItem" (
+CREATE TABLE IF NOT EXISTS "OrderItem" (
     "id" TEXT NOT NULL,
     "item" TEXT NOT NULL,
     "itemId" TEXT NOT NULL,
@@ -12,7 +12,7 @@ CREATE TABLE "OrderItem" (
 );
 
 -- CreateTable
-CREATE TABLE "Order" (
+CREATE TABLE IF NOT EXISTS "Order" (
     "id" TEXT NOT NULL,
     "total" DOUBLE PRECISION NOT NULL,
     "restaurantId" TEXT NOT NULL,

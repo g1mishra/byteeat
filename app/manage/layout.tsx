@@ -4,8 +4,8 @@ import { getServerSession } from "next-auth"
 
 import { Separator } from "@/components/ui/separator"
 import AuthUserMenu from "@/components/AuthUserMenu"
-import { authOptions } from "../api/auth/authOption"
 
+import { authOptions } from "../api/auth/authOption"
 
 export const metadata: Metadata = {
   title: "Restaurant Settings - ByteEat 🍔",

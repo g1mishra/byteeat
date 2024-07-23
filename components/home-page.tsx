@@ -51,11 +51,11 @@ export default function HomePage() {
             <div className="flex max-w-screen-lg flex-col items-center justify-center space-y-6">
               <div className="flex flex-col items-center space-y-4 text-center">
                 <h1 className="text-3xl font-bold sm:text-5xl xl:text-6xl/none">
-                ByteEat, The Better Way to Serve <AnimatingEmoji/>
+                  ByteEat, The Better Way to Serve <AnimatingEmoji />
                 </h1>
                 <p className="text-muted-foreground max-w-screen-sm md:text-xl">
-                  Discover the power of digital menus and QR-based
-                  contactless ordering with ByteEat, the ultimate solution for modern
+                  Discover the power of digital menus and QR-based contactless
+                  ordering with ByteEat, the ultimate solution for modern
                   restaurants.
                 </p>
               </div>
@@ -72,10 +72,7 @@ export default function HomePage() {
             {/* </div> */}
           </div>
         </section>
-        <section
-          id="features"
-          className="bg-muted w-full py-12 md:pt-24"
-        >
+        <section id="features" className="bg-muted w-full py-12 md:pt-24">
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-2">
@@ -108,7 +105,8 @@ export default function HomePage() {
                       </h3>
                       <p className="text-muted-foreground">
                         Empower your customers to order directly from their
-                        phones at the table, reducing wait times, improving efficiency and freeing up staff.
+                        phones at the table, reducing wait times, improving
+                        efficiency and freeing up staff.
                       </p>
                     </div>
                   </li>
@@ -129,10 +127,7 @@ export default function HomePage() {
             </div>
           </div>
         </section>
-        <section
-          id="pricing"
-          className="bg-muted w-full pb-12"
-        >
+        <section id="pricing" className="bg-muted w-full pb-12">
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-2">
@@ -153,14 +148,13 @@ export default function HomePage() {
                     </p>
                   </div>
                   <div className="grid gap-1">
-                    <h4 className="text-4xl font-bold">	
-                    &#8377; 2,999</h4>
+                    <h4 className="text-4xl font-bold">&#8377; 2,999</h4>
                     <p className="text-muted-foreground">per year</p>
                   </div>
                   <ul className="text-muted-foreground grid gap-2">
                     <li>Digital Menu</li>
                   </ul>
-                   {/*<Button variant="outline" className="w-full">
+                  {/*<Button variant="outline" className="w-full">
                     Get Started
                   </Button>*/}
                 </div>
@@ -181,7 +175,7 @@ export default function HomePage() {
                     <li>Real-time Order Tracking</li>
                     <li>Analytics</li>
                   </ul>
-                   {/*<Button variant="outline" className="w-full">
+                  {/*<Button variant="outline" className="w-full">
                     Get Started
                   </Button>*/}
                 </div>
@@ -197,7 +191,7 @@ export default function HomePage() {
                     <p className="text-muted-foreground">Custom pricing</p>
                   </div>
                   <ul className="text-muted-foreground grid gap-2">
-                  <li>Digital Menu</li>
+                    <li>Digital Menu</li>
                     <li>QR-based Contactless Ordering</li>
                     <li>Real-time Order Tracking</li>
                     <li>Analytics</li>

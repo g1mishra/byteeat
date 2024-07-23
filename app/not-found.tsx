@@ -1,8 +1,8 @@
 import Link from "next/link"
 
-import AnimatingEmoji from "@/components/rolling_emojis"
-import { buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import { buttonVariants } from "@/components/ui/button"
+import AnimatingEmoji from "@/components/rolling_emojis"
 
 export default function NotFound() {
   return (
