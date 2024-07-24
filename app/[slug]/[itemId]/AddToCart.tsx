@@ -6,35 +6,6 @@ import { useCart } from "@/app/store/CartProvider"
 const AddToCart = ({ response }: { response: any }) => {
   const { cart, setCart } = useCart()((state) => state)
 
-  const addToCart = (priceItem: any, type: "inc" | "dec") => {
-    const item = cart.find(
-      (item) =>
-        item.id === response?.id &&
-        (item.portion || null) === (priceItem.portion || null)
-    )
-    const newCart = item
-      ? cart.map((cartItem) =>
-          cartItem.id === item.id &&
-          (cartItem.portion || null) === (item.portion || null)
-            ? {
-                ...cartItem,
-                quantity: cartItem.quantity + (type === "inc" ? 1 : -1),
-              }
-            : cartItem
-        )
-      : [
-          ...cart,
-          {
-            id: response?.id,
-            name: response?.dish,
-            price: priceItem.price || 0,
-            quantity: 1,
-            portion: priceItem.portion || null,
-          },
-        ]
-    setCart(newCart)
-  }
-
   return (
     <div className="flex flex-col justify-between">
       <div>
@@ -63,13 +34,40 @@ const AddToCart = ({ response }: { response: any }) => {
                 </div>
                 <div className="flex items-center gap-2">
                   <Button
-                    onClick={() => addToCart(priceItem, "dec")}
+                    onClick={() =>
+                      setCart(
+                        {
+                          id: response?.id,
+                          name: response?.dish,
+                          price: priceItem.price || 0,
+                          quantity: item?.quantity || 0,
+                          portion: priceItem.portion || null,
+                        },
+                        "dec"
+                      )
+                    }
                     disabled={item?.quantity === 1}
                   >
                     -
                   </Button>
                   <p className="mx-1">{item?.quantity}</p>
-                  <Button onClick={() => addToCart(priceItem, "inc")}>+</Button>
+                  <Button
+                    color="primary"
+                    onClick={() =>
+                      setCart(
+                        {
+                          id: response?.id,
+                          name: response?.dish,
+                          price: priceItem.price || 0,
+                          quantity: item?.quantity || 0,
+                          portion: priceItem.portion || null,
+                        },
+                        "inc"
+                      )
+                    }
+                  >
+                    +
+                  </Button>
                 </div>
               </div>
             )

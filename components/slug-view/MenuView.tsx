@@ -20,17 +20,6 @@ import MenuItem from "./MenuItem"
 import { MenuPopover } from "./MenuPopover"
 import { ItemsForOrder, ItemsToRender } from "./type"
 
-const getLowestPrice = (data: PriceItemMapI[]) => {
-  if (!data) return -1
-  if (data.length === 1) return -1
-  return data.reduce((acc, curr) => {
-    if (acc.price > curr.price) {
-      return curr
-    }
-    return acc
-  }).price
-}
-
 type MenuViewProps = {
   data: ItemsToRender[]
   tableNo: number
@@ -102,7 +91,7 @@ const MenuView: React.FC<MenuViewProps> = ({ data, tableNo }) => {
               {category.categoryName} - ({category?.Item?.length})
             </AccordionTrigger>
 
-            <AccordionContent className="grid gap-6">
+            <AccordionContent className="grid gap-4">
               {category?.Item?.map((item) => {
                 const imgPath = item?.imgPath?.trim()
                 const images = imgPath ? imgPath.split(";") : []
@@ -112,9 +101,6 @@ const MenuView: React.FC<MenuViewProps> = ({ data, tableNo }) => {
                     item={item}
                     images={images}
                     showAddToCart={tableNo > 0}
-                    lowestPrice={getLowestPrice(
-                      item.PriceItemMap as PriceItemMapI[]
-                    )}
                   />
                 )
               })}

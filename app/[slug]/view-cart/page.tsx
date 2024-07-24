@@ -1,74 +1,50 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import { Trash2 } from "lucide-react"
+import { ArrowLeft, Trash2 } from "lucide-react"
 
+import { Cart } from "@/lib/types"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 
 import { useCart } from "../../store/CartProvider"
 
 export default function ViewCart() {
-  const { cart, setCart } = useCart()((state) => state)
+  const { cart, setCart, removeItem } = useCart()((state) => state)
   const router = useRouter()
 
-  const removeFromCart = (item: any) => {
-    setCart(
-      cart.filter((_item) => {
-        if (_item?.portion || item?.portion) {
-          return (
-            _item.id !== item.id ||
-            _item.portion?.toLowerCase() !== item.portion?.toLowerCase()
-          )
-        }
-        return _item.id !== item.id
-      })
-    )
-  }
+  const handleQuantityChange = (
+    operation: "inc" | "dec",
+    currentItem: Cart
+  ) => {
+    if (!currentItem) return
 
-  const addToCart = (type: "inc" | "dec", _item: any) => {
-    const item = cart.find(
-      (item) =>
-        item.id === _item?.id &&
-        (item.portion || null) === (_item.portion || null)
+    setCart(
+      {
+        id: currentItem.id as string,
+        name: currentItem.name,
+        price: currentItem.price || 0,
+        quantity: currentItem?.quantity || 0,
+        portion: currentItem.portion || "",
+      },
+      operation
     )
-    const newCart = item
-      ? cart.map((cartItem) =>
-          cartItem.id === item.id &&
-          (cartItem.portion || null) === (item.portion || null)
-            ? {
-                ...cartItem,
-                quantity: cartItem.quantity + (type === "inc" ? 1 : -1),
-              }
-            : cartItem
-        )
-      : [
-          ...cart,
-          {
-            id: _item?.id,
-            name: _item?.dish,
-            price: _item.price || 0,
-            quantity: 1,
-            portion: _item.portion || null,
-          },
-        ]
-    setCart(newCart)
   }
 
   return (
-    <div className="container mx-auto grid gap-6 px-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Your Cart</h1>
-        <Button size="default" variant="outline" onClick={() => router.back()}>
-          Go back
+    <div className="container mx-auto grid gap-6 p-0">
+      <div className="bg-primary flex items-center space-x-2">
+        <Button size="sm" onClick={() => router.back()}>
+          <ArrowLeft size={24} />
         </Button>
+        <h1 className="text-3xl font-bold">Your Cart</h1>
       </div>
       {cart.length === 0 ? (
-        <div className="text-muted-foreground min-h-40 text-center">
+        <div className="text-muted-foreground grid min-h-40 place-content-center text-center">
           Your cart is empty.
         </div>
       ) : (
-        <div className="grid gap-6">
+        <div className="grid gap-6 px-6">
           {cart.map((item) => (
             <div
               key={item.id}
@@ -83,7 +59,7 @@ export default function ViewCart() {
                   <div className="flex items-center gap-2">
                     <Button
                       size="sm"
-                      onClick={() => addToCart("dec", item)}
+                      onClick={() => handleQuantityChange("dec", item)}
                       disabled={item.quantity === 1}
                     >
                       -
@@ -91,16 +67,14 @@ export default function ViewCart() {
                     <div>{item.quantity}</div>
                     <Button
                       size="sm"
-                      onClick={() =>
-                        addToCart("inc", { ...item, price: item.price })
-                      }
+                      onClick={() => handleQuantityChange("inc", item)}
                     >
                       +
                     </Button>
                     <Trash2
                       size={24}
                       className="ml-2 cursor-pointer text-red-500"
-                      onClick={() => removeFromCart(item)}
+                      onClick={() => removeItem(item)}
                     />
                   </div>
                 </div>
@@ -109,7 +83,7 @@ export default function ViewCart() {
           ))}
         </div>
       )}
-      <div className="mt-8 flex w-full">
+      <div className="mt-8 flex w-full px-6">
         <div className="bg-background w-full rounded-lg p-6 shadow-lg md:p-8">
           <h2 className="mb-4 text-2xl font-bold">Order Summary</h2>
           <div className="mb-2 flex items-center justify-between">

@@ -27,7 +27,7 @@ export default async function Component({
   const images = imgPath ? imgPath.split(";") : []
 
   return (
-    <>
+    <div className="px-6">
       {restaurant ? (
         <Sidebar
           name={restaurant?.name}
@@ -52,6 +52,6 @@ export default async function Component({
         <AddToCart response={response} />
         <BackButton />
       </div>
-    </>
+    </div>
   )
 }

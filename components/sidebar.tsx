@@ -99,7 +99,7 @@ export function Sidebar({
         </div>
       </div>
       <div
-        className={cn("flex items-center justify-between", className, {
+        className={cn("flex items-center justify-between py-2", className, {
           hidden: open,
         })}
         {...props}

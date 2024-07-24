@@ -1,90 +1,194 @@
 "use client"
 
+import { MouseEvent } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { useParams } from "next/navigation"
 import { MenuItemI } from "@/services/menuService"
 
+import { Cart } from "@/lib/types"
 import { cn } from "@/lib/utils"
+import { useCart } from "@/app/store/CartProvider"
 
-import { Button } from "../ui/button"
 import VegOrNonVeg from "../veg-or-nonveg"
 
 const MenuItem = ({
   item,
   images,
-  lowestPrice,
   showAddToCart = false,
 }: {
   item: MenuItemI & {
     labels?: string[]
   }
   images: string[]
-  lowestPrice?: number
   showAddToCart?: boolean
 }) => {
   const params = useParams()
-  return (
-    <div className="bg-background group relative rounded-lg border p-4 transition-colors hover:border-collapse">
-      <Link href={`/${params.slug}/${item.id}`}>
-        <div className="grid gap-2">
-          <div className="flex flex-wrap items-center gap-2">
-            {item.foodOrBar ? (
-              <div className="h-4">
-                <VegOrNonVeg isVeg={item.isVeg} />
-              </div>
-            ) : null}
-            {item?.labels?.map((label, index) => (
-              <LabelItem key={index} label={label} />
-            ))}
-          </div>
-          {images?.length > 0 ? (
-            <div className="relative flex max-h-36 justify-center overflow-hidden rounded-lg">
-              <Image
-                loading="lazy"
-                src={images[0]}
-                className="h-full w-auto rounded-lg object-contain transition-opacity group-hover:opacity-80"
-                alt={item.dish}
-                width={300}
-                height={300}
-              />
-            </div>
-          ) : null}
 
-          <div className="grid gap-2">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold">{item.dish}</h3>
-              <div className="text-2xl font-bold">
-                {lowestPrice === -1
-                  ? item.PriceItemMap?.[0].price
-                  : lowestPrice}
-              </div>
-            </div>
-            <p className="text-sm leading-relaxed">{item.description}</p>
-          </div>
-          {showAddToCart ? (
-            <Button
-              variant="outline"
-              className="w-full"
-              onClick={(e) => {
-                if (item?.PriceItemMap && item?.PriceItemMap?.length > 1) {
-                  console.log("Continue to select portion")
-                  return
-                }
-                e.preventDefault()
-                console.log("Add to cart")
-              }}
-            >
-              Add to Cart
-            </Button>
-          ) : null}
-        </div>
-      </Link>
-    </div>
+  return (
+    <Link href={`/${params.slug}/${item.id}`}>
+      {images?.length > 0 ? (
+        <ItemCard {...item} image={images[0]} />
+      ) : (
+        <ItemRow {...item} />
+      )}
+    </Link>
   )
 }
 
 export default MenuItem
+
+const ItemCard = (item: MenuItemI & { image: string }) => {
+  const { cart, setCart } = useCart()((state) => state)
+
+  const onAdd = (e: MouseEvent<HTMLElement>) => {
+    e.preventDefault()
+    if (item.PriceItemMap && item.PriceItemMap.length > 1) {
+      console.log("Multiple prices")
+      return
+    }
+    setCart(
+      {
+        id: item.id as string,
+        name: item.dish as string,
+        price: item.PriceItemMap?.[0].price || 0,
+        quantity: 1,
+      },
+      "inc"
+    )
+  }
+
+  const totalQty = cart.reduce(
+    (acc, _item) => (_item.id === item.id ? acc + _item.quantity : acc),
+    0
+  )
+
+  if (!item || !item.id) return null
+
+  return (
+    <div className="overflow-hidden rounded bg-slate-100/50">
+      <div className="flex">
+        <Image
+          loading="lazy"
+          src={item.image}
+          alt={item.dish}
+          className="w-1/3 object-cover"
+          width={300}
+          height={300}
+        />
+        <div className="w-2/3 p-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-base font-semibold">{item.dish}</h3>
+            {item.foodOrBar && <VegOrNonVeg isVeg={item.isVeg} />}
+          </div>
+          <p className="mt-2 line-clamp-4 text-sm text-gray-600">
+            {item.description}
+          </p>
+          <div className="mt-4 flex items-end justify-between">
+            <p className="text-base font-bold">
+              {item.PriceItemMap?.[0].price}
+            </p>
+            {totalQty ? (
+              <div className="flex items-center gap-2">
+                <button className="font-semibold">-</button>
+                <p className="mx-1">{totalQty}</p>
+                <button className="font-semibold">+</button>
+              </div>
+            ) : (
+              <button className="font-semibold text-orange-300" onClick={onAdd}>
+                ADD
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+const ItemRow = (item: MenuItemI & {}) => {
+  const { cart, setCart } = useCart()((state) => state)
+
+  const onAdd = (e: MouseEvent<HTMLElement>) => {
+    e.preventDefault()
+    if (
+      !item.id ||
+      !item.dish ||
+      (item.PriceItemMap && item.PriceItemMap.length > 1)
+    ) {
+      return
+    }
+    setCart(
+      {
+        id: item.id,
+        name: item.dish,
+        price: item.PriceItemMap?.[0].price || 0,
+        quantity: 1,
+      },
+      "inc"
+    )
+  }
+
+  const currentItem = cart.find((elem) => elem.id === item.id)
+
+  const handleQuantityChange = (operation: "inc" | "dec") => {
+    if (!currentItem) return
+
+    setCart(
+      {
+        id: item.id as string,
+        name: item.dish,
+        price: item.PriceItemMap?.[0].price || 0,
+        quantity: currentItem?.quantity || 0,
+        portion: item.PriceItemMap?.[0].portion || "",
+      },
+      operation
+    )
+  }
+
+  return (
+    <div className="mb-2 flex flex-col">
+      <div className="mb-2 flex items-center justify-between">
+        <div>
+          <h3 className="flex items-center gap-1 text-base font-semibold">
+            {item.foodOrBar && <VegOrNonVeg isVeg={item.isVeg} />}
+            {item.dish}
+          </h3>
+          <p className="text-sm text-gray-600">{item.description}</p>
+        </div>
+        <div className="text-right">
+          <p className="text-base font-bold">{item.PriceItemMap?.[0].price}</p>
+          {currentItem?.quantity ? (
+            <div
+              className="flex items-center gap-2"
+              onClick={(e) => e.preventDefault()}
+            >
+              <button
+                className="font-semibold"
+                onClick={() => handleQuantityChange("dec")}
+                disabled={currentItem.quantity === 1}
+              >
+                -
+              </button>
+              <p className="mx-1">{currentItem.quantity}</p>
+              <button
+                className="font-semibold"
+                onClick={() => handleQuantityChange("inc")}
+              >
+                +
+              </button>
+            </div>
+          ) : (
+            <button className="font-semibold text-orange-300" onClick={onAdd}>
+              ADD
+            </button>
+          )}
+        </div>
+      </div>
+      <div className="mt-2 border-b border-[#ededed]" />
+    </div>
+  )
+}
 
 const LabelItem = ({ label }: { label: string }) => {
   return (
