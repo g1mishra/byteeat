@@ -17,7 +17,7 @@ const OrderPage = async ({
   }
 }) => {
   if (!searchParams?.orderId) return <NotFound />
-  const orderDetails = await getOrderWithItemsById(searchParams.orderId)
+  const orderDetails = await getOrderWithItemsById(searchParams.orderId, true)
   if (!orderDetails) return <NotFound />
   return (
     <>

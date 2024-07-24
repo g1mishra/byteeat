@@ -100,10 +100,17 @@ export default function ViewCart() {
   return (
     <div className="container mx-auto grid gap-6 p-0">
       <div className="bg-primary flex h-14 items-center overflow-hidden">
-        <Button size="sm" onClick={() => router.back()}>
+        <Button
+          className="z-10 shrink-0"
+          size="sm"
+          onClick={() => {
+            console.log("Back to menu")
+            router.back()
+          }}
+        >
           <ArrowLeft size={24} />
         </Button>
-        <h1 className="-ml-14 flex-1 text-center text-xl font-bold text-white">
+        <h1 className="-ml-14 flex-1 overflow-hidden text-center text-xl font-bold text-white">
           Your Cart
         </h1>
       </div>

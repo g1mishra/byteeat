@@ -31,7 +31,7 @@ export default function OrderView({
     <div className="flex min-h-screen flex-col bg-gray-100">
       {orderDetails.status === "pending" ? (
         <div className="flex h-full flex-col items-center justify-center gap-4 p-4">
-          <PackageIcon className="w-12 h-12 text-blue-500" />
+          <PackageIcon className="size-12 text-blue-500" />
           <h2 className="text-2xl font-bold">Order Pending</h2>
           <h3>
             Order ID: <span className="font-bold">{orderDetails.id}</span>
@@ -101,6 +101,7 @@ function OrderDetail({
 }
 
 function OrderItems({ items }: { items: OrderItem[] | undefined }) {
+  console.log(items)
   return (
     <div className="grid gap-3">
       {items?.map((item) => (
@@ -125,10 +126,10 @@ function OrderTotals({
   return (
     <div className="mt-4">
       {subtotal && (
-        <OrderTotal label="Subtotal" value={`$${subtotal.toFixed(2)}`} />
+        <OrderTotal label="Subtotal" value={`${subtotal.toFixed(2)}`} />
       )}
-      {tax && <OrderTotal label="Tax" value={`$${tax.toFixed(2)}`} />}
-      <OrderTotal label="Total" value={`$${total.toFixed(2)}`} bold />
+      {tax && <OrderTotal label="Tax" value={`${tax.toFixed(2)}`} />}
+      <OrderTotal label="Total" value={`${total.toFixed(2)}`} bold />
     </div>
   )
 }

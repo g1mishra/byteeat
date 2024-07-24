@@ -1,24 +1,20 @@
 "use client"
 
 import { useMemo, useState } from "react"
-import Link from "next/link"
-import { MenuItemI, PriceItemMapI } from "@/services/menuService"
 
-import { cn } from "@/lib/utils"
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion"
-import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
 
 import SearchAndFilter from "../search-filter"
 import { Separator } from "../ui/separator"
-import Cart from "./Cart"
 import MenuItem from "./MenuItem"
 import { MenuPopover } from "./MenuPopover"
-import { ItemsForOrder, ItemsToRender } from "./type"
+import { ItemsToRender } from "./type"
 
 type MenuViewProps = {
   data: ItemsToRender[]
@@ -31,8 +27,6 @@ const MenuView: React.FC<MenuViewProps> = ({ data, tableNo }) => {
     isFood: true,
     searchValue: "",
   })
-
-  const [cart, setCart] = useState<ItemsForOrder[]>([])
 
   const { food: foodItems, bar: barItems } = useMemo(
     () =>

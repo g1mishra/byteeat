@@ -22,7 +22,7 @@ export default function CheckoutDialog({
 }: {
   onSubmit: (data: { name: string; phone: string; table: string }) => Promise<{
     success: boolean
-    callBack: () => void
+    callBack?: () => void
   }>
 }) {
   const params = useParams()

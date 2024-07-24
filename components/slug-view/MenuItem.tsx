@@ -3,10 +3,9 @@
 import { MouseEvent } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { useParams } from "next/navigation"
+import { useParams, useSearchParams } from "next/navigation"
 import { MenuItemI } from "@/services/menuService"
 
-import { Cart } from "@/lib/types"
 import { cn } from "@/lib/utils"
 import { useCart } from "@/app/store/CartProvider"
 
@@ -24,10 +23,13 @@ const MenuItem = ({
   className?: string
 }) => {
   const params = useParams()
+  const searchParams = useSearchParams()
+  const tableNumber = searchParams.get("tableNumber")
+  const query = tableNumber ? `?tableNumber=${tableNumber}` : ""
 
   return (
     <Link
-      href={`/${params.slug}/${item.id}`}
+      href={`/${params.slug}/${item.id}${query}`}
       className={cn("[&_*]:last:mb-0 [&_.hr-line]:last:hidden", className)}
     >
       {image ? <ItemCard {...item} image={image} /> : <ItemRow {...item} />}
@@ -94,7 +96,10 @@ const ItemCard = (item: MenuItemI & { image: string }) => {
                 <button className="font-semibold">+</button>
               </div>
             ) : (
-              <button className="text-xs font-semibold text-orange-300" onClick={onAdd}>
+              <button
+                className="text-xs font-semibold text-orange-300"
+                onClick={onAdd}
+              >
                 ADD
               </button>
             )}
@@ -175,7 +180,10 @@ const ItemRow = (item: MenuItemI & {}) => {
               </button>
             </div>
           ) : (
-            <button className="text-xs font-semibold text-orange-300" onClick={onAdd}>
+            <button
+              className="text-xs font-semibold text-orange-300"
+              onClick={onAdd}
+            >
               ADD
             </button>
           )}
