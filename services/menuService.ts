@@ -30,7 +30,6 @@ export interface ItemCategoryI {
 
 const fetchMenuItem = async (menuId: string) => {
   try {
-    checkAuth("You are not authorized to view this menu item")
     return await prisma.item.findUnique({
       where: {
         id: menuId,

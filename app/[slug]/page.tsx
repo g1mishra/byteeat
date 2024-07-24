@@ -35,7 +35,7 @@ const Welcome = async ({
   const address = formatAddress(response as FullAdress)
 
   return (
-    <>
+    <div className="px-6">
       <Sidebar
         name={response?.name}
         socials={response.SocialLinks}
@@ -56,7 +56,7 @@ const Welcome = async ({
       {response?.ItemCategory ? (
         <MenuView data={response?.ItemCategory} tableNo={tableNumber} />
       ) : null}
-    </>
+    </div>
   )
 }
 
