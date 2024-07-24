@@ -10,6 +10,7 @@ const createStore = (cart: Cart[]) =>
     cart: Cart[]
     setCart: (cart: Cart, type: "inc" | "dec") => void
     removeItem: (cart: Cart) => void
+    clearCart: () => void
   }>((set, get) => ({
     cart,
     removeItem(item: Cart) {
@@ -52,6 +53,9 @@ const createStore = (cart: Cart[]) =>
           ]
 
       set({ cart: newCart })
+    },
+    clearCart() {
+      set({ cart: [] })
     },
   }))
 

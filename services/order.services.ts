@@ -1,9 +1,11 @@
+"use server"
+
 import { Order, OrderItem } from "@prisma/client"
-import { Part } from "aws-sdk/clients/s3"
 
 import prisma from "@/lib/prisma"
+import { Cart } from "@/lib/types"
 
-type OrderWithItems = Order & { orderItems?: OrderItem[] }
+export type OrderWithItems = Order & { orderItems?: OrderItem[] }
 
 // Create a new order
 async function createOrder(
@@ -42,27 +44,18 @@ async function updateOrder(payload: Partial<Order>): Promise<Order> {
 }
 
 // Batch create order items
-async function addOrderItems(
-  orderId: string,
-  items: {
-    item: string
-    itemId: string
-    portion: string
-    price: number
-    quantity: number
-  }[]
-): Promise<void> {
-  const data = items.map(({ item, itemId, portion, price, quantity }) => ({
-    item,
-    itemId,
-    portion,
-    price,
-    quantity,
+async function addOrderItems(orderId: string, items: Cart[]) {
+  const data = items.map((item) => ({
     orderId,
+    item: item.name,
+    itemId: item.id,
+    portion: item.portion || "",
+    price: item.price,
+    quantity: item.quantity,
   }))
 
   try {
-    await prisma.orderItem.createMany({
+    return await prisma.orderItem.createMany({
       data,
     })
   } catch (error) {
@@ -88,11 +81,13 @@ async function getAllOrdersByRestaurant(
 
 // Get order by ID
 async function getOrderWithItemsById(
-  orderId: string
+  orderId: string,
+  includeItems = false
 ): Promise<OrderWithItems | null> {
   try {
     return await prisma.order.findUnique({
       where: { id: orderId },
+      include: includeItems ? { orderItems: true } : {},
     })
   } catch (error) {
     throw new Error(`Failed to get order by ID: ${(error as Error).message}`)
@@ -100,9 +95,9 @@ async function getOrderWithItemsById(
 }
 
 export {
-  createOrder,
   addOrderItems,
-  updateOrder,
+  createOrder,
   getAllOrdersByRestaurant,
   getOrderWithItemsById,
+  updateOrder,
 }

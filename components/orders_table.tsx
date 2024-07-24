@@ -63,7 +63,6 @@ function Actions(rowOrder: any) {
             <DropdownMenuItem
               key={curr}
               onClick={() => {
-                console.log("onclick")
                 handleStatusChange(curr)
               }}
             >
