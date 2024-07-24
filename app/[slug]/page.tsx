@@ -22,41 +22,47 @@ const Welcome = async ({
     tableNumber: string
   }
 }) => {
-  const response = await fetchRestaurantBySlug(params.slug, {
+  const restaurant = await fetchRestaurantBySlug(params.slug, {
     includeMenuItems: true,
     includePrice: true,
   })
 
   const tableNumber = Number(searchParams.tableNumber)
-  if (!response) return notFound()
-  if (tableNumber === 0 || tableNumber > response?.tableSize) {
+  if (!restaurant) return notFound()
+  if (tableNumber === 0 || tableNumber > restaurant?.tableSize) {
     return redirect(`/${params.slug}`)
   }
-  const address = formatAddress(response as FullAdress)
+  const address = formatAddress(restaurant as FullAdress)
 
   return (
-    <div className="px-6">
+    <>
       <Sidebar
-        name={response?.name}
-        socials={response.SocialLinks}
+        name={restaurant?.name}
+        socials={restaurant.SocialLinks}
         address={address}
       />
-      <div className="flex items-center justify-center">
-        <LogoOrAvatar
-          src={response?.logoUrl}
-          name={response?.name}
-          className="max-w-52"
-        />
-      </div>
-      <div className="flex flex-col items-center justify-center">
-        <h1 className="text-2xl font-bold">{response?.name}</h1>
-        <p className="text-sm font-light">{address}</p>
-      </div>
+      <div className="px-6 py-4">
+        <div className="flex flex-col items-center space-y-4">
+          <div className="flex items-center justify-center">
+            <LogoOrAvatar
+              src={restaurant?.logoUrl}
+              name={restaurant?.name}
+              className="max-w-52"
+            />
+          </div>
+          <div className="flex flex-col items-center">
+            <h1 className="text-2xl font-bold text-gray-800">
+              {restaurant?.name}
+            </h1>
+            <p className="text-sm font-light text-gray-500">{address}</p>
+          </div>
+        </div>
 
-      {response?.ItemCategory ? (
-        <MenuView data={response?.ItemCategory} tableNo={tableNumber} />
-      ) : null}
-    </div>
+        {restaurant?.ItemCategory ? (
+          <MenuView data={restaurant?.ItemCategory} tableNo={tableNumber} />
+        ) : null}
+      </div>
+    </>
   )
 }
 

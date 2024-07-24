@@ -83,7 +83,7 @@ export function Sidebar({
               const url = socials?.[social as keyof typeof socials].trim()
               return (
                 <a
-                  key={url}
+                  key={`social-${social}`}
                   href={url || `#${social}`}
                   className="text-gray-800 hover:underline dark:text-white"
                 >
@@ -99,19 +99,23 @@ export function Sidebar({
         </div>
       </div>
       <div
-        className={cn("flex items-center justify-between py-2", className, {
-          hidden: open,
-        })}
+        className={cn(
+          "bg-primary flex h-14 items-center justify-between space-x-2 px-4 text-white",
+          className,
+          {
+            hidden: open,
+          }
+        )}
         {...props}
       >
         <MenuIcon
           onClick={() => setOpen(!open)}
-          className="size-7 cursor-pointer text-gray-800 dark:text-white"
+          className="size-7 cursor-pointer"
         />
 
         <div className="flex items-center justify-end gap-2">
           <Link href={`/${params?.slug}/view-cart`}>
-            <ShoppingCart className="size-7 cursor-pointer text-gray-800 dark:text-white" />
+            <ShoppingCart className="size-7 cursor-pointer" />
           </Link>
         </div>
       </div>

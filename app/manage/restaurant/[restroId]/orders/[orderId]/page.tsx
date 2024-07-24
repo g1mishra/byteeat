@@ -1,4 +1,4 @@
-import { getOrderById } from "services/order.services"
+import { getOrderWithItemsById } from "services/order.services"
 
 import {
   Table,
@@ -15,14 +15,7 @@ async function OrderTable({
 }: {
   params: { restroId: string; orderId: string }
 }) {
-  const order = await getOrderById(params.orderId)
-
-  const orderTotal = order?.orderItems?.reduce(
-    (acc, orderItem) => acc + orderItem.price * orderItem.quantity,
-    0
-  )
-
-  console.log(order)
+  const order = await getOrderWithItemsById(params.orderId)
 
   return (
     <div>
@@ -53,7 +46,9 @@ async function OrderTable({
             <TableCell className="font-medium">Total</TableCell>
             <TableCell></TableCell>
             <TableCell></TableCell>
-            <TableCell className="text-right"> &#x20b9; {orderTotal}</TableCell>
+            <TableCell className="text-right">
+              &#x20b9; {order?.total}
+            </TableCell>
           </TableRow>
         </TableBody>
       </Table>
