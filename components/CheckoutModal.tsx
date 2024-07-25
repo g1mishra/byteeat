@@ -1,8 +1,8 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import { useParams, useRouter, useSearchParams } from "next/navigation"
 import { Loader2 } from "lucide-react"
+import { useParams, useSearchParams } from "next/navigation"
+import { useEffect, useState } from "react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -34,8 +34,6 @@ export default function CheckoutDialog({
   const [error, setError] = useState<{
     [key: string]: string
   }>({})
-
-  const router = useRouter()
 
   const clearState = () => {
     setName("")

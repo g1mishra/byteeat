@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react"
 import Link from "next/link"
-import { useParams, useRouter } from "next/navigation"
+import { useParams, useRouter, useSearchParams } from "next/navigation"
 import { addOrderItems, createOrder } from "@/services/order.services"
 import { getRestaurantIdBySlug } from "@/services/restaurantService"
 import { ArrowLeft, Minus, Plus, Trash2 } from "lucide-react"
@@ -20,6 +20,9 @@ export default function ViewCart() {
   const [showCheckoutDialog, setShowCheckoutDialog] = useState(false)
   const router = useRouter()
   const params = useParams()
+  const searchParams = useSearchParams()
+  const tableNumber = searchParams.get("tableNumber")
+  const query = tableNumber ? `?tableNumber=${tableNumber}` : ""
 
   const { toast } = useToast()
 
@@ -105,7 +108,7 @@ export default function ViewCart() {
           size="sm"
           onClick={() => {
             console.log("Back to menu")
-            router.back()
+            router.push(`/${params?.slug}${query}`)
           }}
         >
           <ArrowLeft size={24} />
@@ -190,7 +193,7 @@ export default function ViewCart() {
       )}
       {cart.length === 0 && (
         <div className="flex w-full justify-center">
-          <Link href={`/${params?.slug}`}>
+          <Link href={`/${params?.slug}${query}`}>
             <Button size="lg">Continue Shopping</Button>
           </Link>
         </div>

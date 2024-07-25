@@ -5,6 +5,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { useParams, useSearchParams } from "next/navigation"
 import { MenuItemI } from "@/services/menuService"
+import { Minus, Plus } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { useCart } from "@/app/store/CartProvider"
@@ -91,9 +92,13 @@ const ItemCard = (item: MenuItemI & { image: string }) => {
             </p>
             {totalQty ? (
               <div className="flex items-center gap-2">
-                <button className="font-semibold">-</button>
+                <button className="font-semibold">
+                  <Minus size={14} />
+                </button>
                 <p className="mx-1">{totalQty}</p>
-                <button className="font-semibold">+</button>
+                <button className="font-semibold">
+                  <Plus size={14} />
+                </button>
               </div>
             ) : (
               <button
@@ -167,16 +172,15 @@ const ItemRow = (item: MenuItemI & {}) => {
               <button
                 className="font-semibold"
                 onClick={() => handleQuantityChange("dec")}
-                disabled={currentItem.quantity === 1}
               >
-                -
+                <Minus size={14} />
               </button>
               <p className="mx-1">{currentItem.quantity}</p>
               <button
                 className="font-semibold"
                 onClick={() => handleQuantityChange("inc")}
               >
-                +
+                <Plus size={14} />
               </button>
             </div>
           ) : (

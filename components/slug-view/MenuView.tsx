@@ -2,13 +2,13 @@
 
 import { useMemo, useState } from "react"
 
+import { cn } from "@/lib/utils"
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion"
-import { cn } from "@/lib/utils"
 
 import SearchAndFilter from "../search-filter"
 import { Separator } from "../ui/separator"
@@ -18,11 +18,10 @@ import { ItemsToRender } from "./type"
 
 type MenuViewProps = {
   data: ItemsToRender[]
-  tableNo: number
   restaurantId?: string | undefined
 }
 
-const MenuView: React.FC<MenuViewProps> = ({ data, tableNo }) => {
+const MenuView: React.FC<MenuViewProps> = ({ data }) => {
   const [filters, setFilters] = useState({
     isFood: true,
     searchValue: "",

@@ -3,7 +3,7 @@
 import React from "react"
 import dynamic from "next/dynamic"
 import Link from "next/link"
-import { useParams } from "next/navigation"
+import { useParams, useSearchParams } from "next/navigation"
 import { ChevronLeft, MenuIcon, ShoppingCart, StepBack, X } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -45,6 +45,9 @@ export function Sidebar({
 }: SidebarProps) {
   const [open, setOpen] = React.useState(false)
   const params = useParams()
+  const searchParams = useSearchParams()
+  const tableNumber = searchParams.get("tableNumber")
+  const query = tableNumber ? `?tableNumber=${tableNumber}` : ""
 
   return (
     <>
@@ -114,7 +117,7 @@ export function Sidebar({
         />
 
         <div className="flex items-center justify-end gap-2">
-          <Link href={`/${params?.slug}/view-cart`}>
+          <Link href={`/${params?.slug}/view-cart${query}`}>
             <ShoppingCart className="size-7 cursor-pointer" />
           </Link>
         </div>

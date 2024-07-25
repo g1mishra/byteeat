@@ -59,7 +59,7 @@ const Welcome = async ({
         </div>
 
         {restaurant?.ItemCategory ? (
-          <MenuView data={restaurant?.ItemCategory} tableNo={tableNumber} />
+          <MenuView data={restaurant?.ItemCategory} />
         ) : null}
       </div>
     </>
