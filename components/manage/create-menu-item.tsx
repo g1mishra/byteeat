@@ -309,7 +309,7 @@ export default function MenuCreateForm({
         />
 
         {form.getValues().PriceItemMap.map((price, idx) => (
-          <div key={idx} className="flex items-end gap-4">
+          <div key={idx} className="flex items-start gap-4">
             <FormField
               control={form.control}
               name={`PriceItemMap.${idx}.portion`}
@@ -344,49 +344,44 @@ export default function MenuCreateForm({
                 </FormItem>
               )}
             />
-
             {idx === form.getValues().PriceItemMap.length - 1 ? (
-              <>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  onClick={() =>
-                    form.setValue("PriceItemMap", [
-                      ...form.getValues().PriceItemMap,
-                      { portion: "", price: 0 },
-                    ])
-                  }
-                >
-                  <PlusIcon size={22} />
-                </Button>
-                <FormMessage className="absolute bottom-[-22px]">
-                  {errors.PriceItemMap && (
-                    <p role="alert">{errors.PriceItemMap?.root?.message}</p>
-                  )}
-                </FormMessage>
-              </>
-            ) : (
               <Button
                 type="button"
                 variant="outline"
                 size="icon"
-                onClick={() => {
-                  form.setValue(
-                    "PriceItemMap",
-                    form.getValues().PriceItemMap.filter((_, i) => i !== idx)
-                  )
-                }}
+                className="self-end"
+                onClick={() =>
+                  form.setValue("PriceItemMap", [
+                    ...form.getValues().PriceItemMap,
+                    { portion: "", price: 0 },
+                  ])
+                }
               >
-                <Trash2 size={22} />
+                <PlusIcon size={22} />
               </Button>
-            )}
+            ) : null}
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              className="self-end"
+              onClick={() => {
+                form.setValue(
+                  "PriceItemMap",
+                  form.getValues().PriceItemMap.filter((_, i) => i !== idx)
+                )
+              }}
+            >
+              <Trash2 size={22} />
+            </Button>
           </div>
         ))}
         <UploadItemImage imagesRef={imagesRef} uploadItemImage={""} />
-        <Button type="submit">
-          {form.formState.isSubmitting ? "Adding Item..." : "Add Item"}
-        </Button>
+        <div className="flex w-full justify-center">
+          <Button type="submit">
+            {form.formState.isSubmitting ? "Adding Item..." : "Add Item"}
+          </Button>
+        </div>
       </form>
     </Form>
   )

@@ -9,6 +9,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion"
+import { useCart } from "@/app/store/CartProvider"
 
 import SearchAndFilter from "../search-filter"
 import { Separator } from "../ui/separator"
@@ -22,6 +23,7 @@ type MenuViewProps = {
 }
 
 const MenuView: React.FC<MenuViewProps> = ({ data }) => {
+  const { cart, setCart } = useCart()((state) => state)
   const [filters, setFilters] = useState({
     isFood: true,
     searchValue: "",
@@ -89,10 +91,23 @@ const MenuView: React.FC<MenuViewProps> = ({ data }) => {
                 const images = imgPath ? imgPath.split(";") : []
                 if (images.length > 0) {
                   return (
-                    <MenuItem key={item.id} item={item} image={images[0]} />
+                    <MenuItem
+                      key={item.id}
+                      item={item}
+                      image={images[0]}
+                      cart={cart}
+                      setCart={setCart}
+                    />
                   )
                 }
-                return <MenuItem key={item.id} item={item} />
+                return (
+                  <MenuItem
+                    key={item.id}
+                    item={item}
+                    cart={cart}
+                    setCart={setCart}
+                  />
+                )
               })}
             </AccordionContent>
           </AccordionItem>

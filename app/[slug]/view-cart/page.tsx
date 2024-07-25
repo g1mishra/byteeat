@@ -2,12 +2,13 @@
 
 import { useMemo, useState } from "react"
 import Link from "next/link"
-import { useParams, useRouter, useSearchParams } from "next/navigation"
+import { useParams, useRouter } from "next/navigation"
 import { addOrderItems, createOrder } from "@/services/order.services"
 import { getRestaurantIdBySlug } from "@/services/restaurantService"
 import { ArrowLeft, Minus, Plus, Trash2 } from "lucide-react"
 
 import { Cart } from "@/lib/types"
+import { getPathWithQuery } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { useToast } from "@/components/ui/use-toast"
@@ -20,9 +21,6 @@ export default function ViewCart() {
   const [showCheckoutDialog, setShowCheckoutDialog] = useState(false)
   const router = useRouter()
   const params = useParams()
-  const searchParams = useSearchParams()
-  const tableNumber = searchParams.get("tableNumber")
-  const query = tableNumber ? `?tableNumber=${tableNumber}` : ""
 
   const { toast } = useToast()
 
@@ -83,9 +81,11 @@ export default function ViewCart() {
       return {
         success: true,
         callBack() {
-          clearCart()
           setShowCheckoutDialog(false)
           router.push(`/${params?.slug}/orders?orderId=${resp.id}`)
+          setTimeout(() => {
+            clearCart()
+          }, 1000)
         },
       }
     } catch (error) {
@@ -106,10 +106,7 @@ export default function ViewCart() {
         <Button
           className="z-10 shrink-0"
           size="sm"
-          onClick={() => {
-            console.log("Back to menu")
-            router.push(`/${params?.slug}${query}`)
-          }}
+          onClick={() => router.push(getPathWithQuery(`/${params?.slug}`))}
         >
           <ArrowLeft size={24} />
         </Button>
@@ -193,7 +190,7 @@ export default function ViewCart() {
       )}
       {cart.length === 0 && (
         <div className="flex w-full justify-center">
-          <Link href={`/${params?.slug}${query}`}>
+          <Link href={getPathWithQuery(`/${params?.slug}`)}>
             <Button size="lg">Continue Shopping</Button>
           </Link>
         </div>

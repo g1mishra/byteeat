@@ -17,7 +17,6 @@ async function OrderTable({
 }) {
   const order = await getOrderWithItemsById(params.orderId, true)
 
-  console.log(order)
   return (
     <div>
       <h1>Order Details</h1>
