@@ -15,8 +15,9 @@ async function OrderTable({
 }: {
   params: { restroId: string; orderId: string }
 }) {
-  const order = await getOrderWithItemsById(params.orderId)
+  const order = await getOrderWithItemsById(params.orderId, true)
 
+  console.log(order)
   return (
     <div>
       <h1>Order Details</h1>
