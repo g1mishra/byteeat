@@ -1,70 +1,96 @@
 "use client"
 
-import { MouseEvent } from "react"
+import { MouseEvent, useCallback } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { useParams, useSearchParams } from "next/navigation"
+import { useParams } from "next/navigation"
 import { MenuItemI } from "@/services/menuService"
 import { Minus, Plus } from "lucide-react"
 
-import { cn } from "@/lib/utils"
-import { useCart } from "@/app/store/CartProvider"
+import { Cart } from "@/lib/types"
+import { cn, getPathWithQuery } from "@/lib/utils"
 
 import VegOrNonVeg from "../veg-or-nonveg"
+import { addItemToCart, changeItemQuantity } from "./util"
 
 const MenuItem = ({
   item,
   image,
   className = "",
+  cart,
+  setCart,
 }: {
   item: MenuItemI & {
     labels?: string[]
   }
   image?: string
   className?: string
+  cart: Cart[]
+  setCart: (item: Cart, operation: "inc" | "dec") => void
 }) => {
   const params = useParams()
-  const searchParams = useSearchParams()
-  const tableNumber = searchParams.get("tableNumber")
-  const query = tableNumber ? `?tableNumber=${tableNumber}` : ""
-
-  return (
-    <Link
-      href={`/${params.slug}/${item.id}${query}`}
-      className={cn("[&_*]:last:mb-0 [&_.hr-line]:last:hidden", className)}
-    >
-      {image ? <ItemCard {...item} image={image} /> : <ItemRow {...item} />}
-    </Link>
-  )
-}
-
-export default MenuItem
-
-const ItemCard = (item: MenuItemI & { image: string }) => {
-  const { cart, setCart } = useCart()((state) => state)
-
-  const onAdd = (e: MouseEvent<HTMLElement>) => {
-    if (item.PriceItemMap && item.PriceItemMap.length > 1) {
-      console.log("Multiple prices")
-      return
-    }
-    e.preventDefault()
-    setCart(
-      {
-        id: item.id as string,
-        name: item.dish as string,
-        price: item.PriceItemMap?.[0].price || 0,
-        quantity: 1,
-      },
-      "inc"
-    )
-  }
 
   const totalQty = cart.reduce(
     (acc, _item) => (_item.id === item.id ? acc + _item.quantity : acc),
     0
   )
 
+  const currentItem = cart.find((elem) => elem.id === item.id)
+
+  const onAdd = useCallback(
+    (event: MouseEvent<HTMLElement>) => addItemToCart(item, setCart)(event),
+    [item, setCart]
+  )
+  const handleQuantityChange = useCallback(
+    (event: MouseEvent<HTMLElement>, operation: "inc" | "dec") => {
+      changeItemQuantity(item, currentItem, setCart)(event, operation)
+    },
+    [item, currentItem, setCart]
+  )
+
+  return (
+    <Link
+      href={getPathWithQuery(`/${params.slug}/${item.id}`)}
+      className={cn("[&_*]:last:mb-0 [&_.hr-line]:last:hidden", className)}
+    >
+      {image ? (
+        <ItemCard
+          item={item}
+          image={image}
+          totalQty={totalQty}
+          onAddClick={onAdd}
+          handleQuantityChange={handleQuantityChange}
+        />
+      ) : (
+        <ItemRow
+          item={item}
+          currentItem={currentItem}
+          onAddClick={onAdd}
+          handleQuantityChange={handleQuantityChange}
+        />
+      )}
+    </Link>
+  )
+}
+
+export default MenuItem
+
+const ItemCard = ({
+  item,
+  image,
+  totalQty,
+  onAddClick,
+  handleQuantityChange,
+}: {
+  item: MenuItemI
+  image: string
+  totalQty: number
+  onAddClick: (e: MouseEvent<HTMLElement>) => void
+  handleQuantityChange: (
+    event: MouseEvent<HTMLElement>,
+    operation: "inc" | "dec"
+  ) => void
+}) => {
   if (!item || !item.id) return null
 
   return (
@@ -72,18 +98,18 @@ const ItemCard = (item: MenuItemI & { image: string }) => {
       <div className="flex">
         <Image
           loading="lazy"
-          src={item.image}
+          src={image}
           alt={item.dish}
-          className="w-1/3 object-cover"
+          className="w-1/2 object-cover sm:w-1/3 sm:object-cover"
           width={300}
           height={300}
         />
-        <div className="flex w-2/3 flex-col p-4">
+        <div className="flex w-1/2 flex-col p-4 sm:w-2/3">
           <div className="flex items-center justify-between">
             <h3 className="text-base font-semibold">{item.dish}</h3>
             {item.foodOrBar && <VegOrNonVeg isVeg={item.isVeg} />}
           </div>
-          <p className="mt-2 line-clamp-4 flex-1 text-sm text-gray-600">
+          <p className="mt-2 line-clamp-3 flex-1 text-sm text-gray-600">
             {item.description}
           </p>
           <div className="mt-4 flex items-end justify-between">
@@ -91,19 +117,28 @@ const ItemCard = (item: MenuItemI & { image: string }) => {
               {item.PriceItemMap?.[0].price}
             </p>
             {totalQty ? (
-              <div className="flex items-center gap-2">
-                <button className="font-semibold">
+              <div className="flex items-center justify-end">
+                <button
+                  className="px-1 font-semibold"
+                  onClick={(e) => handleQuantityChange(e, "dec")}
+                >
                   <Minus size={14} />
                 </button>
-                <p className="mx-1">{totalQty}</p>
-                <button className="font-semibold">
+                <p className="px-1.5" onClick={(e) => e.preventDefault()}>
+                  {totalQty}
+                </p>
+
+                <button
+                  className="pl-1 font-semibold"
+                  onClick={(e) => handleQuantityChange(e, "inc")}
+                >
                   <Plus size={14} />
                 </button>
               </div>
             ) : (
               <button
                 className="text-xs font-semibold text-orange-300"
-                onClick={onAdd}
+                onClick={(e) => onAddClick(e)}
               >
                 ADD
               </button>
@@ -115,43 +150,20 @@ const ItemCard = (item: MenuItemI & { image: string }) => {
   )
 }
 
-const ItemRow = (item: MenuItemI & {}) => {
-  const { cart, setCart } = useCart()((state) => state)
-
-  const onAdd = (e: MouseEvent<HTMLElement>) => {
-    if (item.PriceItemMap && item.PriceItemMap.length > 1) {
-      console.log("Multiple prices")
-      return
-    }
-    e.preventDefault()
-    setCart(
-      {
-        id: item.id as string,
-        name: item.dish as string,
-        price: item.PriceItemMap?.[0].price || 0,
-        quantity: 1,
-      },
-      "inc"
-    )
-  }
-
-  const currentItem = cart.find((elem) => elem.id === item.id)
-
-  const handleQuantityChange = (operation: "inc" | "dec") => {
-    if (!currentItem) return
-
-    setCart(
-      {
-        id: item.id as string,
-        name: item.dish,
-        price: item.PriceItemMap?.[0].price || 0,
-        quantity: currentItem?.quantity || 0,
-        portion: item.PriceItemMap?.[0].portion || "",
-      },
-      operation
-    )
-  }
-
+const ItemRow = ({
+  item,
+  currentItem,
+  onAddClick,
+  handleQuantityChange,
+}: {
+  item: MenuItemI
+  currentItem?: Cart
+  onAddClick: (e: MouseEvent<HTMLElement>) => void
+  handleQuantityChange: (
+    e: MouseEvent<HTMLElement>,
+    operation: "inc" | "dec"
+  ) => void
+}) => {
   return (
     <div className="mb-2 flex flex-col pr-4">
       <div className="mb-2 flex items-center justify-between">
@@ -162,23 +174,22 @@ const ItemRow = (item: MenuItemI & {}) => {
           </h3>
           <p className="text-sm text-gray-600">{item.description}</p>
         </div>
-        <div className="text-right">
+        <div className="min-w-20 text-right">
           <p className="text-base font-bold">{item.PriceItemMap?.[0].price}</p>
           {currentItem?.quantity ? (
-            <div
-              className="flex items-center gap-2"
-              onClick={(e) => e.preventDefault()}
-            >
+            <div className="flex items-center justify-end">
               <button
-                className="font-semibold"
-                onClick={() => handleQuantityChange("dec")}
+                className="px-1 font-semibold"
+                onClick={(e) => handleQuantityChange(e, "dec")}
               >
                 <Minus size={14} />
               </button>
-              <p className="mx-1">{currentItem.quantity}</p>
+              <p className="px-1.5" onClick={(e) => e.preventDefault()}>
+                {currentItem.quantity}
+              </p>
               <button
-                className="font-semibold"
-                onClick={() => handleQuantityChange("inc")}
+                className="pl-1 font-semibold"
+                onClick={(e) => handleQuantityChange(e, "inc")}
               >
                 <Plus size={14} />
               </button>
@@ -186,7 +197,7 @@ const ItemRow = (item: MenuItemI & {}) => {
           ) : (
             <button
               className="text-xs font-semibold text-orange-300"
-              onClick={onAdd}
+              onClick={(e) => onAddClick(e)}
             >
               ADD
             </button>

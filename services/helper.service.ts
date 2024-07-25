@@ -8,6 +8,7 @@ import {
   addItemPrice,
   addMenuItem,
   addOrFetchCategory,
+  deleteItemPrice,
   deleteMenuItem,
   deletePriceItem,
   updateCategory,
@@ -41,8 +42,13 @@ const addMenuItemHelper = async (
 // update
 
 const updateMenuItemHelper = async (
-  data: MenuFormValues & MenuItemI
+  oldData: MenuFormValues & MenuItemI,
+  newData: MenuFormValues
 ): Promise<void> => {
+  const data = {
+    ...oldData,
+    ...newData,
+  }
   try {
     if (!data.id) throw new Error("Menu item id is required")
     let categoryId = data.categoryId
@@ -50,18 +56,30 @@ const updateMenuItemHelper = async (
     await updateCategory(data.category, categoryId)
 
     await updateMenuItem({
-      ...data,
-      categoryId,
+      id: data.id,
+      dish: data.dish,
+      categoryId: categoryId,
+      description: data.description,
+      imgPath: data.imgPath,
+      foodOrBar: data.foodOrBar,
+      isVeg: data.isVeg,
     })
 
     const pricesToBeAdded: PriceItemMapI[] = []
     const pricesToBeUpdate: Partial<PriceItemMapI>[] = []
+    const pricesToBeDelete: string[] = []
 
-    data?.PriceItemMap?.forEach((priceObj) => {
+    newData?.PriceItemMap?.forEach((priceObj) => {
       if (priceObj.id) {
         pricesToBeUpdate.push(priceObj)
       } else {
         pricesToBeAdded.push(priceObj as PriceItemMapI)
+      }
+    })
+
+    oldData?.PriceItemMap?.forEach((priceObj) => {
+      if (!data.PriceItemMap.find((item) => item.id === priceObj.id)) {
+        pricesToBeDelete.push(priceObj.id as string)
       }
     })
 
@@ -70,8 +88,13 @@ const updateMenuItemHelper = async (
     }
 
     if (pricesToBeAdded.length) {
-      addItemPrice(pricesToBeAdded)
+      await addItemPrice(pricesToBeAdded)
+    } 
+
+    if (pricesToBeDelete.length) {
+      await deleteItemPrice(pricesToBeDelete)
     }
+
   } catch (error) {
     throw error
   }
@@ -89,4 +112,5 @@ const deleteMenuItemHelper = async (
   }
 }
 
-export { addMenuItemHelper, updateMenuItemHelper, deleteMenuItemHelper }
+export { addMenuItemHelper, deleteMenuItemHelper, updateMenuItemHelper }
+

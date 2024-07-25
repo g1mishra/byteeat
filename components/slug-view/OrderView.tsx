@@ -101,7 +101,6 @@ function OrderDetail({
 }
 
 function OrderItems({ items }: { items: OrderItem[] | undefined }) {
-  console.log(items)
   return (
     <div className="grid gap-3">
       {items?.map((item) => (

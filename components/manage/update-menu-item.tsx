@@ -13,6 +13,7 @@ import { PlusIcon, Trash2 } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
+import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
   Form,
@@ -89,16 +90,7 @@ export default function MenuUpdateForm({
         itemData.imgPath = imgPath
       }
 
-      const updatedItemData = {
-        ...itemData,
-        ...data,
-        PriceItemMap: data.PriceItemMap.map((priceItem) => ({
-          ...priceItem,
-          itemId: itemData.id || "",
-        })),
-      }
-
-      await updateMenuItemHelper(updatedItemData)
+      await updateMenuItemHelper(itemData, data)
 
       toast({
         title: `Item ${itemData ? "updated" : "created"} successfully.`,
@@ -320,7 +312,6 @@ export default function MenuUpdateForm({
         <FormField
           control={form.control}
           name="category"
-          //disabled={itemData ? true : false}
           render={({ field }) => (
             <FormItem>
               <FormLabel>Add category</FormLabel>
@@ -338,7 +329,7 @@ export default function MenuUpdateForm({
         />
 
         {form.getValues().PriceItemMap.map((price, idx) => (
-          <div key={idx} className="relative flex items-end gap-4">
+          <div key={idx} className="relative flex items-start gap-4">
             <FormField
               control={form.control}
               name={`PriceItemMap.${idx}.portion`}
@@ -356,7 +347,6 @@ export default function MenuUpdateForm({
                       }
                     />
                   </FormControl>
-                  <FormMessage />
                 </FormItem>
               )}
             />
@@ -374,42 +364,37 @@ export default function MenuUpdateForm({
               )}
             />
 
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              className="self-end"
+              onClick={() => {
+                form.setValue(
+                  "PriceItemMap",
+                  form.getValues().PriceItemMap.filter((_, i) => i !== idx)
+                )
+              }}
+            >
+              <Trash2 size={22} />
+            </Button>
+
             {idx === form.getValues().PriceItemMap.length - 1 ? (
-              <>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  onClick={() =>
-                    form.setValue("PriceItemMap", [
-                      ...form.getValues().PriceItemMap,
-                      { portion: "", price: 0, itemId: itemData.id },
-                    ])
-                  }
-                >
-                  <PlusIcon size={22} />
-                </Button>
-                <FormMessage className="absolute bottom-[-22px]">
-                  {errors.PriceItemMap && (
-                    <p role="alert">{errors.PriceItemMap?.root?.message}</p>
-                  )}
-                </FormMessage>
-              </>
-            ) : (
               <Button
                 type="button"
                 variant="outline"
                 size="icon"
-                onClick={() => {
-                  form.setValue(
-                    "PriceItemMap",
-                    form.getValues().PriceItemMap.filter((_, i) => i !== idx)
-                  )
-                }}
+                className="self-end"
+                onClick={() =>
+                  form.setValue("PriceItemMap", [
+                    ...form.getValues().PriceItemMap,
+                    { portion: "", price: 0, itemId: itemData.id },
+                  ])
+                }
               >
-                <Trash2 size={22} />
+                <PlusIcon size={22} />
               </Button>
-            )}
+            ) : null}
           </div>
         ))}
 
@@ -418,21 +403,23 @@ export default function MenuUpdateForm({
           uploadItemImage={itemData?.imgPath?.trim() || ""}
         />
 
-        <Button type="submit" className="mr-2">
-          {form.formState.isSubmitting
-            ? `${itemData ? "Updating" : "Adding"} Item...`
-            : `${itemData ? "Update" : "Add"} Item`}
-        </Button>
+        <div className="flex w-full justify-center space-x-2">
+          <Button type="submit">
+            {form.formState.isSubmitting
+              ? `${itemData ? "Updating" : "Adding"} Item...`
+              : `${itemData ? "Update" : "Add"} Item`}
+          </Button>
 
-        <Button
-          type="button"
-          variant="destructive"
-          onClick={() => {
-            onDeleteSubmit(itemData)
-          }}
-        >
-          Delete Item
-        </Button>
+          <Button
+            type="button"
+            variant="destructive"
+            onClick={() => {
+              onDeleteSubmit(itemData)
+            }}
+          >
+            Delete Item
+          </Button>
+        </div>
       </form>
     </Form>
   )

@@ -15,3 +15,21 @@ export function debounce<T extends (...args: any) => any>(
     timeout = setTimeout(() => func.apply(this, args), waitFor)
   }
 }
+
+export const getPathWithQuery = (href: string): string => {
+  if (typeof window === "undefined") return href
+  const searchParams = new URLSearchParams(window.location.search)
+  let url: URL
+
+  if (href.startsWith("http")) {
+    url = new URL(href)
+  } else {
+    url = new URL(href, window.location.origin)
+  }
+
+  searchParams.forEach((value, key) => {
+    url.searchParams.append(key, value)
+  })
+
+  return url.pathname + url.search
+}

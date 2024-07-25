@@ -1,7 +1,7 @@
 "use client"
 
 import { Loader2 } from "lucide-react"
-import { useParams, useSearchParams } from "next/navigation"
+import { useSearchParams } from "next/navigation"
 import { useEffect, useState } from "react"
 
 import { Button } from "@/components/ui/button"
@@ -25,7 +25,6 @@ export default function CheckoutDialog({
     callBack?: () => void
   }>
 }) {
-  const params = useParams()
   const searchParams = useSearchParams()
   const [name, setName] = useState("")
   const [phone, setPhone] = useState("")

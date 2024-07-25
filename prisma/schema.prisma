@@ -61,6 +61,8 @@ model PriceItemMap {
   itemId  String
   price   Float
   portion String @default("null")
+
+  @@unique([itemId, portion])
 }
 
 model SocialLinks {

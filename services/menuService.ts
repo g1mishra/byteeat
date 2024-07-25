@@ -62,7 +62,15 @@ const addMenuItem = async (menuData: MenuItemI) => {
   }
 }
 
-const updateMenuItem = async (menuData: MenuItemI): Promise<MenuItemI> => {
+const updateMenuItem = async (menuData: {
+  id: string
+  dish: string
+  categoryId: string
+  description?: string
+  imgPath?: string
+  foodOrBar: boolean
+  isVeg?: boolean
+}): Promise<MenuItemI> => {
   if (!menuData.id) {
     throw new Error("Menu item id is required")
   }
@@ -306,6 +314,20 @@ const updateItemPrice = async (priceData: Partial<PriceItemMapI>[]) => {
   }
 }
 
+const deleteItemPrice = async (priceIds: string[]) => {
+  try {
+    return await prisma.priceItemMap.deleteMany({
+      where: {
+        id: {
+          in: priceIds,
+        },
+      },
+    })
+  } catch (error) {
+    throw error
+  }
+}
+
 export {
   addItemPrice,
   addMenuItem,
@@ -320,5 +342,6 @@ export {
   updateMenuItem,
   updateCategory,
   deletePriceItem,
+  deleteItemPrice,
   getCatIdNums,
 }

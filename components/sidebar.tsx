@@ -1,15 +1,15 @@
 "use client"
 
+import { get } from "https"
 import React from "react"
 import dynamic from "next/dynamic"
 import Link from "next/link"
-import { useParams, useSearchParams } from "next/navigation"
-import { ChevronLeft, MenuIcon, ShoppingCart, StepBack, X } from "lucide-react"
+import { useParams } from "next/navigation"
+import { MenuIcon, ShoppingCart, X } from "lucide-react"
 
-import { cn } from "@/lib/utils"
+import { cn, getPathWithQuery } from "@/lib/utils"
 
 import LogoOrAvatar from "./logo-or-avatar"
-import { Button } from "./ui/button"
 
 const SocailIconMap = {
   facebook: dynamic(() => import("@/components/icons/facebook")),
@@ -45,9 +45,6 @@ export function Sidebar({
 }: SidebarProps) {
   const [open, setOpen] = React.useState(false)
   const params = useParams()
-  const searchParams = useSearchParams()
-  const tableNumber = searchParams.get("tableNumber")
-  const query = tableNumber ? `?tableNumber=${tableNumber}` : ""
 
   return (
     <>
@@ -117,7 +114,7 @@ export function Sidebar({
         />
 
         <div className="flex items-center justify-end gap-2">
-          <Link href={`/${params?.slug}/view-cart${query}`}>
+          <Link href={getPathWithQuery(`/${params?.slug}/view-cart`)}>
             <ShoppingCart className="size-7 cursor-pointer" />
           </Link>
         </div>
