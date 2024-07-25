@@ -1,10 +1,10 @@
 "use client"
 
-import React, { useEffect, useState } from "react"
+import React from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { Router } from "next/router"
-import { updateOrderStatus } from "@/services/order.services"
+import { updateOrder } from "@/services/order.services"
+import { Order } from "@prisma/client"
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -33,35 +33,17 @@ import {
   TableRow,
 } from "@/components/ui/table"
 
-import { Input } from "./ui/input"
-
-export type Order = {
-  id: string
-  total: number | undefined
-  tableNo: number
-  status: string
-  createdAt: Date
-  restaurantId: string
-}
-
 function Actions(rowOrder: any) {
   const router = useRouter()
-  console.log("HER", rowOrder)
-
-  console.log(router)
 
   const handleStatusChange = async (newStatus: string) => {
-    console.log("running me")
-
     try {
-      const updatedOrder = await updateOrderStatus(
-        rowOrder.rowOrder.id,
-        newStatus
-      )
+      const updatedOrder = await updateOrder({
+        id: rowOrder.rowOrder.id,
+        status: newStatus,
+      })
       console.log("Order status updated successfully", updatedOrder)
       router.refresh()
-
-      // Optionally, update the local state or refetch the data
     } catch (error) {
       console.error("Failed to update order status", error)
     }
@@ -69,9 +51,9 @@ function Actions(rowOrder: any) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="h-8 w-8 p-0">
+        <Button variant="ghost" className="size-8 p-0">
           <span className="sr-only">Open menu</span>
-          <MoreHorizontal className="h-4 w-4" />
+          <MoreHorizontal className="size-4" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
@@ -81,7 +63,6 @@ function Actions(rowOrder: any) {
             <DropdownMenuItem
               key={curr}
               onClick={() => {
-                console.log("onclick")
                 handleStatusChange(curr)
               }}
             >

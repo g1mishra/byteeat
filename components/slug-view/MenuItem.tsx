@@ -3,10 +3,10 @@
 import { MouseEvent } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { useParams } from "next/navigation"
+import { useParams, useSearchParams } from "next/navigation"
 import { MenuItemI } from "@/services/menuService"
+import { Minus, Plus } from "lucide-react"
 
-import { Cart } from "@/lib/types"
 import { cn } from "@/lib/utils"
 import { useCart } from "@/app/store/CartProvider"
 
@@ -14,24 +14,26 @@ import VegOrNonVeg from "../veg-or-nonveg"
 
 const MenuItem = ({
   item,
-  images,
-  showAddToCart = false,
+  image,
+  className = "",
 }: {
   item: MenuItemI & {
     labels?: string[]
   }
-  images: string[]
-  showAddToCart?: boolean
+  image?: string
+  className?: string
 }) => {
   const params = useParams()
+  const searchParams = useSearchParams()
+  const tableNumber = searchParams.get("tableNumber")
+  const query = tableNumber ? `?tableNumber=${tableNumber}` : ""
 
   return (
-    <Link href={`/${params.slug}/${item.id}`}>
-      {images?.length > 0 ? (
-        <ItemCard {...item} image={images[0]} />
-      ) : (
-        <ItemRow {...item} />
-      )}
+    <Link
+      href={`/${params.slug}/${item.id}${query}`}
+      className={cn("[&_*]:last:mb-0 [&_.hr-line]:last:hidden", className)}
+    >
+      {image ? <ItemCard {...item} image={image} /> : <ItemRow {...item} />}
     </Link>
   )
 }
@@ -42,11 +44,11 @@ const ItemCard = (item: MenuItemI & { image: string }) => {
   const { cart, setCart } = useCart()((state) => state)
 
   const onAdd = (e: MouseEvent<HTMLElement>) => {
-    e.preventDefault()
     if (item.PriceItemMap && item.PriceItemMap.length > 1) {
       console.log("Multiple prices")
       return
     }
+    e.preventDefault()
     setCart(
       {
         id: item.id as string,
@@ -76,12 +78,12 @@ const ItemCard = (item: MenuItemI & { image: string }) => {
           width={300}
           height={300}
         />
-        <div className="w-2/3 p-4">
+        <div className="flex w-2/3 flex-col p-4">
           <div className="flex items-center justify-between">
             <h3 className="text-base font-semibold">{item.dish}</h3>
             {item.foodOrBar && <VegOrNonVeg isVeg={item.isVeg} />}
           </div>
-          <p className="mt-2 line-clamp-4 text-sm text-gray-600">
+          <p className="mt-2 line-clamp-4 flex-1 text-sm text-gray-600">
             {item.description}
           </p>
           <div className="mt-4 flex items-end justify-between">
@@ -90,12 +92,19 @@ const ItemCard = (item: MenuItemI & { image: string }) => {
             </p>
             {totalQty ? (
               <div className="flex items-center gap-2">
-                <button className="font-semibold">-</button>
+                <button className="font-semibold">
+                  <Minus size={14} />
+                </button>
                 <p className="mx-1">{totalQty}</p>
-                <button className="font-semibold">+</button>
+                <button className="font-semibold">
+                  <Plus size={14} />
+                </button>
               </div>
             ) : (
-              <button className="font-semibold text-orange-300" onClick={onAdd}>
+              <button
+                className="text-xs font-semibold text-orange-300"
+                onClick={onAdd}
+              >
                 ADD
               </button>
             )}
@@ -110,18 +119,15 @@ const ItemRow = (item: MenuItemI & {}) => {
   const { cart, setCart } = useCart()((state) => state)
 
   const onAdd = (e: MouseEvent<HTMLElement>) => {
-    e.preventDefault()
-    if (
-      !item.id ||
-      !item.dish ||
-      (item.PriceItemMap && item.PriceItemMap.length > 1)
-    ) {
+    if (item.PriceItemMap && item.PriceItemMap.length > 1) {
+      console.log("Multiple prices")
       return
     }
+    e.preventDefault()
     setCart(
       {
-        id: item.id,
-        name: item.dish,
+        id: item.id as string,
+        name: item.dish as string,
         price: item.PriceItemMap?.[0].price || 0,
         quantity: 1,
       },
@@ -147,7 +153,7 @@ const ItemRow = (item: MenuItemI & {}) => {
   }
 
   return (
-    <div className="mb-2 flex flex-col">
+    <div className="mb-2 flex flex-col pr-4">
       <div className="mb-2 flex items-center justify-between">
         <div>
           <h3 className="flex items-center gap-1 text-base font-semibold">
@@ -166,26 +172,28 @@ const ItemRow = (item: MenuItemI & {}) => {
               <button
                 className="font-semibold"
                 onClick={() => handleQuantityChange("dec")}
-                disabled={currentItem.quantity === 1}
               >
-                -
+                <Minus size={14} />
               </button>
               <p className="mx-1">{currentItem.quantity}</p>
               <button
                 className="font-semibold"
                 onClick={() => handleQuantityChange("inc")}
               >
-                +
+                <Plus size={14} />
               </button>
             </div>
           ) : (
-            <button className="font-semibold text-orange-300" onClick={onAdd}>
+            <button
+              className="text-xs font-semibold text-orange-300"
+              onClick={onAdd}
+            >
               ADD
             </button>
           )}
         </div>
       </div>
-      <div className="mt-2 border-b border-[#ededed]" />
+      <div className="hr-line mt-2 border-b border-[#ededed]" />
     </div>
   )
 }

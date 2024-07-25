@@ -1,14 +1,9 @@
 import Image from "next/image"
 import { fetchMenuItem } from "@/services/menuService"
-import { FullAdress, fetchRestaurantBySlug } from "@/services/restaurantService"
-
-import { formatAddress } from "@/lib/string"
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { Sidebar } from "@/components/sidebar"
 
 import AddToCart from "./AddToCart"
 import BackButton from "./BackButton"
+import ItemViewHeader from "./ItemViewHeader"
 
 export default async function Component({
   params: { slug, itemId },
@@ -18,25 +13,19 @@ export default async function Component({
     itemId: string
   }
 }) {
-  const restaurant = await fetchRestaurantBySlug(slug)
   const response = await fetchMenuItem(itemId)
-
-  const address = formatAddress(restaurant as FullAdress)
 
   const imgPath = response?.imgPath?.trim()
   const images = imgPath ? imgPath.split(";") : []
 
   return (
-    <div className="px-6">
-      {restaurant ? (
-        <Sidebar
-          name={restaurant?.name}
-          socials={restaurant?.SocialLinks}
-          address={address}
-          addBackButton={true}
-        />
-      ) : null}
-      <div className="grid gap-6">
+    <>
+      <ItemViewHeader />
+      <div className="grid gap-4 px-6 py-4">
+        <div>
+          <h3 className="mb-2 text-2xl font-bold">{response?.dish}</h3>
+          <p className="text-muted-foreground">{response?.description}</p>
+        </div>
         <div className="group relative">
           {images.map((img, index) => (
             <Image
@@ -44,14 +33,13 @@ export default async function Component({
               src={img}
               alt={`Dish Image ${index}`}
               width={600}
-              height={400}
-              className="size-full object-cover transition-opacity group-hover:opacity-80"
+              height={300}
+              className="size-full rounded object-cover transition-opacity group-hover:opacity-95"
             />
           ))}
         </div>
         <AddToCart response={response} />
-        <BackButton />
       </div>
-    </div>
+    </>
   )
 }

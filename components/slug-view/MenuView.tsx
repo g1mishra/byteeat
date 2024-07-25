@@ -1,8 +1,6 @@
 "use client"
 
 import { useMemo, useState } from "react"
-import Link from "next/link"
-import { MenuItemI, PriceItemMapI } from "@/services/menuService"
 
 import { cn } from "@/lib/utils"
 import {
@@ -11,28 +9,23 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion"
-import { Button } from "@/components/ui/button"
 
 import SearchAndFilter from "../search-filter"
 import { Separator } from "../ui/separator"
-import Cart from "./Cart"
 import MenuItem from "./MenuItem"
 import { MenuPopover } from "./MenuPopover"
-import { ItemsForOrder, ItemsToRender } from "./type"
+import { ItemsToRender } from "./type"
 
 type MenuViewProps = {
   data: ItemsToRender[]
-  tableNo: number
   restaurantId?: string | undefined
 }
 
-const MenuView: React.FC<MenuViewProps> = ({ data, tableNo }) => {
+const MenuView: React.FC<MenuViewProps> = ({ data }) => {
   const [filters, setFilters] = useState({
     isFood: true,
     searchValue: "",
   })
-
-  const [cart, setCart] = useState<ItemsForOrder[]>([])
 
   const { food: foodItems, bar: barItems } = useMemo(
     () =>
@@ -74,40 +67,37 @@ const MenuView: React.FC<MenuViewProps> = ({ data, tableNo }) => {
       <Separator className="mb-2 mt-4" />
       <SearchAndFilter filters={filters} setFilters={setFilters} />
       <Separator className="mb-4 mt-2" />
-      {itemsToRender.map((category) => (
-        <Accordion
-          key={String(category.id)}
-          defaultValue={String(category.id)}
-          collapsible
-          type="single"
-          className="w-full "
-        >
+      <Accordion
+        defaultValue={itemsToRender.map((category) => String(category.id))}
+        type="multiple"
+        className="w-full "
+      >
+        {itemsToRender.map((category) => (
           <AccordionItem
-            className="mt-4 border-none first:mt-0"
+            key={category.id}
+            className="border-b first:mt-0 last:border-none"
             id={String(category.id)}
             value={String(category.id)}
           >
             <AccordionTrigger className="text-lg font-bold capitalize !no-underline">
-              {category.categoryName} - ({category?.Item?.length})
+              {category.categoryName}
             </AccordionTrigger>
 
             <AccordionContent className="grid gap-4">
               {category?.Item?.map((item) => {
                 const imgPath = item?.imgPath?.trim()
                 const images = imgPath ? imgPath.split(";") : []
-                return (
-                  <MenuItem
-                    key={item.id}
-                    item={item}
-                    images={images}
-                    showAddToCart={tableNo > 0}
-                  />
-                )
+                if (images.length > 0) {
+                  return (
+                    <MenuItem key={item.id} item={item} image={images[0]} />
+                  )
+                }
+                return <MenuItem key={item.id} item={item} />
               })}
             </AccordionContent>
           </AccordionItem>
-        </Accordion>
-      ))}
+        ))}
+      </Accordion>
 
       <div
         className={cn("fixed inset-x-0 bottom-10 flex justify-center", {

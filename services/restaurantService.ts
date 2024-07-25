@@ -33,6 +33,25 @@ const fetchRestaurants = async (userId: string) => {
   }
 }
 
+const getRestaurantIdBySlug = async (restaurantSlug: string) => {
+  if (!restaurantSlug) {
+    throw new Error("Restaurant slug is required")
+  }
+
+  try {
+    return await prisma.restaurant.findUnique({
+      where: {
+        slug: restaurantSlug,
+      },
+      select: {
+        id: true,
+      },
+    })
+  } catch (error) {
+    throw error
+  }
+}
+
 const fetchRestaurantBySlug = async (
   restaurantSlug: string,
   options?: {
@@ -236,6 +255,7 @@ export {
   deleteRestaurant,
   fetchRestaurant,
   fetchRestaurantBySlug,
+  getRestaurantIdBySlug,
   fetchRestaurants,
   getRestaurantSlug,
   updateRestaurant,

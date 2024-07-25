@@ -3,7 +3,7 @@
 import React from "react"
 import dynamic from "next/dynamic"
 import Link from "next/link"
-import { useParams } from "next/navigation"
+import { useParams, useSearchParams } from "next/navigation"
 import { ChevronLeft, MenuIcon, ShoppingCart, StepBack, X } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -45,6 +45,9 @@ export function Sidebar({
 }: SidebarProps) {
   const [open, setOpen] = React.useState(false)
   const params = useParams()
+  const searchParams = useSearchParams()
+  const tableNumber = searchParams.get("tableNumber")
+  const query = tableNumber ? `?tableNumber=${tableNumber}` : ""
 
   return (
     <>
@@ -83,7 +86,7 @@ export function Sidebar({
               const url = socials?.[social as keyof typeof socials].trim()
               return (
                 <a
-                  key={url}
+                  key={`social-${social}`}
                   href={url || `#${social}`}
                   className="text-gray-800 hover:underline dark:text-white"
                 >
@@ -99,19 +102,23 @@ export function Sidebar({
         </div>
       </div>
       <div
-        className={cn("flex items-center justify-between py-2", className, {
-          hidden: open,
-        })}
+        className={cn(
+          "bg-primary flex h-14 items-center justify-between space-x-2 px-4 text-white",
+          className,
+          {
+            hidden: open,
+          }
+        )}
         {...props}
       >
         <MenuIcon
           onClick={() => setOpen(!open)}
-          className="size-7 cursor-pointer text-gray-800 dark:text-white"
+          className="size-7 cursor-pointer"
         />
 
         <div className="flex items-center justify-end gap-2">
-          <Link href={`/${params?.slug}/view-cart`}>
-            <ShoppingCart className="size-7 cursor-pointer text-gray-800 dark:text-white" />
+          <Link href={`/${params?.slug}/view-cart${query}`}>
+            <ShoppingCart className="size-7 cursor-pointer" />
           </Link>
         </div>
       </div>
