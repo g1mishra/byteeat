@@ -31,7 +31,7 @@ const createStore = (cart: Cart[]) =>
           (item.portion || null) === (cartItem?.portion || null)
       )
 
-      const newCart = _item
+      let newCart = _item
         ? prevCart.map((cartItem) =>
             cartItem.id === _item.id &&
             (cartItem.portion || null) === (_item.portion || null)
@@ -51,6 +51,8 @@ const createStore = (cart: Cart[]) =>
               portion: item.portion || "",
             },
           ]
+        
+      newCart = newCart.filter((cartItem) => cartItem.quantity > 0)
 
       set({ cart: newCart })
     },

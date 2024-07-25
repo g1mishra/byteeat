@@ -81,7 +81,7 @@ function Actions(rowOrder: any) {
   )
 }
 
-const statuses = ["pending", "delivered", "cancelled"]
+const statuses = ["pending", "delivered", "cancelled", "accepted"]
 export const dcolumns: ColumnDef<Order>[] = [
   {
     accessorKey: "id",
