@@ -9,6 +9,7 @@ import { MenuIcon, ShoppingCart, X } from "lucide-react"
 
 import { cn, getPathWithQuery } from "@/lib/utils"
 
+import CartIcon from "./icons/cart"
 import LogoOrAvatar from "./logo-or-avatar"
 
 const SocailIconMap = {
@@ -113,11 +114,7 @@ export function Sidebar({
           className="size-7 cursor-pointer"
         />
 
-        <div className="flex items-center justify-end gap-2">
-          <Link href={getPathWithQuery(`/${params?.slug}/view-cart`)}>
-            <ShoppingCart className="size-7 cursor-pointer" />
-          </Link>
-        </div>
+        <CartIcon />
       </div>
     </>
   )

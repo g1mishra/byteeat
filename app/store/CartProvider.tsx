@@ -5,68 +5,103 @@ import { create } from "zustand"
 
 import { Cart } from "@/lib/types"
 
-const createStore = (cart: Cart[]) =>
-  create<{
-    cart: Cart[]
-    setCart: (cart: Cart, type: "inc" | "dec") => void
-    removeItem: (cart: Cart) => void
+type CartItem = {
+  id: string
+  name: string
+  price: number
+  quantity: number
+  portion?: string
+}
+
+type CartMap = {
+  [key: string]: CartItem
+}
+
+const createStore = (initialCart: Cart[]) => {
+  const cartMap: CartMap = initialCart.reduce((acc, item) => {
+    const key = `${item.id}${item.portion ? `-${item.portion}` : ""}`
+    acc[key] = { ...item, quantity: item.quantity }
+    return acc
+  }, {} as CartMap)
+
+  const calculateTotal = (cart: CartMap) => {
+    const quantity = Object.values(cart).reduce(
+      (sum, item) => sum + item.quantity,
+      0
+    )
+    const price = Object.values(cart).reduce(
+      (sum, item) => sum + item.price * item.quantity,
+      0
+    )
+    return { quantity, price }
+  }
+
+  const initialTotal = calculateTotal(cartMap)
+
+  return create<{
+    cart: CartMap
+    total: { quantity: number; price: number }
+    setCart: (item: Cart, type: "inc" | "dec") => void
+    removeItem: (item: Cart) => void
     clearCart: () => void
   }>((set, get) => ({
-    cart,
-    removeItem(item: Cart) {
-      const prevCart = get().cart
-      const newCart = prevCart.filter(
-        (cartItem) =>
-          cartItem.id !== item.id ||
-          (cartItem?.portion?.toLowerCase() || null) !==
-            (item?.portion?.toLowerCase() || null)
-      )
-      set({ cart: newCart })
-    },
+    cart: cartMap,
+    total: initialTotal,
     setCart(item: Cart, type: "inc" | "dec") {
       const prevCart = get().cart
-      const _item = prevCart.find(
-        (cartItem) =>
-          item.id === cartItem?.id &&
-          (item.portion || null) === (cartItem?.portion || null)
-      )
+      const key = `${item.id}${item.portion ? `-${item.portion}` : ""}`
+      const existingItem = prevCart[key]
 
-      let newCart = _item
-        ? prevCart.map((cartItem) =>
-            cartItem.id === _item.id &&
-            (cartItem.portion || null) === (_item.portion || null)
-              ? {
-                  ...cartItem,
-                  quantity: cartItem.quantity + (type === "inc" ? 1 : -1),
-                }
-              : cartItem
-          )
-        : [
-            ...prevCart,
-            {
-              id: item?.id,
-              name: item?.name,
-              price: item.price || 0,
-              quantity: 1,
-              portion: item.portion || "",
-            },
-          ]
-        
-      newCart = newCart.filter((cartItem) => cartItem.quantity > 0)
+      let newCart = { ...prevCart }
+      let newTotal = { ...get().total }
 
-      set({ cart: newCart })
+      if (existingItem) {
+        const newQuantity = existingItem.quantity + (type === "inc" ? 1 : -1)
+
+        if (newQuantity > 0) {
+          newCart[key] = { ...existingItem, quantity: newQuantity }
+          newTotal.price += type === "inc" ? item.price : -item.price
+          newTotal.quantity += type === "inc" ? 1 : -1
+        } else {
+          delete newCart[key]
+          newTotal.price -= item.price * existingItem.quantity
+          newTotal.quantity -= existingItem.quantity
+        }
+      } else if (type === "inc") {
+        newCart[key] = { ...item, quantity: 1 }
+        newTotal.price += item.price
+        newTotal.quantity += 1
+      }
+
+      set({ cart: newCart, total: newTotal })
+    },
+    removeItem(item: Cart) {
+      const prevCart = get().cart
+      const key = `${item.id}${item.portion ? `-${item.portion}` : ""}`
+      const newCart = { ...prevCart }
+      const existingItem = newCart[key]
+
+      if (existingItem) {
+        const newTotal = {
+          price: get().total.price - existingItem.price * existingItem.quantity,
+          quantity: get().total.quantity - existingItem.quantity,
+        }
+        delete newCart[key]
+        set({ cart: newCart, total: newTotal })
+      }
     },
     clearCart() {
-      set({ cart: [] })
+      set({ cart: {}, total: { quantity: 0, price: 0 } })
     },
   }))
+}
 
 const CartContext = createContext<ReturnType<typeof createStore> | null>(null)
 
 export const useCart = () => {
-  if (!CartContext)
-    throw new Error("useCart must be used within a CartProvider")
-  return useContext(CartContext)!
+  const context = useContext(CartContext)
+  if (!context) throw new Error("useCart must be used within a CartProvider")
+  return context
 }
 
 const CartProvider = ({

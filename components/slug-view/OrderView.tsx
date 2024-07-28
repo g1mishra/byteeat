@@ -106,7 +106,7 @@ function OrderItems({ items }: { items: OrderItem[] | undefined }) {
       {items?.map((item) => (
         <div key={item.id} className="flex items-center justify-between">
           <span>{item.item}</span>
-          <span>{item.price}</span>
+          <span>{item?.quantity} x {item.price}</span>
         </div>
       ))}
     </div>
