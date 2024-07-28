@@ -94,10 +94,59 @@ async function getOrderWithItemsById(
   }
 }
 
+async function getTodayOrdersByRestaurant(
+  restaurantId: string,
+  timestamp: Date
+): Promise<OrderWithItems[]> {
+  // add condition where cancelled orders are not included
+  try {
+    return await prisma.order.findMany({
+      where: {
+        restaurantId,
+        createdAt: {
+          gte: new Date(timestamp.setHours(0, 0, 0, 0)),
+          lte: new Date(timestamp.setHours(23, 59, 59, 999)),
+        },
+        status: {
+          not: "cancelled",
+        }
+
+      },
+      orderBy: { createdAt: "desc" },
+    })
+  } catch (error) {
+    throw new Error(
+      `Failed to get today's orders by restaurant: ${(error as Error).message}`
+    )
+  }
+}
+
+async function cancelledOrdersByRestaurant(
+  restaurantId: string
+): Promise<OrderWithItems[]> {
+  try {
+    return await prisma.order.findMany({
+      where: {
+        restaurantId,
+        status: "cancelled",
+      },
+      orderBy: { createdAt: "desc" },
+    })
+  } catch (error) {
+    throw new Error(
+      `Failed to get cancelled orders by restaurant: ${(error as Error).message}`
+    )
+  }
+}
+
+
+
 export {
   addOrderItems,
   createOrder,
   getAllOrdersByRestaurant,
   getOrderWithItemsById,
   updateOrder,
+  getTodayOrdersByRestaurant,
+  cancelledOrdersByRestaurant
 }

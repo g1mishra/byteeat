@@ -2,7 +2,7 @@ import Link from "next/link"
 import { FullAdress, fetchRestaurant } from "@/services/restaurantService"
 import { PlusIcon } from "lucide-react"
 import { getServerSession } from "next-auth"
-
+import { Sidebar } from "@/components/sidebar_other"
 import { formatAddress } from "@/lib/string"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
@@ -25,10 +25,23 @@ const RestaurantDetails = async ({ params }: any) => {
 
   if (!response) return <UnAuthorized />
 
+  const hrefsAndLinks = [
+    
+    { href: `/${response.slug}`, text: "View Menu" },
+    { href: `/manage/restaurant/${restroId}/orders`, text: "Open Orders" },
+    { href: `/manage/restaurant/${restroId}/edit`, text: "Edit Restaurant" },
+    { href: `/${response.slug}/menuqr`, text: "View QR" }
+
+  ]
+
   return (
-    <div className="flex flex-col gap-y-6 dark:text-white">
+    <div className="flex">
+      <Sidebar hrefsAndLinks={hrefsAndLinks} heading=""/>
+    <div className="flex flex-col w-full gap-y-6 dark:text-white">
+      
       <div className="flex justify-between gap-4 max-sm:flex-col">
-        <div className="flex flex-col items-start gap-y-0.5">
+        {/*<div className="flex flex-col items-start gap-y-0.5">
+
           <LogoOrAvatar
             name={response?.name}
             src={response?.logoUrl || ""}
@@ -37,15 +50,7 @@ const RestaurantDetails = async ({ params }: any) => {
           <h1 className="mt-2 text-4xl font-bold">{response.name}</h1>
           <p>{formatAddress(response as FullAdress)}</p>
           <p>Table size: {response.tableSize}</p>
-        </div>
-        <div className="flex flex-wrap justify-between gap-4 self-start sm:gap-x-6">
-          <Link href={`/manage/restaurant/${restroId}/edit`}>
-            <Button>Edit restaurant</Button>
-          </Link>
-          <Link href={`/${response.slug}`} target="_blank">
-            <Button>View menu</Button>
-          </Link>
-        </div>
+        </div>*/}
       </div>
 
       <div>
@@ -58,6 +63,7 @@ const RestaurantDetails = async ({ params }: any) => {
           <PlusIcon size={24} />
         </Card>
       </WithCreateMenuDialog>
+    </div>
     </div>
   )
 }

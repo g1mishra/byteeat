@@ -1,8 +1,11 @@
 "use client"
 
 import { useQRCode } from "next-qrcode"
+import { useEffect, useState } from "react"
+import { getRestaurantIdBySlug } from "@/services/restaurantService"
+import { number } from "zod"
 
-import { Button } from "@/components/ui/button"
+
 
 function QRMenu({ params }: any) {
   const { Canvas } = useQRCode()
@@ -12,10 +15,37 @@ function QRMenu({ params }: any) {
     root_url = window.location.origin
   }
 
-  const url_to_render = `${root_url}/${params.slug}`
+  const [totalTables, setTotalTables] = useState(0);
+
+  useEffect(() => {
+    const fetchTotalTables = async () => {
+      try {
+        const restaurantIds = await getRestaurantIdBySlug(params.slug);
+        setTotalTables(restaurantIds?.tableSize as number);
+      } catch (error) {
+        console.error("Error fetching total tables:", error);
+      }
+    };
+
+    fetchTotalTables();
+  }, [params.slug]);
+  console.log(totalTables)
+
+  const [tableNo, setTableNo] = useState(1)
+  const url_to_render = tableNo<1?`${root_url}/${params.slug}`:`${root_url}/${params.slug}?tableNumber=${tableNo}`
+  
 
   return (
-    <div>
+    <div className="flex flex-col h-screen justify-center items-center">
+     <h2>Select table Number</h2>
+      <select name="table_no" id="table_no" onChange={(e) => setTableNo(Number(e.target.value))} className="text-black">
+         {
+          Array.from({length: totalTables}, (_, i) => i + 1).map((table) => (
+            <option key={table} value={table} >{table}</option>
+          ))
+         }
+
+      </select>
       <Canvas
         text={url_to_render}
         options={{
@@ -24,13 +54,12 @@ function QRMenu({ params }: any) {
           scale: 4,
           width: 200,
           color: {
-            dark: "#010599FF",
-            light: "#FFBF60FF",
+            dark: "#000000",
+            light: "#FFFFFF",
           },
         }}
       />
-      <br></br>
-      <Button>Order stickers</Button>
+      <p>Table number: {tableNo}</p>
     </div>
   )
 }
