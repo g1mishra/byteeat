@@ -137,7 +137,7 @@ export function DataTable<TData, TValue>({
   })
 
   return (
-    <div className="rounded-md border">
+    <div className="rounded-md border w-full">
       <div className="flex items-center py-4">
         <select
           value={(table.getColumn("status")?.getFilterValue() as string) ?? ""}

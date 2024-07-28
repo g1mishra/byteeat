@@ -45,6 +45,7 @@ const getRestaurantIdBySlug = async (restaurantSlug: string) => {
       },
       select: {
         id: true,
+        tableSize: true,
       },
     })
   } catch (error) {
