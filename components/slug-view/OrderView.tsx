@@ -7,6 +7,10 @@ import { OrderItem } from "@prisma/client"
 
 import { Badge } from "@/components/ui/badge"
 
+function getOrderToken(orderId: string, length: number = 6): string {
+  return orderId.slice(-length)
+}
+
 export default function OrderView({
   orderDetails,
 }: {
@@ -17,7 +21,9 @@ export default function OrderView({
   useEffect(() => {
     const interval = setInterval(() => {
       router.refresh()
-      if (orderDetails?.status === "accepted") {
+      if (
+        ["accepted", "delivered", "cancelled"].includes(orderDetails?.status)
+      ) {
         clearInterval(interval)
       }
     }, 5000)
@@ -29,57 +35,101 @@ export default function OrderView({
 
   return (
     <div className="flex min-h-screen flex-col bg-gray-100">
-      {orderDetails.status === "pending" ? (
+      {renderStatusContent(orderDetails)}
+      <div className="flex flex-1 flex-col gap-4 p-4 sm:p-6">
+        <div className="rounded-md border bg-white p-4 shadow-sm">
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-2xl font-bold">Order Details</h2>
+            <Badge variant="secondary" className="px-3 py-1 text-xs capitalize">
+              {orderDetails.status.charAt(0).toUpperCase() +
+                orderDetails.status.slice(1)}
+            </Badge>
+          </div>
+          <OrderInfo orderDetails={orderDetails} />
+        </div>
+        <div className="rounded-md border bg-white p-4 shadow-sm">
+          <h3 className="mb-2 text-xl font-bold">Order Items</h3>
+          <OrderItems items={orderDetails.orderItems} />
+          <OrderTotals total={orderDetails.total} />
+        </div>
+      </div>
+    </div>
+  )
+}
+
+const renderStatusContent = (orderDetails: any) => {
+  const orderToken = getOrderToken(orderDetails.id)
+
+  switch (orderDetails.status) {
+    case "pending":
+      return (
         <div className="flex h-full flex-col items-center justify-center gap-4 p-4">
           <PackageIcon className="size-12 text-blue-500" />
           <h2 className="text-2xl font-bold">Order Pending</h2>
           <h3>
-            Order ID: <span className="font-bold">{orderDetails.id}</span>
+            Order Token:{" "}
+            <span className="font-bold uppercase">{orderToken}</span>
           </h3>
-          <p className="text-gray-600">
+          <p className="text-center text-gray-600">
             Your order has been placed and is awaiting confirmation.
           </p>
         </div>
-      ) : (
-        <div className="flex flex-1 flex-col gap-4 p-4 sm:p-6">
-          <div className="rounded-md border bg-white p-4 shadow-sm">
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-2xl font-bold">Order Details</h2>
-              <Badge
-                variant="secondary"
-                className="px-3 py-1 text-xs capitalize"
-              >
-                {orderDetails.status.charAt(0).toUpperCase() +
-                  orderDetails.status.slice(1)}
-              </Badge>
-            </div>
-            <OrderInfo orderDetails={orderDetails} />
-          </div>
-          <div className="rounded-md border bg-white p-4 shadow-sm">
-            <h3 className="mb-2 text-xl font-bold">Order Items</h3>
-            <OrderItems items={orderDetails.orderItems} />
-            <OrderTotals
-              // subtotal={orderDetails.subtotal}
-              // tax={orderDetails.tax}
-              total={orderDetails.total}
-            />
-          </div>
+      )
+    case "delivered":
+      return (
+        <div className="flex h-full flex-col items-center justify-center gap-4 p-4">
+          <PackageIcon className="size-12 text-green-500" />
+          <h2 className="text-2xl font-bold">Order Delivered</h2>
+          <h3>
+            Order Token:{" "}
+            <span className="font-bold uppercase">{orderToken}</span>
+          </h3>
+          <p className="text-center text-gray-600">
+            Your order has been delivered successfully.
+          </p>
         </div>
-      )}
-    </div>
-  )
+      )
+    case "cancelled":
+      return (
+        <div className="flex h-full flex-col items-center justify-center gap-4 p-4">
+          <PackageIcon className="size-12 text-red-500" />
+          <h2 className="text-2xl font-bold">Order Cancelled</h2>
+          <h3>
+            Order Token:{" "}
+            <span className="font-bold uppercase">{orderToken}</span>
+          </h3>
+          <p className="text-center text-gray-600">
+            Your order has been cancelled.
+          </p>
+        </div>
+      )
+    case "accepted":
+      return (
+        <div className="flex h-full flex-col items-center justify-center gap-4 p-4">
+          <PackageIcon className="size-12 text-yellow-500" />
+          <h2 className="text-2xl font-bold">Order Accepted</h2>
+          <h3>
+            Order Token:{" "}
+            <span className="font-bold uppercase">{orderToken}</span>
+          </h3>
+          <p className="text-center text-gray-600">
+            Your order has been accepted and is being prepared.
+          </p>
+        </div>
+      )
+    default:
+      return null
+  }
 }
 
 function OrderInfo({ orderDetails }: { orderDetails: OrderWithItems }) {
   return (
     <div className="grid gap-3">
-      <OrderDetail label="Order #" value={orderDetails.id} />
+      <OrderDetail label="Order Id" value={orderDetails.id} />
       <OrderDetail
         label="Date"
         value={new Date(orderDetails.createdAt).toDateString()}
       />
-      {/* <OrderDetail label="Customer" value={orderDetails?.name} /> */}
-      {/* <OrderDetail label="Phone" value={orderDetails?.phone} /> */}
       <OrderDetail label="Table #" value={orderDetails.tableNo} />
     </div>
   )
@@ -93,9 +143,9 @@ function OrderDetail({
   value: string | number
 }) {
   return (
-    <div className="flex items-center justify-between">
-      <span className="text-gray-600">{label}</span>
-      <span>{value}</span>
+    <div className="flex items-start justify-between gap-x-2">
+      <span className="shrink-0 text-gray-600">{label}</span>
+      <span className="text-right">{value}</span>
     </div>
   )
 }
@@ -106,28 +156,18 @@ function OrderItems({ items }: { items: OrderItem[] | undefined }) {
       {items?.map((item) => (
         <div key={item.id} className="flex items-center justify-between">
           <span>{item.item}</span>
-          <span>{item?.quantity} x {item.price}</span>
+          <span>
+            {item.quantity} x {item.price}
+          </span>
         </div>
       ))}
     </div>
   )
 }
 
-function OrderTotals({
-  subtotal,
-  tax,
-  total,
-}: {
-  subtotal?: number
-  tax?: number
-  total: number
-}) {
+function OrderTotals({ total }: { total: number }) {
   return (
     <div className="mt-4">
-      {subtotal && (
-        <OrderTotal label="Subtotal" value={`${subtotal.toFixed(2)}`} />
-      )}
-      {tax && <OrderTotal label="Tax" value={`${tax.toFixed(2)}`} />}
       <OrderTotal label="Total" value={`${total.toFixed(2)}`} bold />
     </div>
   )

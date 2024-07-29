@@ -6,7 +6,7 @@ import { Minus, Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useCart } from "@/app/store/CartProvider"
 
-const AddToCart = ({
+const ItemInCart = ({
   response,
 }: {
   response: MenuItemWithPriceI | undefined
@@ -92,4 +92,4 @@ const AddToCart = ({
   )
 }
 
-export default AddToCart
+export default ItemInCart
