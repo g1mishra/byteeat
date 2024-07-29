@@ -17,16 +17,14 @@ import CheckoutDialog from "@/components/CheckoutModal"
 import { useCart } from "../../store/CartProvider"
 
 export default function ViewCart() {
-  const { cart, setCart, removeItem, clearCart } = useCart()((state) => state)
+  const { cart, total, setCart, removeItem, clearCart } = useCart()(
+    (state) => state
+  )
   const [showCheckoutDialog, setShowCheckoutDialog] = useState(false)
   const router = useRouter()
   const params = useParams()
 
   const { toast } = useToast()
-
-  const subTotal = useMemo(() => {
-    return cart.reduce((total, item) => total + item.price * item.quantity, 0)
-  }, [cart])
 
   const handleQuantityChange = (
     operation: "inc" | "dec",
@@ -62,13 +60,13 @@ export default function ViewCart() {
           success: false,
         }
       }
-      const resp = await createOrder(restoId.id, Number(table), subTotal)
+      const resp = await createOrder(restoId.id, Number(table), total?.price)
       if (!resp || !resp.id) {
         return {
           success: false,
         }
       }
-      const orderItemResp = await addOrderItems(resp.id, cart)
+      const orderItemResp = await addOrderItems(resp.id, Object.values(cart))
       if (orderItemResp.count === 0) {
         return {
           success: false,
@@ -104,7 +102,7 @@ export default function ViewCart() {
     <div className="container mx-auto grid gap-6 p-0">
       <div className="bg-primary flex h-14 items-center overflow-hidden">
         <Button
-          className="z-10 shrink-0"
+          className="bg-primary z-10 shrink-0"
           size="sm"
           onClick={() => router.push(getPathWithQuery(`/${params?.slug}`))}
         >
@@ -114,42 +112,44 @@ export default function ViewCart() {
           Your Cart
         </h1>
       </div>
-      {cart.length === 0 ? (
+      {Object.values(cart).length === 0 ? (
         <div className="text-muted-foreground grid min-h-40 place-content-center text-center">
           Your cart is empty.
         </div>
       ) : (
-        <div className="grid gap-6 px-6">
-          {cart.map((item) => (
+        <div className="grid gap-4 px-6">
+          {Object.values(cart).map((item) => (
             <div
               key={item.id}
-              className="bg-background grid gap-6 overflow-hidden rounded-lg border shadow-lg"
+              className="bg-background grid overflow-hidden rounded-lg border shadow-lg"
             >
-              <div className="flex flex-col justify-between p-6">
-                <h3 className="mb-2 text-2xl font-bold">
+              <div className="flex flex-col justify-between p-4">
+                <h3 className="mb-1 text-lg font-bold">
                   {item.portion ? `${item.name} - ${item.portion}` : item.name}
                 </h3>
                 <div className="flex items-center justify-between">
                   <div className="text-lg font-medium">₹{item.price}</div>
-                  <div className="flex items-center gap-2">
-                    <button
-                      className="flex size-7 items-center justify-center rounded-full bg-red-500 text-white"
-                      onClick={() => handleQuantityChange("dec", item)}
-                      disabled={item.quantity === 1}
-                    >
-                      <Minus size={16} />
-                    </button>
-                    <span className="text-lg font-semibold">
-                      {item.quantity}
-                    </span>
-                    <button
-                      className="flex size-7 items-center justify-center rounded-full bg-green-500 text-white"
-                      onClick={() => handleQuantityChange("inc", item)}
-                    >
-                      <Plus size={16} />
-                    </button>
+                  <div className="flex items-center">
+                    <div className="bg-secondary text-primary flex items-center space-x-2 rounded-lg border">
+                      <button
+                        className="px-3 py-2"
+                        onClick={() => handleQuantityChange("dec", item)}
+                        disabled={item.quantity === 1}
+                      >
+                        <Minus size={16} />
+                      </button>
+                      <span className="text-base font-medium">
+                        {item.quantity}
+                      </span>
+                      <button
+                        className="px-3 py-2"
+                        onClick={() => handleQuantityChange("inc", item)}
+                      >
+                        <Plus size={16} />
+                      </button>
+                    </div>
                     <Trash2
-                      size={24}
+                      size={20}
                       className="ml-2 cursor-pointer text-red-500"
                       onClick={() => removeItem(item)}
                     />
@@ -160,13 +160,13 @@ export default function ViewCart() {
           ))}
         </div>
       )}
-      {cart.length > 0 && (
+      {Object.values(cart).length > 0 && (
         <div className="mt-8 flex w-full px-6">
           <div className="bg-background w-full rounded-lg p-6 shadow-lg md:p-8">
             <h2 className="mb-4 text-2xl font-bold">Order Summary</h2>
             <div className="mb-2 flex items-center justify-between">
               <div>Subtotal</div>
-              <div>₹{subTotal.toFixed(2)}</div>
+              <div>₹{total?.price?.toFixed(2)}</div>
             </div>
             <div className="mb-4 flex items-center justify-between">
               <div>Charges</div>
@@ -175,12 +175,13 @@ export default function ViewCart() {
             <Separator className="my-4" />
             <div className="mb-4 flex items-center justify-between">
               <div className="text-lg font-medium">Total</div>
-              <div className="text-lg font-medium">₹{subTotal.toFixed(2)}</div>
+              <div className="text-lg font-medium">
+                ₹{total?.price?.toFixed(2)}
+              </div>
             </div>
             <Button
               size="lg"
               className="w-full"
-              disabled={cart.length === 0}
               onClick={() => setShowCheckoutDialog(true)}
             >
               Proceed to Checkout
@@ -188,7 +189,7 @@ export default function ViewCart() {
           </div>
         </div>
       )}
-      {cart.length === 0 && (
+      {Object.values(cart).length === 0 && (
         <div className="flex w-full justify-center">
           <Link href={getPathWithQuery(`/${params?.slug}`)}>
             <Button size="lg">Continue Shopping</Button>

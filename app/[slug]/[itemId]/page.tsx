@@ -1,8 +1,7 @@
 import Image from "next/image"
 import { fetchMenuItem } from "@/services/menuService"
 
-import AddToCart from "./AddToCart"
-import BackButton from "./BackButton"
+import ItemInCart from "./ItemInCart"
 import ItemViewHeader from "./ItemViewHeader"
 
 export default async function Component({
@@ -38,7 +37,7 @@ export default async function Component({
             />
           ))}
         </div>
-        <AddToCart response={response} />
+        {response ? <ItemInCart response={response} /> : null}
       </div>
     </>
   )

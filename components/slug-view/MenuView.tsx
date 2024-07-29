@@ -1,8 +1,8 @@
 "use client"
 
 import { useMemo, useState } from "react"
+import dynamic from "next/dynamic"
 
-import { cn } from "@/lib/utils"
 import {
   Accordion,
   AccordionContent,
@@ -14,8 +14,9 @@ import { useCart } from "@/app/store/CartProvider"
 import SearchAndFilter from "../search-filter"
 import { Separator } from "../ui/separator"
 import MenuItem from "./MenuItem"
-import { MenuPopover } from "./MenuPopover"
 import { ItemsToRender } from "./type"
+
+const MenuPopover = dynamic(() => import("./MenuPopover"), { ssr: false })
 
 type MenuViewProps = {
   data: ItemsToRender[]
@@ -23,7 +24,6 @@ type MenuViewProps = {
 }
 
 const MenuView: React.FC<MenuViewProps> = ({ data }) => {
-  const { cart, setCart } = useCart()((state) => state)
   const [filters, setFilters] = useState({
     isFood: true,
     searchValue: "",
@@ -89,38 +89,19 @@ const MenuView: React.FC<MenuViewProps> = ({ data }) => {
               {category?.Item?.map((item) => {
                 const imgPath = item?.imgPath?.trim()
                 const images = imgPath ? imgPath.split(";") : []
+
                 if (images.length > 0) {
                   return (
-                    <MenuItem
-                      key={item.id}
-                      item={item}
-                      image={images[0]}
-                      cart={cart}
-                      setCart={setCart}
-                    />
+                    <MenuItem key={item.id} item={item} image={images[0]} />
                   )
                 }
-                return (
-                  <MenuItem
-                    key={item.id}
-                    item={item}
-                    cart={cart}
-                    setCart={setCart}
-                  />
-                )
+                return <MenuItem key={item.id} item={item} />
               })}
             </AccordionContent>
           </AccordionItem>
         ))}
       </Accordion>
-
-      <div
-        className={cn("fixed inset-x-0 bottom-10 flex justify-center", {
-          hidden: Object.keys(itemsToRender).length === 0,
-        })}
-      >
-        <MenuPopover itemsToRender={itemsToRender} />
-      </div>
+      <MenuPopover itemsToRender={itemsToRender} />
     </div>
   )
 }

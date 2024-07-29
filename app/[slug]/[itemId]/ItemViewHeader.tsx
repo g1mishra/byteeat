@@ -1,10 +1,11 @@
 "use client"
 
-import { ArrowLeft, ShoppingCart } from "lucide-react"
 import Link from "next/link"
 import { useParams } from "next/navigation"
+import { ArrowLeft, ShoppingCart } from "lucide-react"
 
 import { getPathWithQuery } from "@/lib/utils"
+import CartIcon from "@/components/icons/cart"
 
 const ItemViewHeader = () => {
   const { slug } = useParams()
@@ -13,9 +14,7 @@ const ItemViewHeader = () => {
       <Link href={getPathWithQuery(`/${slug}`)} className="text-white">
         <ArrowLeft size={24} />
       </Link>
-      <Link href={getPathWithQuery(`/${slug}/view-cart`)}>
-        <ShoppingCart className="size-7 cursor-pointer text-white" />
-      </Link>
+      <CartIcon />
     </div>
   )
 }
