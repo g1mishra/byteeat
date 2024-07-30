@@ -17,8 +17,10 @@ export default function HomePage() {
           className="flex items-center justify-center"
           prefetch={false}
         >
-          <BinaryIcon className="size-6" />
-          <span className="text-2xl font-bold">ByteEat</span>
+          {/*<BinaryIcon className="size-6" />*/}
+          <Image src="/logo.svg" width={256} height={256} alt="ByteEat"/>
+
+          {/*<span className="text-2xl font-bold">ByteEat</span>*/}
         </Link>
         <nav className="ml-auto flex gap-4 sm:gap-6">
           <Link
