@@ -40,6 +40,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { useToast } from "@/components/ui/use-toast"
+import CenterLoading from "@/components/center-loading"
 import LogoOrAvatar from "@/components/logo-or-avatar"
 import state2city from "@/components/manage/utils/cities"
 import uploadImage from "@/components/manage/utils/uploadImage"
@@ -95,59 +96,80 @@ export default function EditPage({
       },
     },
   })
+
   const router = useRouter()
   const { toast } = useToast()
   const [file, setFile] = useState<File | null>(null)
+  const [loading, setLoading] = useState(false)
+
   const onSubmit = async (data: EditRestaurantFormValues) => {
-    if (
-      JSON.stringify(data) ===
+    // Define the data to check for changes
+    const generalData = {
+      logoUrl: response?.logoUrl,
+      tableSize: response?.tableSize,
+      address_string: response?.address_string,
+      city: response?.city,
+      state: response?.state,
+      country: response?.country,
+    }
+
+    const socialData = response?.SocialLinks || {}
+
+    const hasGeneralChanges =
+      JSON.stringify(data) !==
       JSON.stringify({
-        logoUrl: response?.logoUrl,
-        tableSize: response?.tableSize,
-        address_string: response?.address_string,
-        city: response?.city,
-        state: response?.state,
-        country: response?.country,
-        SocialLinks: {
-          instagram: response?.SocialLinks?.instagram || "",
-          twitter: response?.SocialLinks?.twitter || "",
-          facebook: response?.SocialLinks?.facebook || "",
-          whatsapp: response?.SocialLinks?.whatsapp || "",
-        },
+        ...generalData,
+        SocialLinks: undefined,
       })
-    ) {
-      toast({
-        title: `No changes made.`,
-      })
+
+    const hasSocialChanges =
+      JSON.stringify(data.SocialLinks) !== JSON.stringify(socialData)
+
+    if (!hasGeneralChanges && !hasSocialChanges) {
+      toast({ title: `No changes made.` })
       return
     }
 
+    setLoading(true)
+
     try {
-      const uploadedUrl = await uploadImage(file, `${response?.slug}/logo.png`)
-      if (uploadedUrl) {
-        data.logoUrl = uploadedUrl
+      if (hasGeneralChanges) {
+        if (file) {
+          const uploadedUrl = await uploadImage(
+            file,
+            `${response?.slug}/logo.png`
+          )
+          if (uploadedUrl) {
+            data.logoUrl = uploadedUrl
+          }
+        }
+
+        data["id"] = response?.id
+
+        const dataWithOutSocialLinks = {
+          ...data,
+          SocialLinks: undefined,
+        }
+
+        if (!response?.id) {
+          throw new Error("Restaurant ID is required")
+        }
+
+        await updateRestaurant(dataWithOutSocialLinks)
       }
 
-      data["id"] = response?.id
+      if (hasSocialChanges) {
+        if (!response?.id) {
+          throw new Error("Restaurant ID is required")
+        }
 
-      const dataWithOutSocialLinks = {
-        ...data,
-        SocialLinks: undefined,
+        await addOrUpdateSocialLinks(
+          response?.id as string,
+          data.SocialLinks as any
+        )
       }
 
-      if (!response?.id) {
-        throw new Error("Restaurant ID is required")
-      }
-
-      await Promise.all([
-        addOrUpdateSocialLinks(response?.id as string, data.SocialLinks as any),
-        updateRestaurant(dataWithOutSocialLinks),
-      ])
-
-      toast({
-        title: `Restaurant updated successfully.`,
-      })
-
+      toast({ title: `Restaurant updated successfully.` })
       router.refresh()
       form.reset({})
     } catch (error) {
@@ -156,17 +178,20 @@ export default function EditPage({
         variant: "destructive",
       })
       console.error(error)
+    } finally {
+      setLoading(false)
     }
   }
 
   return (
     <>
+      {loading && <CenterLoading />}
       <div className="flex w-full justify-between">
-        <div className="relative max-w-max">
+        <div className="relative max-w-max rounded border p-1">
           <LogoOrAvatar
             name={response?.name || ""}
             src={form.watch("logoUrl") || response?.logoUrl}
-            className="size-32"
+            className="size-32 object-contain"
           />
           <input
             type="file"
@@ -175,14 +200,14 @@ export default function EditPage({
             onChange={(e) => {
               if (e.target.files && e.target.files[0]) {
                 setFile(e.target.files[0])
+                form.setValue("logoUrl", URL.createObjectURL(e.target.files[0]))
               }
             }}
           />
-          <div className="absolute right-0 top-0 cursor-pointer rounded-full border bg-white p-1">
+          <div className="absolute right-1 top-1 cursor-pointer rounded-full border bg-white p-1">
             <Pencil size={16} />
           </div>
         </div>
-        {/* // back button */}
         <Button
           onClick={() => router.push(`/manage/restaurant/${response?.id}`)}
         >

@@ -1,5 +1,6 @@
 "use client"
 
+import dynamic from "next/dynamic"
 import { MenuItemI } from "@/services/menuService"
 
 import {
@@ -8,23 +9,30 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion"
+import { Button } from "@/components/ui/button"
 import {
   Card,
   CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { WithUpdateMenuDialog } from "@/components/manage/update-menu-item"
 import VegOrNonVeg from "@/components/veg-or-nonveg"
 
-const MenuList = ({
+const WithUpdateMenuDialog = dynamic(
+  () => import("@/components/manage/dialog-trigger/with-update-item"),
+  { ssr: false }
+)
+
+const MenuCardList = ({
   menu,
+  slug,
 }: {
   menu: {
     id: string
     categoryName: string
     Item: MenuItemI[]
   }
+  slug: string
 }) => {
   return (
     <Accordion
@@ -54,8 +62,9 @@ const MenuList = ({
                   description: item.description || "",
                   PriceItemMap: item.PriceItemMap || [],
                 }}
+                restaurantSlug={slug}
               >
-                <Card>
+                <Card className="flex h-full flex-col justify-between">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-x-1 text-base">
                       {item.foodOrBar ? (
@@ -66,24 +75,28 @@ const MenuList = ({
                       ) : null}
                       {item.dish}{" "}
                     </CardTitle>
-                    <CardDescription>
-                      <span className="line-clamp-2">{item.description}</span>
-                      <span className="mt-0.5">
-                        {item?.PriceItemMap?.map((price) => (
-                          <span className="block" key={price.id}>
-                            {!price.portion ? (
-                              <strong>₹ {price.price}</strong>
-                            ) : (
-                              <span>
-                                {price.portion} :{" "}
-                                <strong>₹ {price.price}</strong>
-                              </span>
-                            )}
-                          </span>
-                        ))}
-                      </span>
+                    <CardDescription className="line-clamp-2">
+                      {item.description}
                     </CardDescription>
+                    <div className="mt-2">
+                      {item?.PriceItemMap?.map((price) => (
+                        <div key={price.id}>
+                          {!price.portion ? (
+                            <strong>₹ {price.price}</strong>
+                          ) : (
+                            <span>
+                              {price.portion} : <strong>₹ {price.price}</strong>
+                            </span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
                   </CardHeader>
+                  <div className="mt-auto">
+                    <Button className="w-full rounded-none" variant="secondary">
+                      Edit
+                    </Button>
+                  </div>
                 </Card>
               </WithUpdateMenuDialog>
             ))}
@@ -94,4 +107,4 @@ const MenuList = ({
   )
 }
 
-export default MenuList
+export default MenuCardList

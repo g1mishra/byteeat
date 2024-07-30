@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useRef, useState } from "react"
+import { useRef } from "react"
 import { useRouter } from "next/navigation"
 import { addMenuItemHelper } from "@/services/helper.service"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -8,6 +8,7 @@ import { PlusIcon, Trash2 } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
+import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
   Form,
@@ -20,7 +21,6 @@ import {
 import { Input } from "@/components/ui/input"
 import { useToast } from "@/components/ui/use-toast"
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog"
 import {
   Select,
   SelectContent,
@@ -28,6 +28,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select"
+import { Textarea } from "../ui/textarea"
 import UploadItemImage from "./upload-item-image"
 import uploadImage from "./utils/uploadImage"
 
@@ -133,7 +134,8 @@ export default function MenuCreateForm({
     const uploadPromises = files.map((file) =>
       uploadImage(
         file,
-        `${Date.now().toString()}-${slug}/${dishName}/${file.name}`
+        `${Date.now().toString()}-${slug}/${dishName}/${file.name}`,
+        true
       )
         .then((result) => ({ success: true, result }))
         .catch((error) => ({ success: false, error: error.message }))
@@ -177,7 +179,7 @@ export default function MenuCreateForm({
         onSubmit={form.handleSubmit(onSubmit, (errors) => {
           console.log("Error while submitting form", errors)
         })}
-        className="space-y-8"
+        className="grid gap-4 sm:grid-cols-2"
       >
         <FormField
           control={form.control}
@@ -193,19 +195,6 @@ export default function MenuCreateForm({
           )}
         />
 
-        <FormField
-          control={form.control}
-          name="description"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Add description</FormLabel>
-              <FormControl>
-                <Input {...field} placeholder="Add description" />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
         <FormField
           control={form.control}
           name="foodOrBar"
@@ -254,9 +243,9 @@ export default function MenuCreateForm({
               <FormItem>
                 <FormLabel>Veg or Non Veg?</FormLabel>
                 <Select
-                  onValueChange={(value) =>
+                  onValueChange={(value) => {
                     field.onChange(value === "true" ? true : false)
-                  }
+                  }}
                   defaultValue={String(field.value)}
                 >
                   <FormControl>
@@ -291,7 +280,6 @@ export default function MenuCreateForm({
         <FormField
           control={form.control}
           name="category"
-          // disabled={itemData ? true : false}
           render={({ field }) => (
             <FormItem>
               <FormLabel>Add category</FormLabel>
@@ -308,13 +296,30 @@ export default function MenuCreateForm({
           )}
         />
 
+        <FormField
+          control={form.control}
+          name="description"
+          render={({ field }) => (
+            <FormItem className="sm:col-span-2">
+              <FormLabel>Add description</FormLabel>
+              <FormControl>
+                <Textarea {...field} placeholder="Add description" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
         {form.getValues().PriceItemMap.map((price, idx) => (
-          <div key={idx} className="flex items-start gap-4">
+          <div
+            key={idx}
+            className="relative flex items-start gap-4 sm:col-span-2"
+          >
             <FormField
               control={form.control}
               name={`PriceItemMap.${idx}.portion`}
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="flex-1">
                   <FormLabel>Portion</FormLabel>
                   <FormControl>
                     <Input
@@ -322,8 +327,8 @@ export default function MenuCreateForm({
                       {...field}
                       placeholder={
                         form.getValues().foodOrBar
-                          ? "Half, Full"
-                          : "10ml, 30ml, 60ml, etc."
+                          ? "Enter portion (ex. Half, Full)"
+                          : "Enter portion (10ml, 30ml, 60ml, etc.)"
                       }
                     />
                   </FormControl>
@@ -335,7 +340,7 @@ export default function MenuCreateForm({
               control={form.control}
               name={`PriceItemMap.${idx}.price`}
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="flex-1">
                   <FormLabel>Price</FormLabel>
                   <FormControl>
                     <Input type="number" {...field} placeholder="Enter price" />
@@ -344,86 +349,65 @@ export default function MenuCreateForm({
                 </FormItem>
               )}
             />
-            {idx === form.getValues().PriceItemMap.length - 1 ? (
+
+            <div
+              className={cn(
+                "flex min-w-24 shrink-0 items-center gap-2 self-end sm:gap-4",
+                {
+                  "self-center":
+                    errors.PriceItemMap?.[idx]?.portion ||
+                    errors.PriceItemMap?.[idx]?.price,
+                }
+              )}
+            >
               <Button
                 type="button"
                 variant="outline"
                 size="icon"
-                className="self-end"
-                onClick={() =>
-                  form.setValue("PriceItemMap", [
-                    ...form.getValues().PriceItemMap,
-                    { portion: "", price: 0 },
-                  ])
-                }
+                onClick={() => {
+                  form.setValue(
+                    "PriceItemMap",
+                    form.getValues().PriceItemMap.filter((_, i) => i !== idx)
+                  )
+                }}
               >
-                <PlusIcon size={22} />
+                <Trash2 size={22} />
               </Button>
-            ) : null}
-            <Button
-              type="button"
-              variant="outline"
-              size="icon"
-              className="self-end"
-              onClick={() => {
-                form.setValue(
-                  "PriceItemMap",
-                  form.getValues().PriceItemMap.filter((_, i) => i !== idx)
-                )
-              }}
-            >
-              <Trash2 size={22} />
-            </Button>
+
+              {idx === form.getValues().PriceItemMap.length - 1 ? (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={() =>
+                    form.setValue("PriceItemMap", [
+                      ...form.getValues().PriceItemMap,
+                      { portion: "", price: 0 },
+                    ])
+                  }
+                >
+                  <PlusIcon size={22} />
+                </Button>
+              ) : null}
+            </div>
           </div>
         ))}
         <UploadItemImage imagesRef={imagesRef} uploadItemImage={""} />
-        <div className="flex w-full justify-center">
-          <Button type="submit">
+
+        <div className="flex w-full justify-center gap-4 max-sm:mt-2 max-sm:flex-col-reverse sm:col-span-2">
+          <Button
+            className="min-w-48"
+            type="button"
+            variant="outline"
+            onClick={closeModal}
+          >
+            Cancel
+          </Button>
+          <Button className="min-w-48" type="submit">
             {form.formState.isSubmitting ? "Adding Item..." : "Add Item"}
           </Button>
         </div>
       </form>
     </Form>
-  )
-}
-
-type WithCreateMenuDialogProps = {
-  children: React.ReactElement
-  restaurantId: string
-  slug: string
-}
-
-export function WithCreateMenuDialog({
-  children,
-  restaurantId,
-  slug,
-}: WithCreateMenuDialogProps): React.ReactElement {
-  const [isOpen, setIsOpen] = useState(false)
-  const openDialog = () => setIsOpen(true)
-  const onCloseModal = () => setIsOpen(false)
-
-  const cloneChildren = React.cloneElement(children, {
-    onClick: openDialog,
-  })
-
-  return (
-    <>
-      {cloneChildren}
-      <Dialog open={isOpen} onOpenChange={onCloseModal} modal>
-        <DialogContent
-          data-radix-scroll-area-viewport=""
-          className="max-h-[90vh] overflow-y-auto"
-        >
-          <DialogHeader>
-            <DialogTitle>Add New Item</DialogTitle>
-          </DialogHeader>
-          <MenuCreateForm
-            restaurantId={restaurantId}
-            slug={slug}
-            closeModal={onCloseModal}
-          />
-        </DialogContent>
-      </Dialog>
-    </>
   )
 }

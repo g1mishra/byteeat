@@ -1,6 +1,7 @@
 "use client"
 
 import { useMemo, useState } from "react"
+import dynamic from "next/dynamic"
 import Link from "next/link"
 import { useParams, useRouter } from "next/navigation"
 import { addOrderItems, createOrder } from "@/services/order.services"
@@ -12,9 +13,12 @@ import { getPathWithQuery } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { useToast } from "@/components/ui/use-toast"
-import CheckoutDialog from "@/components/CheckoutModal"
 
 import { useCart } from "../../store/CartProvider"
+
+const CheckoutDialog = dynamic(() => import("@/components/CheckoutModal"), {
+  ssr: false,
+})
 
 export default function ViewCart() {
   const { cart, total, setCart, removeItem, clearCart } = useCart()(
@@ -196,7 +200,13 @@ export default function ViewCart() {
           </Link>
         </div>
       )}
-      {showCheckoutDialog ? <CheckoutDialog onSubmit={handleCheckout} /> : null}
+      {showCheckoutDialog ? (
+        <CheckoutDialog
+          isOpen={showCheckoutDialog}
+          setIsOpen={setShowCheckoutDialog}
+          onSubmit={handleCheckout}
+        />
+      ) : null}
     </div>
   )
 }

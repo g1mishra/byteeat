@@ -44,18 +44,21 @@ const ItemCard = memo(
     if (!item?.id) return null
 
     return (
-      <div className="overflow-hidden rounded bg-slate-100/50">
+      <div className="overflow-hidden rounded border bg-slate-100/50">
         <div className="flex">
           <Image
             loading="lazy"
             src={image}
             alt={item.dish}
-            className="w-1/2 object-cover sm:w-1/3 sm:object-cover"
+            className="w-1/2 rounded-l object-cover sm:w-1/3 sm:object-cover"
             width={300}
             height={300}
           />
           <div className="flex w-1/2 flex-col gap-1 p-4 sm:w-2/3">
-            <Link href={getPathWithQuery(`/${slug}/${item.id}`)}>
+            <Link
+              className="w-full flex-1"
+              href={getPathWithQuery(`/${slug}/${item.id}`)}
+            >
               <div className="flex items-center justify-between">
                 <h3 className="text-base font-semibold">{item.dish}</h3>
                 {item.foodOrBar && <VegOrNonVeg isVeg={item.isVeg} />}
@@ -65,11 +68,11 @@ const ItemCard = memo(
               </p>
             </Link>
 
-            <div className="mt-4 flex items-end justify-between">
+            <div className="flex min-h-14 min-w-28 shrink-0 flex-col items-end self-end text-right">
               <p className="mb-1 text-sm font-medium">
                 {item.PriceItemMap?.[0]?.price}
               </p>
-              <QuantityControls item={item} />
+              <QuantityControls item={item} className="-mr-3" addBtnClassName="pr-0" />
             </div>
           </div>
         </div>
@@ -86,16 +89,19 @@ const ItemRow = memo(({ item, slug }: { item: MenuItemI; slug: string }) => {
   return (
     <div className="mb-2 flex flex-col">
       <div className="mb-2 flex items-center justify-between gap-1">
-        <Link href={getPathWithQuery(`/${slug}/${item.id}`)}>
+        <Link
+          href={getPathWithQuery(`/${slug}/${item.id}`)}
+          className="max-w-[95%] flex-1"
+        >
           <h3 className="flex items-center gap-1 text-base font-semibold">
             {item.foodOrBar && <VegOrNonVeg isVeg={item.isVeg} />}
             {item.dish}
           </h3>
-          <p className="line-clamp-3 max-w-[95%] text-sm text-gray-600">
+          <p className="line-clamp-3 text-sm text-gray-600">
             {item.description}
           </p>
         </Link>
-        <div className="flex min-w-28 shrink-0 flex-col items-end text-right">
+        <div className="flex min-h-14 min-w-28 shrink-0 flex-col items-end self-end text-right">
           <p className="mb-1 pr-4 text-sm font-medium">
             {item.PriceItemMap?.[0]?.price}
           </p>
