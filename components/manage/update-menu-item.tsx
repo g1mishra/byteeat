@@ -1,7 +1,5 @@
 "use client"
 
-import { useRef } from "react"
-import { useParams, useRouter } from "next/navigation"
 import {
   deleteMenuItemHelper,
   updateMenuItemHelper,
@@ -9,9 +7,10 @@ import {
 import { MenuItemI } from "@/services/menuService"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { PlusIcon, Trash2 } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { useRef } from "react"
 import { useForm } from "react-hook-form"
 
-import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
   Form,
@@ -23,6 +22,7 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { useToast } from "@/components/ui/use-toast"
+import { cn } from "@/lib/utils"
 
 import {
   Select,
@@ -48,7 +48,6 @@ export default function MenuUpdateForm({
   restaurantSlug,
 }: MenuUpdateFormProps) {
   const router = useRouter()
-  const params = useParams()
   const { toast } = useToast()
   const imagesRef = useRef<(File | string)[]>([])
   const form = useForm<MenuFormValues>({
@@ -210,7 +209,12 @@ export default function MenuUpdateForm({
           render={({ field }) => (
             <FormItem>
               <FormLabel>🍔 or 🍺?</FormLabel>
-              <Select {...field} defaultValue={String(field.value)}>
+              <Select
+                defaultValue={String(field.value)}
+                onValueChange={(value) => {
+                  field.onChange(value)
+                }}
+              >
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="Food or Bar?" />

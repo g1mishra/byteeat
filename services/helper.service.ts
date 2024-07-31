@@ -24,8 +24,11 @@ const addMenuItemHelper = async (
     const categoryResp = await addOrFetchCategory(data.category, restaurantId)
     const menuResp = await addMenuItem({
       ...data,
+      isVeg: data.isVeg || false,
       categoryId: categoryResp.id as string,
       PriceItemMap: [],
+      type: data.type || "FOOD",
+      imgPath: data.imgPath || "",
     })
 
     const payload = data.PriceItemMap.map((price) => ({
@@ -89,12 +92,11 @@ const updateMenuItemHelper = async (
 
     if (pricesToBeAdded.length) {
       await addItemPrice(pricesToBeAdded)
-    } 
+    }
 
     if (pricesToBeDelete.length) {
       await deleteItemPrice(pricesToBeDelete)
     }
-
   } catch (error) {
     throw error
   }
@@ -113,4 +115,3 @@ const deleteMenuItemHelper = async (
 }
 
 export { addMenuItemHelper, deleteMenuItemHelper, updateMenuItemHelper }
-

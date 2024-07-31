@@ -35,13 +35,13 @@ import uploadImage from "./utils/uploadImage"
 
 export const menuFormSchema = z.object({
   dish: z.string().min(3, { message: "Name is required." }),
-  category: z.string().min(3, { message: "Category is required." }),
+  category: z.string().trim().min(3, { message: "Category is required." }),
   description: z.string(),
   isVeg: z.preprocess(
     (x) => x === "true" || x === true,
     z.boolean().optional()
   ),
-  type: z.nativeEnum(ItemType),
+  type: z.enum([ItemType.FOOD, ItemType.BEVERAGE, ItemType.BAR]).optional(),
   PriceItemMap: z
     .array(
       z.object({
@@ -202,7 +202,12 @@ export default function MenuCreateForm({
           render={({ field }) => (
             <FormItem>
               <FormLabel>🍔 or 🍺?</FormLabel>
-              <Select {...field} defaultValue={String(field.value)}>
+              <Select
+                defaultValue={String(field.value)}
+                onValueChange={(value) => {
+                  field.onChange(value)
+                }}
+              >
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="Food or Bar?" />

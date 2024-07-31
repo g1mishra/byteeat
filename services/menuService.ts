@@ -40,7 +40,7 @@ const fetchMenuItem = async (menuId: string) => {
 
 export type MenuItemWithPriceI = MenuItemI & { PriceItemMap: PriceItemMapI[] }
 
-const addMenuItem = async (menuData: MenuItemI) => {
+const addMenuItem = async (menuData: Omit<MenuItemI, "id" | "position">) => {
   try {
     await checkAuth("You are not authorized to add a menu item")
 
