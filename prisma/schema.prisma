@@ -42,15 +42,22 @@ model ItemCategory {
   @@unique([restaurantId, categoryName])
 }
 
+enum ItemType {
+  FOOD
+  BEVERAGE
+  BAR
+}
+
 model Item {
   id           String         @id @default(uuid())
   category     ItemCategory   @relation(fields: [categoryId], references: [id])
   categoryId   String
   isVeg        Boolean        @default(true)
-  foodOrBar    Boolean        @default(true)
   description  String         @default("")
   imgPath      String         @default("")
   dish         String
+  type         ItemType       @default(FOOD) // Use enum values
+  foodOrBar    Boolean        @default(true) // Temporary field
   PriceItemMap PriceItemMap[]
   position     Int            @default(autoincrement())
 }
