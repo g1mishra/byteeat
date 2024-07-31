@@ -34,8 +34,8 @@ const MenuView: React.FC<MenuViewProps> = ({ data }) => {
       data.reduce(
         (acc, menu) => {
           if (!menu.Item) return acc
-          const foodOrBar = menu?.Item[0]?.foodOrBar ? "food" : "bar"
-          acc[foodOrBar].push(menu)
+          const itemType = menu?.Item[0]?.type === "FOOD" ? "food" : "bar"
+          acc[itemType].push(menu)
           return acc
         },
         {

@@ -1,18 +1,13 @@
 "use server"
 
+import { Item, ItemType } from "@prisma/client"
+
 import prisma from "@/lib/prisma"
 
 import { checkAuth } from "./utils.service"
 
-export interface MenuItemI {
+export interface MenuItemI extends Item {
   PriceItemMap?: PriceItemMapI[]
-  id?: string
-  dish: string
-  categoryId: string
-  description?: string
-  imgPath?: string
-  foodOrBar: boolean
-  isVeg?: boolean
 }
 
 export interface PriceItemMapI {
@@ -55,8 +50,8 @@ const addMenuItem = async (menuData: MenuItemI) => {
         categoryId: menuData.categoryId,
         description: menuData.description,
         imgPath: menuData.imgPath,
-        foodOrBar: menuData.foodOrBar,
         isVeg: menuData.isVeg,
+        type: menuData.type,
       },
     })
   } catch (error) {
@@ -64,15 +59,9 @@ const addMenuItem = async (menuData: MenuItemI) => {
   }
 }
 
-const updateMenuItem = async (menuData: {
-  id: string
-  dish: string
-  categoryId: string
-  description?: string
-  imgPath?: string
-  foodOrBar: boolean
-  isVeg?: boolean
-}): Promise<MenuItemI> => {
+const updateMenuItem = async (
+  menuData: Partial<MenuItemI>
+): Promise<MenuItemI> => {
   if (!menuData.id) {
     throw new Error("Menu item id is required")
   }
@@ -88,8 +77,8 @@ const updateMenuItem = async (menuData: {
         categoryId: menuData.categoryId,
         description: menuData.description,
         imgPath: menuData.imgPath,
-        foodOrBar: menuData.foodOrBar,
         isVeg: menuData.isVeg,
+        type: menuData.type,
       },
     })
   } catch (error) {

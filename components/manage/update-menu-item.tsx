@@ -61,7 +61,7 @@ export default function MenuUpdateForm({
 
   const errors = form.formState.errors
 
-  form.watch(["foodOrBar", "PriceItemMap"])
+  form.watch(["type", "PriceItemMap"])
 
   const onDeleteSubmit = async (itemData: MenuFormValues & MenuItemI) => {
     try {
@@ -206,16 +206,11 @@ export default function MenuUpdateForm({
 
         <FormField
           control={form.control}
-          name="foodOrBar"
+          name="type"
           render={({ field }) => (
             <FormItem>
               <FormLabel>🍔 or 🍺?</FormLabel>
-              <Select
-                onValueChange={(value) =>
-                  field.onChange(value === "true" ? true : false)
-                }
-                defaultValue={String(field.value)}
-              >
+              <Select {...field} defaultValue={String(field.value)}>
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="Food or Bar?" />
@@ -224,11 +219,15 @@ export default function MenuUpdateForm({
                 <SelectContent>
                   {[
                     {
-                      value: true,
+                      value: "FOOD",
                       label: "Food",
                     },
                     {
-                      value: false,
+                      value: "BEVERAGE",
+                      label: "Bevarage",
+                    },
+                    {
+                      value: "BAR",
                       label: "Bar",
                     },
                   ].map((item) => (
@@ -244,7 +243,7 @@ export default function MenuUpdateForm({
           )}
         />
 
-        {form.getValues().foodOrBar ? (
+        {form.getValues().type === "FOOD" ? (
           <FormField
             control={form.control}
             name="isVeg"
@@ -296,7 +295,11 @@ export default function MenuUpdateForm({
                 <Input
                   {...field}
                   placeholder={`Add category (ex. ${
-                    form.getValues().foodOrBar ? "Main Course" : "Wine"
+                    form.getValues().type === "FOOD"
+                      ? "Main Course"
+                      : form.getValues().type === "BEVERAGE"
+                      ? "Mocktail"
+                      : "Whiskey"
                   })`}
                 />
               </FormControl>
@@ -335,9 +338,11 @@ export default function MenuUpdateForm({
                       type="string"
                       {...field}
                       placeholder={
-                        form.getValues().foodOrBar
+                        form.getValues().type === "FOOD"
                           ? "Enter portion (ex. Half, Full)"
-                          : "Enter portion (10ml, 30ml, 60ml, etc.)"
+                          : form.getValues().type === "BEVERAGE"
+                          ? "Enter portion (10ml, 30ml, 60ml, etc.)"
+                          : "Enter portion (30ml, 60ml, 90ml, etc.)"
                       }
                     />
                   </FormControl>

@@ -61,7 +61,7 @@ const updateMenuItemHelper = async (
       categoryId: categoryId,
       description: data.description,
       imgPath: data.imgPath,
-      foodOrBar: data.foodOrBar,
+      type: data.type,
       isVeg: data.isVeg,
     })
 
