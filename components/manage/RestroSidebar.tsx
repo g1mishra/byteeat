@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { DashboardIcon } from "@radix-ui/react-icons"
 
 import {
   Tooltip,
@@ -21,6 +22,7 @@ import {
 } from "../icons/siderbar-icons"
 
 const iconMap = {
+  DashboardIcon: DashboardIcon,
   Package2Icon: Package2Icon,
   ShoppingCartIcon: ShoppingCartIcon,
   QrCodeIcon: QrCodeIcon,
@@ -66,6 +68,13 @@ export default function RestroSidebar({
               href={sidebarItems[sidebarItems.length - 1].href}
               icon={sidebarItems[sidebarItems.length - 1].icon}
               label={sidebarItems[sidebarItems.length - 1].label}
+              isActive={
+                sidebarItems[sidebarItems.length - 1].exact
+                  ? pathname === sidebarItems[sidebarItems.length - 1].href
+                  : pathname.startsWith(
+                      sidebarItems[sidebarItems.length - 1].href
+                    )
+              }
             />
           </TooltipProvider>
         </nav>
@@ -85,7 +94,7 @@ const SidebarItem = ({
   label: string
   isActive?: boolean
 }) => {
-  // if (!iconMap[icon]) return null
+  if (!href) return null
   const Icon = iconMap[icon]
   return (
     <Tooltip>

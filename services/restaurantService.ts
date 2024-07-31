@@ -71,6 +71,9 @@ const fetchRestaurantBySlug = async (
       include: {
         ItemCategory: options?.includeMenuItems
           ? {
+              orderBy: {
+                id: "asc",
+              },
               include: {
                 Item: {
                   include: options?.includePrice
@@ -113,6 +116,9 @@ const fetchRestaurant = async (
       },
       include: {
         ItemCategory: {
+          orderBy: {
+            id: "asc",
+          },
           include: {
             Item: options?.includeMenuItems
               ? {

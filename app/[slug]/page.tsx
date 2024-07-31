@@ -1,3 +1,4 @@
+import { Metadata, ResolvingMetadata } from "next"
 import { notFound, redirect } from "next/navigation"
 import { MenuItemI } from "@/services/menuService"
 import { FullAdress, fetchRestaurantBySlug } from "@/services/restaurantService"
@@ -67,3 +68,36 @@ const Welcome = async ({
 }
 
 export default Welcome
+
+export async function generateMetadata(
+  { params, searchParams }: any,
+  parent: ResolvingMetadata
+): Promise<Metadata> {
+  const slug = params.slug
+
+  const response = await fetchRestaurantBySlug(slug)
+
+  const previousImages = (await parent).openGraph?.images || []
+
+  const { name, logoUrl, address_string, city, state, country, tableSize } =
+    response || {}
+
+  return {
+    title: `${name} - Restaurant in ${city}, ${state}`,
+    description: `Experience a delightful dining experience at ${name} in ${city}, ${state}. Located at ${address_string}, our restaurant offers a cozy atmosphere and delicious food. Book your table today!`,
+    openGraph: {
+      title: `${name} - Restaurant`,
+      description: `Visit ${name} in ${city} for a memorable dining experience. Located at ${address_string}, we provide a cozy ambiance and great food. Discover our menu and make a reservation today!`,
+      images: [logoUrl || "", ...previousImages],
+      url: `https://byteeat.in/${slug}`,
+      type: "website",
+      siteName: "ByteEat",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${name} - Restaurant`,
+      description: `Enjoy a great meal at ${name} in ${city}. Located at ${address_string}, our restaurant offers a cozy setting and delicious dishes. Reserve your table now!`,
+      images: [logoUrl || ""],
+    },
+  }
+}

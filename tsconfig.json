@@ -30,7 +30,7 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "app/restaurant/pagestsx"
+    "temp/**/*.js"
   ],
   "exclude": ["node_modules"]
 }

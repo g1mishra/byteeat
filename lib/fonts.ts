@@ -1,4 +1,4 @@
-import { Nunito as FontSans } from "next/font/google"
+import { Roboto as FontSans } from "next/font/google"
 
 export const fontSans = FontSans({
   subsets: ["latin"],
