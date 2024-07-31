@@ -57,7 +57,6 @@ model Item {
   imgPath      String         @default("")
   dish         String
   type         ItemType       @default(FOOD) // Use enum values
-  foodOrBar    Boolean        @default(true) // Temporary field
   PriceItemMap PriceItemMap[]
   position     Int            @default(autoincrement())
 }

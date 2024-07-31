@@ -67,7 +67,7 @@ const MenuCardList = ({
                 <Card className="flex h-full flex-col justify-between">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-x-1 text-base">
-                      {item.foodOrBar ? (
+                      {item.type === "FOOD" ? (
                         <VegOrNonVeg
                           className="shrink-0 scale-90"
                           isVeg={item.isVeg}

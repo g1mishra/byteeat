@@ -61,7 +61,9 @@ const ItemCard = memo(
             >
               <div className="flex items-center justify-between">
                 <h3 className="text-base font-semibold">{item.dish}</h3>
-                {item.foodOrBar && <VegOrNonVeg isVeg={item.isVeg} />}
+                {item.type === "FOOD" ? (
+                  <VegOrNonVeg isVeg={item.isVeg} />
+                ) : null}
               </div>
               <p className="mt-2 line-clamp-3 flex-1 text-sm text-gray-600">
                 {item.description}
@@ -72,7 +74,11 @@ const ItemCard = memo(
               <p className="mb-1 text-sm font-medium">
                 {item.PriceItemMap?.[0]?.price}
               </p>
-              <QuantityControls item={item} className="-mr-3" addBtnClassName="pr-0" />
+              <QuantityControls
+                item={item}
+                className="-mr-3"
+                addBtnClassName="pr-0"
+              />
             </div>
           </div>
         </div>
@@ -94,7 +100,7 @@ const ItemRow = memo(({ item, slug }: { item: MenuItemI; slug: string }) => {
           className="max-w-[95%] flex-1"
         >
           <h3 className="flex items-center gap-1 text-base font-semibold">
-            {item.foodOrBar && <VegOrNonVeg isVeg={item.isVeg} />}
+            {item.type === "FOOD" ? <VegOrNonVeg isVeg={item.isVeg} /> : null}
             {item.dish}
           </h3>
           <p className="line-clamp-3 text-sm text-gray-600">

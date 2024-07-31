@@ -19,7 +19,6 @@ export async function POST(request: Request) {
   const filebuffer = Buffer.from(await file.arrayBuffer())
 
   let resized: Buffer | undefined = undefined
-  console.log("Uploading image: ", resized, file)
 
   if (resize) {
     try {

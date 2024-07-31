@@ -4,6 +4,7 @@ import { useRef } from "react"
 import { useRouter } from "next/navigation"
 import { addMenuItemHelper } from "@/services/helper.service"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { ItemType } from "@prisma/client"
 import { PlusIcon, Trash2 } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
@@ -34,13 +35,13 @@ import uploadImage from "./utils/uploadImage"
 
 export const menuFormSchema = z.object({
   dish: z.string().min(3, { message: "Name is required." }),
-  category: z.string().min(3, { message: "Category is required." }),
+  category: z.string().trim().min(3, { message: "Category is required." }),
   description: z.string(),
   isVeg: z.preprocess(
     (x) => x === "true" || x === true,
     z.boolean().optional()
   ),
-  foodOrBar: z.preprocess((x) => x === "true" || x === true, z.boolean()),
+  type: z.enum([ItemType.FOOD, ItemType.BEVERAGE, ItemType.BAR]).optional(),
   PriceItemMap: z
     .array(
       z.object({
@@ -94,11 +95,11 @@ export default function MenuCreateForm({
       category: "",
       description: "",
       isVeg: true,
-      foodOrBar: true,
+      type: ItemType.FOOD,
     },
   })
 
-  form.watch(["foodOrBar", "PriceItemMap"])
+  form.watch(["type", "PriceItemMap"])
   const { toast } = useToast()
   const errors = form.formState.errors
   const onSubmit = async (data: MenuFormValues) => {
@@ -197,15 +198,15 @@ export default function MenuCreateForm({
 
         <FormField
           control={form.control}
-          name="foodOrBar"
+          name="type"
           render={({ field }) => (
             <FormItem>
               <FormLabel>🍔 or 🍺?</FormLabel>
               <Select
-                onValueChange={(value) =>
-                  field.onChange(value === "true" ? true : false)
-                }
                 defaultValue={String(field.value)}
+                onValueChange={(value) => {
+                  field.onChange(value)
+                }}
               >
                 <FormControl>
                   <SelectTrigger>
@@ -215,11 +216,15 @@ export default function MenuCreateForm({
                 <SelectContent>
                   {[
                     {
-                      value: true,
+                      value: "FOOD",
                       label: "Food",
                     },
                     {
-                      value: false,
+                      value: "BEVERAGE",
+                      label: "Bevarage",
+                    },
+                    {
+                      value: "BAR",
                       label: "Bar",
                     },
                   ].map((item) => (
@@ -235,7 +240,7 @@ export default function MenuCreateForm({
           )}
         />
 
-        {form.getValues().foodOrBar ? (
+        {form.getValues().type === "FOOD" ? (
           <FormField
             control={form.control}
             name="isVeg"
@@ -287,7 +292,11 @@ export default function MenuCreateForm({
                 <Input
                   {...field}
                   placeholder={`Add category (ex. ${
-                    form.getValues().foodOrBar ? "Main Course" : "Wine"
+                    form.getValues().type === "FOOD"
+                      ? "Main Course"
+                      : form.getValues().type === "BEVERAGE"
+                      ? "Mocktail"
+                      : "Whiskey"
                   })`}
                 />
               </FormControl>
@@ -326,9 +335,11 @@ export default function MenuCreateForm({
                       type="string"
                       {...field}
                       placeholder={
-                        form.getValues().foodOrBar
+                        form.getValues().type === "FOOD"
                           ? "Enter portion (ex. Half, Full)"
-                          : "Enter portion (10ml, 30ml, 60ml, etc.)"
+                          : form.getValues().type === "BEVERAGE"
+                          ? "Enter portion (10ml, 30ml, 60ml, etc.)"
+                          : "Enter portion (30ml, 60ml, 90ml, etc.)"
                       }
                     />
                   </FormControl>

@@ -1,7 +1,5 @@
 "use client"
 
-import { useRef } from "react"
-import { useParams, useRouter } from "next/navigation"
 import {
   deleteMenuItemHelper,
   updateMenuItemHelper,
@@ -9,9 +7,10 @@ import {
 import { MenuItemI } from "@/services/menuService"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { PlusIcon, Trash2 } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { useRef } from "react"
 import { useForm } from "react-hook-form"
 
-import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
   Form,
@@ -23,6 +22,7 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { useToast } from "@/components/ui/use-toast"
+import { cn } from "@/lib/utils"
 
 import {
   Select,
@@ -48,7 +48,6 @@ export default function MenuUpdateForm({
   restaurantSlug,
 }: MenuUpdateFormProps) {
   const router = useRouter()
-  const params = useParams()
   const { toast } = useToast()
   const imagesRef = useRef<(File | string)[]>([])
   const form = useForm<MenuFormValues>({
@@ -61,7 +60,7 @@ export default function MenuUpdateForm({
 
   const errors = form.formState.errors
 
-  form.watch(["foodOrBar", "PriceItemMap"])
+  form.watch(["type", "PriceItemMap"])
 
   const onDeleteSubmit = async (itemData: MenuFormValues & MenuItemI) => {
     try {
@@ -206,15 +205,15 @@ export default function MenuUpdateForm({
 
         <FormField
           control={form.control}
-          name="foodOrBar"
+          name="type"
           render={({ field }) => (
             <FormItem>
               <FormLabel>🍔 or 🍺?</FormLabel>
               <Select
-                onValueChange={(value) =>
-                  field.onChange(value === "true" ? true : false)
-                }
                 defaultValue={String(field.value)}
+                onValueChange={(value) => {
+                  field.onChange(value)
+                }}
               >
                 <FormControl>
                   <SelectTrigger>
@@ -224,11 +223,15 @@ export default function MenuUpdateForm({
                 <SelectContent>
                   {[
                     {
-                      value: true,
+                      value: "FOOD",
                       label: "Food",
                     },
                     {
-                      value: false,
+                      value: "BEVERAGE",
+                      label: "Bevarage",
+                    },
+                    {
+                      value: "BAR",
                       label: "Bar",
                     },
                   ].map((item) => (
@@ -244,7 +247,7 @@ export default function MenuUpdateForm({
           )}
         />
 
-        {form.getValues().foodOrBar ? (
+        {form.getValues().type === "FOOD" ? (
           <FormField
             control={form.control}
             name="isVeg"
@@ -296,7 +299,11 @@ export default function MenuUpdateForm({
                 <Input
                   {...field}
                   placeholder={`Add category (ex. ${
-                    form.getValues().foodOrBar ? "Main Course" : "Wine"
+                    form.getValues().type === "FOOD"
+                      ? "Main Course"
+                      : form.getValues().type === "BEVERAGE"
+                      ? "Mocktail"
+                      : "Whiskey"
                   })`}
                 />
               </FormControl>
@@ -335,9 +342,11 @@ export default function MenuUpdateForm({
                       type="string"
                       {...field}
                       placeholder={
-                        form.getValues().foodOrBar
+                        form.getValues().type === "FOOD"
                           ? "Enter portion (ex. Half, Full)"
-                          : "Enter portion (10ml, 30ml, 60ml, etc.)"
+                          : form.getValues().type === "BEVERAGE"
+                          ? "Enter portion (10ml, 30ml, 60ml, etc.)"
+                          : "Enter portion (30ml, 60ml, 90ml, etc.)"
                       }
                     />
                   </FormControl>
