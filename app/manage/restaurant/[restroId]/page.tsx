@@ -1,15 +1,15 @@
+import dynamic from "next/dynamic"
+import Link from "next/link"
 import { FullAdress, fetchRestaurant } from "@/services/restaurantService"
 import { PlusIcon } from "lucide-react"
 import { getServerSession } from "next-auth"
-import dynamic from "next/dynamic"
-import Link from "next/link"
 
-import { authOptions } from "@/app/api/auth/authOption"
-import LogoOrAvatar from "@/components/logo-or-avatar"
+import { formatAddress } from "@/lib/string"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import UnAuthorized from "@/components/UnAuthorized"
-import { formatAddress } from "@/lib/string"
+import LogoOrAvatar from "@/components/logo-or-avatar"
+import { authOptions } from "@/app/api/auth/authOption"
 
 import MenuCardList from "../MenuCardList"
 
@@ -44,9 +44,6 @@ const RestaurantDetails = async ({ params }: any) => {
           <p>Table size: {response.tableSize}</p>
         </div>
         <div className="flex flex-wrap justify-between gap-4 self-start sm:gap-x-6">
-          <Link href={`/manage/restaurant/${restroId}/edit`}>
-            <Button>Edit restaurant</Button>
-          </Link>
           <Link href={`/${response.slug}`} target="_blank">
             <Button>Menu Preview</Button>
           </Link>

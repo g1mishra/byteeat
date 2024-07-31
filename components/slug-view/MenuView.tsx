@@ -64,6 +64,7 @@ const MenuView: React.FC<MenuViewProps> = ({ data }) => {
     }
     return applyFilter()
   }, [filters, foodItems, barItems])
+  
   return (
     <div className="mt-2 flex flex-col content-center">
       <Separator className="mb-2 mt-4" />
@@ -85,7 +86,7 @@ const MenuView: React.FC<MenuViewProps> = ({ data }) => {
               {category.categoryName}
             </AccordionTrigger>
 
-            <AccordionContent className="grid gap-4">
+            <AccordionContent className="grid gap-2">
               {category?.Item?.map((item) => {
                 const imgPath = item?.imgPath?.trim()
                 const images = imgPath ? imgPath.split(";") : []

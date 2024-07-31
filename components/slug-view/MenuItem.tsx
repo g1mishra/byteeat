@@ -56,11 +56,11 @@ const ItemCard = memo(
           />
           <div className="flex w-1/2 flex-col gap-1 p-4 sm:w-2/3">
             <Link
-              className="w-full flex-1"
+              className="w-full flex-1 self-start"
               href={getPathWithQuery(`/${slug}/${item.id}`)}
             >
               <div className="flex items-center justify-between">
-                <h3 className="text-base font-semibold">{item.dish}</h3>
+                <h3 className="text-base font-medium">{item.dish}</h3>
                 {item.type === "FOOD" ? (
                   <VegOrNonVeg isVeg={item.isVeg} />
                 ) : null}
@@ -70,9 +70,9 @@ const ItemCard = memo(
               </p>
             </Link>
 
-            <div className="flex min-h-14 min-w-28 shrink-0 flex-col items-end self-end text-right">
+            <div className="flex  min-w-28 shrink-0 flex-col items-end self-end text-right">
               <p className="mb-1 text-sm font-medium">
-                {item.PriceItemMap?.[0]?.price}
+                ₹{item.PriceItemMap?.[0]?.price}
               </p>
               <QuantityControls
                 item={item}
@@ -97,9 +97,9 @@ const ItemRow = memo(({ item, slug }: { item: MenuItemI; slug: string }) => {
       <div className="mb-2 flex items-center justify-between gap-1">
         <Link
           href={getPathWithQuery(`/${slug}/${item.id}`)}
-          className="max-w-[95%] flex-1"
+          className="max-w-[95%] flex-1 self-start"
         >
-          <h3 className="flex items-center gap-1 text-base font-semibold">
+          <h3 className="flex items-center gap-1 text-base font-medium">
             {item.type === "FOOD" ? <VegOrNonVeg isVeg={item.isVeg} /> : null}
             {item.dish}
           </h3>
@@ -107,14 +107,18 @@ const ItemRow = memo(({ item, slug }: { item: MenuItemI; slug: string }) => {
             {item.description}
           </p>
         </Link>
-        <div className="flex min-h-14 min-w-28 shrink-0 flex-col items-end self-end text-right">
+        <div className="flex  min-w-28 shrink-0 flex-col items-end self-end text-right">
           <p className="mb-1 pr-4 text-sm font-medium">
-            {item.PriceItemMap?.[0]?.price}
+            ₹{item.PriceItemMap?.[0]?.price}
           </p>
           <QuantityControls item={item} />
         </div>
       </div>
-      <div className="hr-line mt-2 border-b border-[#ededed]" />
+      <div
+        className={cn("hr-line mt-0.5 border-b border-[#ededed]", {
+          "mt-0": !item.description,
+        })}
+      />
     </div>
   )
 })

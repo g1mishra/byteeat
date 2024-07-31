@@ -17,6 +17,12 @@ const RestroLayout = async ({
 
   const sidebarItems: SidebarItemType[] = [
     {
+      href: `/manage`,
+      icon: "DashboardIcon",
+      label: "Manage",
+      exact: true,
+    },
+    {
       href: `/manage/restaurant/${params.restroId}`,
       icon: "Package2Icon",
       label: "Dashboard",
@@ -36,7 +42,13 @@ const RestroLayout = async ({
     // { href: "#", icon: "PackageIcon", label: "Products" },
     // { href: "#", icon: "UsersIcon", label: "Customers" },
     { href: "#", icon: "LineChartIcon", label: "Analytics" },
-    { href: "#", icon: "SettingsIcon", label: "Settings" },
+    // { href: "#", icon: "SettingsIcon", label: "Settings" },
+    {
+      label: "Settings",
+      icon: "SettingsIcon",
+      href: `/manage/restaurant/${params.restroId}/edit`,
+      exact: true,
+    },
     // profile
   ]
 
