@@ -1,6 +1,11 @@
-import { Button } from "../ui/button"
-import { WithCreateRestaurantDialog } from "./create-restaurants"
+import dynamic from "next/dynamic"
 
+import { Button } from "../ui/button"
+
+const WithCreateRestaurantDialog = dynamic(
+  () => import("@/components/manage/dialog-trigger/with-create-restaurant"),
+  { ssr: false }
+)
 const NoRestaurant = ({ className = "" }: { className?: string }) => {
   return (
     <>
@@ -9,7 +14,7 @@ const NoRestaurant = ({ className = "" }: { className?: string }) => {
       >
         <div className="flex flex-col items-center gap-4 py-5">
           <div className="flex flex-col items-center">
-            <p className="font-inter text-center text-2xl font-semibold leading-tight dark:text-white lg:text-3xl">
+            <p className="font-inter text-center text-2xl font-semibold leading-tight lg:text-3xl dark:text-white">
               You don&apos;t have any restaurant yet
             </p>
           </div>

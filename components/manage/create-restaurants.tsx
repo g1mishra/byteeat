@@ -1,6 +1,5 @@
 "use client"
 
-import React, { useState } from "react"
 import { useRouter } from "next/navigation"
 import { addRestaurant } from "@/services/restaurantService"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -18,9 +17,8 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { toast, useToast } from "@/components/ui/use-toast"
+import { useToast } from "@/components/ui/use-toast"
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog"
 import {
   Select,
   SelectContent,
@@ -28,6 +26,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select"
+import { Textarea } from "../ui/textarea"
 import state2city from "./utils/cities"
 
 const restaurantFormSchema = z.object({
@@ -90,7 +89,7 @@ export default function RestaurantCreateForm({
         onSubmit={form.handleSubmit(onSubmit, (errors) => {
           console.log("Error while submitting form", errors)
         })}
-        className="space-y-8"
+        className="grid gap-4 sm:grid-cols-2"
       >
         <FormField
           control={form.control}
@@ -126,10 +125,10 @@ export default function RestaurantCreateForm({
           control={form.control}
           name="address_string"
           render={({ field }) => (
-            <FormItem>
+            <FormItem className="sm:col-span-2">
               <FormLabel>Address</FormLabel>
               <FormControl>
-                <Input {...field} placeholder="Enter restaurant address" />
+                <Textarea {...field} placeholder="Enter restaurant address" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -189,40 +188,20 @@ export default function RestaurantCreateForm({
           )}
         />
 
-        <Button type="submit">
-          {form.formState.isSubmitting ? "Creating..." : "Create Restaurant"}
-        </Button>
+        <div className="mt-2 flex w-full justify-center gap-2 max-sm:flex-col-reverse sm:col-span-2">
+          <Button
+            className="min-w-48"
+            type="button"
+            variant="outline"
+            onClick={closeModal}
+          >
+            Cancel
+          </Button>
+          <Button type="submit" className="min-w-48">
+            {form.formState.isSubmitting ? "Creating..." : "Create Restaurant"}
+          </Button>
+        </div>
       </form>
     </Form>
-  )
-}
-
-type WithCreateRestaurantDialogProps = {
-  children: React.ReactElement
-}
-
-export function WithCreateRestaurantDialog({
-  children,
-}: WithCreateRestaurantDialogProps): React.ReactElement {
-  const [isOpen, setIsOpen] = useState(false)
-  const openDialog = () => setIsOpen(true)
-  const onCloseModal = () => setIsOpen(false)
-
-  const cloneChildren = React.cloneElement(children, {
-    onClick: openDialog,
-  })
-
-  return (
-    <>
-      {cloneChildren}
-      <Dialog open={isOpen} onOpenChange={onCloseModal} modal>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Create Restaurant</DialogTitle>
-          </DialogHeader>
-          <RestaurantCreateForm closeModal={onCloseModal} />
-        </DialogContent>
-      </Dialog>
-    </>
   )
 }

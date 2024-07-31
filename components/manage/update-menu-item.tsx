@@ -1,17 +1,15 @@
 "use client"
 
-import React, { useEffect, useRef, useState } from "react"
+import { useRef } from "react"
 import { useParams, useRouter } from "next/navigation"
 import {
   deleteMenuItemHelper,
   updateMenuItemHelper,
 } from "@/services/helper.service"
 import { MenuItemI } from "@/services/menuService"
-import { getRestaurantSlug } from "@/services/restaurantService"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { PlusIcon, Trash2 } from "lucide-react"
 import { useForm } from "react-hook-form"
-import { z } from "zod"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -26,7 +24,6 @@ import {
 import { Input } from "@/components/ui/input"
 import { useToast } from "@/components/ui/use-toast"
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog"
 import {
   Select,
   SelectContent,
@@ -34,20 +31,21 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select"
-import { menuFormSchema } from "./create-menu-item"
+import { Textarea } from "../ui/textarea"
+import { MenuFormValues, menuFormSchema } from "./create-menu-item"
 import UploadItemImage from "./upload-item-image"
 import uploadImage from "./utils/uploadImage"
-
-export type MenuFormValues = z.infer<typeof menuFormSchema>
 
 interface MenuUpdateFormProps {
   closeModal?: () => void
   itemData: MenuFormValues & MenuItemI
+  restaurantSlug: string
 }
 
 export default function MenuUpdateForm({
   closeModal,
   itemData,
+  restaurantSlug,
 }: MenuUpdateFormProps) {
   const router = useRouter()
   const params = useParams()
@@ -114,17 +112,6 @@ export default function MenuUpdateForm({
 
     const alreadyUploadedImages = images.filter((i) => typeof i === "string")
 
-    let slug = "common"
-
-    try {
-      const slugRes = await getRestaurantSlug(params.restroId as string)
-      if (slugRes) {
-        slug = slugRes.slug
-      }
-    } catch (error) {
-      console.error("Failed to get restaurant slug:", error)
-    }
-
     try {
       const uploadedImages = await Promise.all(
         files.map(async (file) => {
@@ -132,7 +119,10 @@ export default function MenuUpdateForm({
             if (typeof file !== "string") {
               const uploadedPath = await uploadImage(
                 file as File,
-                `${Date.now().toString()}-${slug}/${dishName}/${file.name}`
+                `${Date.now().toString()}-${restaurantSlug}/${dishName}/${
+                  file.name
+                }`,
+                true
               )
               return { success: true, file, uploadedPath }
             }
@@ -198,7 +188,7 @@ export default function MenuUpdateForm({
         onSubmit={form.handleSubmit(onSubmit, (errors) => {
           console.log("Error while submitting form", errors)
         })}
-        className="space-y-8"
+        className="grid gap-4 sm:grid-cols-2"
       >
         <FormField
           control={form.control}
@@ -214,19 +204,6 @@ export default function MenuUpdateForm({
           )}
         />
 
-        <FormField
-          control={form.control}
-          name="description"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Add description</FormLabel>
-              <FormControl>
-                <Input {...field} placeholder="Add description" />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
         <FormField
           control={form.control}
           name="foodOrBar"
@@ -328,13 +305,30 @@ export default function MenuUpdateForm({
           )}
         />
 
+        <FormField
+          control={form.control}
+          name="description"
+          render={({ field }) => (
+            <FormItem className="sm:col-span-2">
+              <FormLabel>Add description</FormLabel>
+              <FormControl>
+                <Textarea {...field} placeholder="Add description" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
         {form.getValues().PriceItemMap.map((price, idx) => (
-          <div key={idx} className="relative flex items-start gap-4">
+          <div
+            key={idx}
+            className="relative flex items-start gap-4 sm:col-span-2"
+          >
             <FormField
               control={form.control}
               name={`PriceItemMap.${idx}.portion`}
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="flex-1">
                   <FormLabel>Portion</FormLabel>
                   <FormControl>
                     <Input
@@ -347,6 +341,7 @@ export default function MenuUpdateForm({
                       }
                     />
                   </FormControl>
+                  <FormMessage />
                 </FormItem>
               )}
             />
@@ -354,7 +349,7 @@ export default function MenuUpdateForm({
               control={form.control}
               name={`PriceItemMap.${idx}.price`}
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="flex-1">
                   <FormLabel>Price</FormLabel>
                   <FormControl>
                     <Input type="number" {...field} placeholder="Enter price" />
@@ -364,37 +359,46 @@ export default function MenuUpdateForm({
               )}
             />
 
-            <Button
-              type="button"
-              variant="outline"
-              size="icon"
-              className="self-end"
-              onClick={() => {
-                form.setValue(
-                  "PriceItemMap",
-                  form.getValues().PriceItemMap.filter((_, i) => i !== idx)
-                )
-              }}
+            <div
+              className={cn(
+                "flex min-w-24 shrink-0 items-center gap-4 self-end",
+                {
+                  "self-center":
+                    errors.PriceItemMap?.[idx]?.portion ||
+                    errors.PriceItemMap?.[idx]?.price,
+                }
+              )}
             >
-              <Trash2 size={22} />
-            </Button>
-
-            {idx === form.getValues().PriceItemMap.length - 1 ? (
               <Button
                 type="button"
                 variant="outline"
                 size="icon"
-                className="self-end"
-                onClick={() =>
-                  form.setValue("PriceItemMap", [
-                    ...form.getValues().PriceItemMap,
-                    { portion: "", price: 0, itemId: itemData.id },
-                  ])
-                }
+                onClick={() => {
+                  form.setValue(
+                    "PriceItemMap",
+                    form.getValues().PriceItemMap.filter((_, i) => i !== idx)
+                  )
+                }}
               >
-                <PlusIcon size={22} />
+                <Trash2 size={22} />
               </Button>
-            ) : null}
+
+              {idx === form.getValues().PriceItemMap.length - 1 ? (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={() =>
+                    form.setValue("PriceItemMap", [
+                      ...form.getValues().PriceItemMap,
+                      { portion: "", price: 0, itemId: itemData.id },
+                    ])
+                  }
+                >
+                  <PlusIcon size={22} />
+                </Button>
+              ) : null}
+            </div>
           </div>
         ))}
 
@@ -403,14 +407,17 @@ export default function MenuUpdateForm({
           uploadItemImage={itemData?.imgPath?.trim() || ""}
         />
 
-        <div className="flex w-full justify-center space-x-2">
-          <Button type="submit">
-            {form.formState.isSubmitting
-              ? `${itemData ? "Updating" : "Adding"} Item...`
-              : `${itemData ? "Update" : "Add"} Item`}
-          </Button>
-
+        <div className="flex w-full justify-center gap-2 max-sm:mt-2 max-sm:flex-col-reverse sm:col-span-2">
           <Button
+            className="min-w-48"
+            type="button"
+            variant="outline"
+            onClick={closeModal}
+          >
+            Cancel
+          </Button>
+          <Button
+            className="min-w-48"
             type="button"
             variant="destructive"
             onClick={() => {
@@ -419,42 +426,13 @@ export default function MenuUpdateForm({
           >
             Delete Item
           </Button>
+          <Button className="min-w-48" type="submit">
+            {form.formState.isSubmitting
+              ? `${itemData ? "Updating" : "Adding"} Item...`
+              : `${itemData ? "Update" : "Add"} Item`}
+          </Button>
         </div>
       </form>
     </Form>
-  )
-}
-
-type WithUpdateMenuDialogProps = {
-  children: React.ReactElement
-  itemData: MenuFormValues & MenuItemI
-}
-
-export function WithUpdateMenuDialog({
-  children,
-  itemData,
-}: WithUpdateMenuDialogProps): React.ReactElement {
-  const [isOpen, setIsOpen] = useState(false)
-  const openDialog = () => setIsOpen(true)
-  const onCloseModal = () => setIsOpen(false)
-  const cloneChildren = React.cloneElement(children, {
-    onClick: openDialog,
-  })
-
-  return (
-    <>
-      {cloneChildren}
-      <Dialog open={isOpen} onOpenChange={onCloseModal} modal>
-        <DialogContent
-          data-radix-scroll-area-viewport=""
-          className="max-h-[90vh] overflow-y-auto"
-        >
-          <DialogHeader>
-            <DialogTitle>Update Item</DialogTitle>
-          </DialogHeader>
-          <MenuUpdateForm itemData={itemData} closeModal={onCloseModal} />
-        </DialogContent>
-      </Dialog>
-    </>
   )
 }

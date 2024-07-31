@@ -3,12 +3,20 @@ import { useParams, useRouter } from "next/navigation"
 import { MenuItemI } from "@/services/menuService"
 import { Minus, Plus } from "lucide-react"
 
-import { getPathWithQuery } from "@/lib/utils"
+import { cn, getPathWithQuery } from "@/lib/utils"
 import { useCart } from "@/app/store/CartProvider"
 
 import { addItemToCart, changeItemQuantity } from "./util"
 
-const QuantityControls = ({ item }: { item: MenuItemI }) => {
+const QuantityControls = ({
+  item,
+  className = "",
+  addBtnClassName = "",
+}: {
+  item: MenuItemI
+  className?: string
+  addBtnClassName?: string
+}) => {
   const router = useRouter()
   const params = useParams()
   const totalQty = useTotalQty(item.id)
@@ -54,7 +62,12 @@ const QuantityControls = ({ item }: { item: MenuItemI }) => {
     //   </button>
     // </div>
 
-    <div className="bg-secondary text-primary flex max-w-max items-center  justify-end space-x-1 rounded-lg border">
+    <div
+      className={cn(
+        "bg-secondary text-primary flex max-w-max items-center  justify-end space-x-1 rounded-lg border",
+        className
+      )}
+    >
       <button className="p-2" onClick={(e) => handleQuantityChange(e, "dec")}>
         <Minus size={14} />
       </button>
@@ -65,7 +78,10 @@ const QuantityControls = ({ item }: { item: MenuItemI }) => {
     </div>
   ) : (
     <button
-      className="pr-4 text-xs font-semibold text-orange-300"
+      className={cn(
+        "pr-4 text-xs font-semibold text-orange-300",
+        addBtnClassName
+      )}
       onClick={(e) => onAdd(e)}
     >
       ADD
