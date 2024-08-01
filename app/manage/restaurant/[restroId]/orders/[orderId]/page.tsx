@@ -33,12 +33,12 @@ async function OrderTable({
         <TableBody>
           {order?.orderItems?.map((orderItem) => (
             <TableRow>
-              <TableCell className="font-medium">{orderItem.item}</TableCell>
+              <TableCell className="font-medium">{orderItem.name}</TableCell>
               <TableCell>{orderItem.portion}</TableCell>
               <TableCell>{orderItem.quantity}</TableCell>
               <TableCell className="text-right">
                 {" "}
-                &#x20b9; {orderItem.price}
+                &#x20b9; {orderItem.price.toString()}
               </TableCell>
             </TableRow>
           ))}
@@ -47,7 +47,7 @@ async function OrderTable({
             <TableCell></TableCell>
             <TableCell></TableCell>
             <TableCell className="text-right">
-              &#x20b9; {order?.total}
+              &#x20b9; {order?.total.toString()}
             </TableCell>
           </TableRow>
         </TableBody>
