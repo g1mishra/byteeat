@@ -170,10 +170,24 @@ const addRestaurant = async (
   }
 ) => {
   try {
-    await checkAuth("You are not authorized to create a restaurant")
-    restaurantData["slug"] = Slugify(
-      `${restaurantData.name} ${restaurantData.city}`
-    )
+    let baseSlug = Slugify(`${restaurantData.name} ${restaurantData.city}`)
+    let slug = baseSlug
+
+    let existingRestaurant = await prisma.restaurant.findUnique({
+      where: { slug },
+    })
+    let suffix = 1
+
+    // If slug exists, increment suffix until a unique slug is found
+    while (existingRestaurant) {
+      slug = `${baseSlug}-${suffix}`
+      existingRestaurant = await prisma.restaurant.findUnique({
+        where: { slug },
+      })
+      suffix++
+    }
+
+    restaurantData["slug"] = slug
     return await prisma.restaurant.create({
       data: restaurantData as RestaurantI & {
         slug: string

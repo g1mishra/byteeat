@@ -20,7 +20,7 @@ async function QRViewPage({
 }) {
   const { restroId } = params
   const session = await getServerSession(authOptions)
-  if (!session || !session.user) return <UnAuthorized />
+  if (!session || !session?.user) return <UnAuthorized />
   const response = await fetchRestaurant(restroId, session?.user?.userId)
   if (!response) return <UnAuthorized />
 
