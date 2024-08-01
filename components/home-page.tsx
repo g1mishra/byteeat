@@ -168,7 +168,7 @@ export default function HomePage() {
                     </p>
                   </div>
                   <div className="grid gap-1">
-                    <h4 className="text-4xl font-bold">&#8377; 3,999</h4>
+                    <h4 className="text-4xl font-bold">&#8377; 4,999</h4>
                     <p className="text-muted-foreground">per year</p>
                   </div>
                   <ul className="text-muted-foreground grid gap-2">

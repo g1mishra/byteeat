@@ -24,7 +24,7 @@ export const authOptions = {
       token: any
       user: any
     }) {
-      const tempUser = session.user
+      const tempUser = session?.user
       tempUser["userId"] = user.id
       tempUser["image"] = user.image
       tempUser["phone"] = user.phone

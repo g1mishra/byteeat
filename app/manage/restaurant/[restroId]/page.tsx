@@ -22,7 +22,7 @@ const RestaurantDetails = async ({ params }: any) => {
   const { restroId } = params
 
   const session = await getServerSession(authOptions)
-  if (!session || !session.user) return <UnAuthorized />
+  if (!session || !session?.user) return <UnAuthorized />
   let response = await fetchRestaurant(restroId, session?.user?.userId, {
     includeMenuItems: true,
     includePrice: true,

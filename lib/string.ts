@@ -16,13 +16,17 @@ export function Slugify(text = "") {
     .toLowerCase()
     .replace(/ /g, "-")
     .replace(/[^\w-]+/g, "")
+    .replace(/--+/g, "-")
+    .replace(/^-+|-+$/g, "")
 }
 
 export function avatarName(name: string) {
   if (!name) return ""
+
   return name
     .split(" ")
+    .filter((n) => n.trim() !== "")
     .slice(0, 3)
-    .map((n) => n[0].toUpperCase())
+    .map((n) => n[0]?.toUpperCase())
     .join("")
 }

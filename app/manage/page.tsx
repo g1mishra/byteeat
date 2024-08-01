@@ -55,7 +55,7 @@ const Restaurant = async () => {
             Manage your restaurants - menu, tables, and more
           </p>
         </div>
-        <AuthUserMenu user={session.user} />
+        <AuthUserMenu user={session?.user} />
       </div>
       <Separator className="my-6" />
       <div className="flex flex-col gap-y-6">
