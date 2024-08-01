@@ -117,9 +117,6 @@ CREATE INDEX "Order_status_idx" ON "Order"("status");
 CREATE INDEX "Restaurant_slug_idx" ON "Restaurant"("slug");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Restaurant_name_address_string_key" ON "Restaurant"("name", "address_string");
-
--- CreateIndex
 CREATE UNIQUE INDEX "verificationtokens_token_key" ON "verificationtokens"("token");
 
 -- AddForeignKey
