@@ -82,10 +82,10 @@ const MenuCardList = ({
                       {item?.PriceItemMap?.map((price) => (
                         <div key={price.id}>
                           {!price.portion ? (
-                            <strong>₹ {price.price}</strong>
+                            <strong>₹ {price.price.toString()}</strong>
                           ) : (
                             <span>
-                              {price.portion} : <strong>₹ {price.price}</strong>
+                              {price.portion} : <strong>₹ {price.price.toString()}</strong>
                             </span>
                           )}
                         </div>

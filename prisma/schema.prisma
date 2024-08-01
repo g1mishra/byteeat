@@ -64,17 +64,16 @@ model Item {
   PriceItemMap PriceItemMap[]
   position     Int            @default(autoincrement())
   isActive     Boolean        @default(true)
-  OrderItem    OrderItem[]
 
   @@index([dish])
 }
 
 model PriceItemMap {
-  id      String  @id @default(uuid())
-  item    Item    @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  id      String @id @default(uuid())
+  item    Item   @relation(fields: [itemId], references: [id], onDelete: Cascade)
   itemId  String
-  price   Decimal @db.Decimal(10, 2)
-  portion String  @default("")
+  price   Float
+  portion String @default("")
 
   @@unique([itemId, portion])
 }
@@ -145,10 +144,10 @@ model VerificationToken {
 
 model OrderItem {
   id       String  @id @default(uuid())
-  item     Item    @relation(fields: [itemId], references: [id])
+  name     String
   itemId   String
   portion  String
-  price    Decimal @db.Decimal(10, 2)
+  price    Float
   quantity Int
   order    Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
   orderId  String

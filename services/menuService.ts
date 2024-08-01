@@ -1,6 +1,6 @@
 "use server"
 
-import { Item, ItemType } from "@prisma/client"
+import { Item, ItemType, PriceItemMap } from "@prisma/client"
 
 import prisma from "@/lib/prisma"
 
@@ -10,11 +10,8 @@ export interface MenuItemI extends Item {
   PriceItemMap?: PriceItemMapI[]
 }
 
-export interface PriceItemMapI {
+export interface PriceItemMapI extends Omit<PriceItemMap, "id"> {
   id?: string
-  price: number
-  portion: string
-  itemId: string
 }
 
 export interface ItemCategoryI {
@@ -40,7 +37,9 @@ const fetchMenuItem = async (menuId: string) => {
 
 export type MenuItemWithPriceI = MenuItemI & { PriceItemMap: PriceItemMapI[] }
 
-const addMenuItem = async (menuData: Omit<MenuItemI, "id" | "position">) => {
+const addMenuItem = async (
+  menuData: Omit<MenuItemI, "id" | "position" | "isActive">
+) => {
   try {
     await checkAuth("You are not authorized to add a menu item")
 

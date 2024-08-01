@@ -4,6 +4,7 @@ import { useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { OrderWithItems } from "@/services/order.services"
 import { OrderItem } from "@prisma/client"
+import { Decimal } from "@prisma/client/runtime/library"
 
 import { Badge } from "@/components/ui/badge"
 
@@ -22,7 +23,9 @@ export default function OrderView({
     const interval = setInterval(() => {
       router.refresh()
       if (
-        ["accepted", "delivered", "cancelled"].includes(orderDetails?.status?.toLowerCase())
+        ["accepted", "delivered", "cancelled"].includes(
+          orderDetails?.status?.toLowerCase()
+        )
       ) {
         clearInterval(interval)
       }
@@ -155,7 +158,7 @@ function OrderItems({ items }: { items: OrderItem[] | undefined }) {
     <div className="grid gap-3">
       {items?.map((item) => (
         <div key={item.id} className="flex items-center justify-between">
-          <span>{item.item}</span>
+          <span>{item.name}</span>
           <span>
             {item.quantity} x {item.price}
           </span>
@@ -165,10 +168,11 @@ function OrderItems({ items }: { items: OrderItem[] | undefined }) {
   )
 }
 
-function OrderTotals({ total }: { total: number }) {
+function OrderTotals({ total }: { total: Decimal }) {
+  const totalValue = Number(total)
   return (
     <div className="mt-4">
-      <OrderTotal label="Total" value={`${total.toFixed(2)}`} bold />
+      <OrderTotal label="Total" value={`${totalValue.toFixed(2)}`} bold />
     </div>
   )
 }

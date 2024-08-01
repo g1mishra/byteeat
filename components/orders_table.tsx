@@ -4,7 +4,7 @@ import React from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { updateOrder } from "@/services/order.services"
-import { Order } from "@prisma/client"
+import { Order, OrderStatus } from "@prisma/client"
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -36,7 +36,7 @@ import {
 function Actions(rowOrder: any) {
   const router = useRouter()
 
-  const handleStatusChange = async (newStatus: string) => {
+  const handleStatusChange = async (newStatus: OrderStatus) => {
     try {
       const updatedOrder = await updateOrder({
         id: rowOrder.rowOrder.id,
@@ -81,7 +81,7 @@ function Actions(rowOrder: any) {
   )
 }
 
-const statuses = ["pending", "delivered", "cancelled", "accepted"]
+const statuses = Object.values(OrderStatus)
 export const dcolumns: ColumnDef<Order>[] = [
   {
     accessorKey: "id",
@@ -137,7 +137,7 @@ export function DataTable<TData, TValue>({
   })
 
   return (
-    <div className="rounded-md border w-full">
+    <div className="w-full rounded-md border">
       <div className="flex items-center py-4">
         <select
           value={(table.getColumn("status")?.getFilterValue() as string) ?? ""}

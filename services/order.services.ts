@@ -17,7 +17,7 @@ async function createOrder(
     return await prisma.order.create({
       data: {
         restaurantId,
-        status: "pending",
+        status: "PENDING",
         total,
         tableNo,
         createdAt: new Date(),
@@ -47,7 +47,7 @@ async function updateOrder(payload: Partial<Order>): Promise<Order> {
 async function addOrderItems(orderId: string, items: Cart[]) {
   const data = items.map((item) => ({
     orderId,
-    item: item.name,
+    name: item.name,
     itemId: item.id,
     portion: item.portion || "",
     price: item.price,
@@ -64,9 +64,7 @@ async function addOrderItems(orderId: string, items: Cart[]) {
 }
 
 // Get all orders by restaurant
-async function getAllOrdersByRestaurant(
-  restaurantId: string
-): Promise<OrderWithItems[]> {
+async function getAllOrdersByRestaurant(restaurantId: string) {
   try {
     return await prisma.order.findMany({
       where: { restaurantId },
@@ -80,14 +78,11 @@ async function getAllOrdersByRestaurant(
 }
 
 // Get order by ID
-async function getOrderWithItemsById(
-  orderId: string,
-  includeItems = false
-): Promise<OrderWithItems | null> {
+async function getOrderWithItemsById(orderId: string, includeItems = false) {
   try {
     return await prisma.order.findUnique({
       where: { id: orderId },
-      include: includeItems ? { orderItems: true } : {},
+      include: { orderItems: includeItems },
     })
   } catch (error) {
     throw new Error(`Failed to get order by ID: ${(error as Error).message}`)
@@ -97,7 +92,7 @@ async function getOrderWithItemsById(
 async function getTodayOrdersByRestaurant(
   restaurantId: string,
   timestamp: Date
-): Promise<OrderWithItems[]> {
+) {
   // add condition where cancelled orders are not included
   try {
     return await prisma.order.findMany({
@@ -108,9 +103,8 @@ async function getTodayOrdersByRestaurant(
           lte: new Date(timestamp.setHours(23, 59, 59, 999)),
         },
         status: {
-          not: "cancelled",
-        }
-
+          not: "CANCELLED",
+        },
       },
       orderBy: { createdAt: "desc" },
     })
@@ -121,32 +115,30 @@ async function getTodayOrdersByRestaurant(
   }
 }
 
-async function cancelledOrdersByRestaurant(
-  restaurantId: string
-): Promise<OrderWithItems[]> {
+async function cancelledOrdersByRestaurant(restaurantId: string) {
   try {
     return await prisma.order.findMany({
       where: {
         restaurantId,
-        status: "cancelled",
+        status: "CANCELLED",
       },
       orderBy: { createdAt: "desc" },
     })
   } catch (error) {
     throw new Error(
-      `Failed to get cancelled orders by restaurant: ${(error as Error).message}`
+      `Failed to get cancelled orders by restaurant: ${
+        (error as Error).message
+      }`
     )
   }
 }
 
-
-
 export {
   addOrderItems,
+  cancelledOrdersByRestaurant,
   createOrder,
   getAllOrdersByRestaurant,
   getOrderWithItemsById,
-  updateOrder,
   getTodayOrdersByRestaurant,
-  cancelledOrdersByRestaurant
+  updateOrder,
 }
