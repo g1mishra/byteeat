@@ -27,7 +27,6 @@ model Restaurant {
   updatedAt      DateTime       @default(now()) @updatedAt @db.Timestamptz()
   isActive       Boolean        @default(true)
 
-  @@unique([name, address_string])
   @@index([slug])
 }
 
