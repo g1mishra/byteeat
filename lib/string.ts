@@ -1,14 +1,20 @@
 import { FullAdress } from "@/services/restaurantService"
 
 export function formatAddress(response: FullAdress) {
-  return [
-    response?.address_string,
-    response?.city,
-    response?.state,
-    response?.country,
-  ]
-    .filter(Boolean)
-    .join(", ")
+  const { address_string, city, state, country } = response
+
+  const parts = new Set<string>(
+    address_string
+      .split(",")
+      .map((part) => part.trim())
+      .filter(Boolean)
+  )
+
+  if (city) parts.add(city)
+  if (state) parts.add(state)
+  if (country) parts.add(country)
+
+  return Array.from(parts).join(", ")
 }
 
 export function Slugify(text = "") {

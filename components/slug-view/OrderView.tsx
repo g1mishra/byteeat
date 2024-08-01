@@ -22,7 +22,7 @@ export default function OrderView({
     const interval = setInterval(() => {
       router.refresh()
       if (
-        ["accepted", "delivered", "cancelled"].includes(orderDetails?.status)
+        ["accepted", "delivered", "cancelled"].includes(orderDetails?.status?.toLowerCase())
       ) {
         clearInterval(interval)
       }
@@ -60,7 +60,7 @@ export default function OrderView({
 const renderStatusContent = (orderDetails: any) => {
   const orderToken = getOrderToken(orderDetails.id)
 
-  switch (orderDetails.status) {
+  switch (orderDetails?.status?.toLowerCase()) {
     case "pending":
       return (
         <div className="flex h-full flex-col items-center justify-center gap-4 p-4">

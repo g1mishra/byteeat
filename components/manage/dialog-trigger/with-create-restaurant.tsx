@@ -54,7 +54,7 @@ export default function WithCreateRestaurantDialog({
             <DrawerHeader>
               <DrawerTitle>Create Restaurant</DrawerTitle>
             </DrawerHeader>
-            <ScrollArea>
+            <ScrollArea className="max-h-[90vh] w-full overflow-y-auto p-4">
               <RestaurantCreateForm closeModal={onCloseModal} />
             </ScrollArea>
           </DrawerContent>
