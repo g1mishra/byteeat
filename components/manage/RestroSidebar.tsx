@@ -1,5 +1,6 @@
 "use client"
 
+import React from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { DashboardIcon } from "@radix-ui/react-icons"
@@ -39,60 +40,13 @@ export type SidebarItemType = {
   exact?: boolean
 }
 
-export default function RestroSidebar({
-  sidebarItems = [],
-}: {
-  sidebarItems?: SidebarItemType[]
-}) {
-  const pathname = usePathname()
-
-  return (
-    <div className="bg-muted/40 hidden min-h-screen w-14 flex-col sm:flex">
-      <aside className="bg-background fixed inset-y-0 left-0 z-10 flex w-14 flex-col border-r">
-        <nav className="flex flex-col items-center gap-4 px-2 sm:py-5">
-          <TooltipProvider>
-            {sidebarItems.slice(0, -1).map(({ href, icon, label, exact }) => (
-              <SidebarItem
-                key={label}
-                href={href}
-                icon={icon}
-                label={label}
-                isActive={exact ? pathname === href : pathname.startsWith(href)}
-              />
-            ))}
-          </TooltipProvider>
-        </nav>
-        <nav className="mt-auto flex flex-col items-center gap-4 px-2 sm:py-5">
-          <TooltipProvider>
-            <SidebarItem
-              href={sidebarItems[sidebarItems.length - 1].href}
-              icon={sidebarItems[sidebarItems.length - 1].icon}
-              label={sidebarItems[sidebarItems.length - 1].label}
-              isActive={
-                sidebarItems[sidebarItems.length - 1].exact
-                  ? pathname === sidebarItems[sidebarItems.length - 1].href
-                  : pathname.startsWith(
-                      sidebarItems[sidebarItems.length - 1].href
-                    )
-              }
-            />
-          </TooltipProvider>
-        </nav>
-      </aside>
-    </div>
-  )
-}
-
 const SidebarItem = ({
   href,
   icon,
   label,
   isActive,
-}: {
-  href: string
-  icon: keyof typeof iconMap
-  label: string
-  isActive?: boolean
+}: SidebarItemType & {
+  isActive: boolean
 }) => {
   if (!href) return null
   const Icon = iconMap[icon]
@@ -116,3 +70,62 @@ const SidebarItem = ({
     </Tooltip>
   )
 }
+
+const RestroSidebar = ({
+  sidebarItems = [],
+  showOn = [],
+  showLast = true,
+}: {
+  sidebarItems: SidebarItemType[]
+  showOn: string[]
+  showLast?: boolean
+}) => {
+  const pathname = usePathname()
+
+  if (!sidebarItems.length) return null
+  if (!showOn.some((path) => pathname.startsWith(path))) return null
+
+  let lastItem: SidebarItemType | undefined
+
+  if (showLast) {
+    lastItem = sidebarItems.pop()
+  }
+
+  return (
+    <div className="bg-muted/40 hidden min-h-screen w-14 flex-col sm:flex">
+      <aside className="bg-background fixed inset-y-0 left-0 z-10 flex w-14 flex-col border-r">
+        <nav className="flex flex-col items-center gap-4 px-2 sm:py-5">
+          <TooltipProvider>
+            {sidebarItems.map(({ href, icon, label, exact }) => (
+              <SidebarItem
+                key={label}
+                href={href}
+                icon={icon}
+                label={label}
+                isActive={exact ? pathname === href : pathname.startsWith(href)}
+              />
+            ))}
+          </TooltipProvider>
+        </nav>
+        {lastItem && (
+          <nav className="mt-auto flex flex-col items-center gap-4 px-2 sm:py-5">
+            <TooltipProvider>
+              <SidebarItem
+                href={lastItem.href}
+                icon={lastItem.icon}
+                label={lastItem.label}
+                isActive={
+                  lastItem.exact
+                    ? pathname === lastItem.href
+                    : pathname.startsWith(lastItem.href)
+                }
+              />
+            </TooltipProvider>
+          </nav>
+        )}
+      </aside>
+    </div>
+  )
+}
+
+export default RestroSidebar
