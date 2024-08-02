@@ -29,10 +29,17 @@ export function Slugify(text = "") {
 export function avatarName(name: string) {
   if (!name) return ""
 
-  return name
+  const cleanName = name
+    .replace(/[^\w\s]/g, "")
+    .replace(/\s+/g, " ")
+    .trim()
+
+  const initials = cleanName
     .split(" ")
-    .filter((n) => n.trim() !== "")
-    .slice(0, 3)
+    .filter((n) => n !== "")
+    .slice(0, 2)
     .map((n) => n[0]?.toUpperCase())
     .join("")
+
+  return initials
 }

@@ -33,3 +33,7 @@ export const getPathWithQuery = (href: string): string => {
 
   return url.pathname + url.search
 }
+
+export function utcToIst(utcDate: Date): Date {
+  return new Date(utcDate.getTime() + 5.5 * 60 * 60 * 1000)
+}
