@@ -9,6 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { getRestaurantSlug } from "@/services/restaurantService";
 
 async function OrderTable({
   params,
@@ -16,10 +17,13 @@ async function OrderTable({
   params: { restroId: string; orderId: string }
 }) {
   const order = await getOrderWithItemsById(params.orderId, true)
+  const restauntName = await getRestaurantSlug(params.restroId)
+  console.log("restauntName", restauntName)
 
   return (
     <div>
-      <h1>Order Details</h1>
+
+      <h1>Order Details for {restauntName?.slug}</h1>
       <Table>
         <TableCaption>Order Details</TableCaption>
         <TableHeader>
