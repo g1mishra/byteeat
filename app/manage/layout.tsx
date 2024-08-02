@@ -21,22 +21,18 @@ const sidebarItems: SidebarItemType[] = [
     exact: true,
   },
   {
-    href: `/manage/restaurant/all/orders`,
+    href: "/manage/orders",
     icon: "ShoppingCartIcon",
     label: "Orders",
   },
   { href: "#", icon: "LineChartIcon", label: "Analytics" },
-    {
-      label: "Settings",
-      icon: "SettingsIcon",
-      href:'#',
-      exact: true,
-    },
 ]
 
 interface SettingsLayoutProps {
   children: React.ReactNode
 }
+
+const SHOW_ON = ["/manage", "/manage/orders"]
 
 export default async function SettingsLayout({
   children,
@@ -48,7 +44,11 @@ export default async function SettingsLayout({
   }
   return (
     <div className="flex w-full">
-      <RestroSidebar sidebarItems={sidebarItems} />
+      <RestroSidebar
+        sidebarItems={sidebarItems}
+        showOn={SHOW_ON}
+        showLast={false}
+      />
       <div className="w-full flex-1 p-4 py-6 sm:px-6">{children}</div>
     </div>
   )
