@@ -1,10 +1,10 @@
 import { Metadata } from "next"
 import { redirect } from "next/navigation"
-import { fetchRestaurant } from "@/services/restaurantService"
 import { getServerSession } from "next-auth"
 
-import { Separator } from "@/components/ui/separator"
-import AuthUserMenu from "@/components/AuthUserMenu"
+import RestroSidebar, {
+  SidebarItemType,
+} from "@/components/manage/RestroSidebar"
 
 import { authOptions } from "../api/auth/authOption"
 
@@ -13,9 +13,26 @@ export const metadata: Metadata = {
   description: "Manage your restaurant - menu, tables, and more",
 }
 
+const sidebarItems: SidebarItemType[] = [
+  {
+    href: `/manage`,
+    icon: "DashboardIcon",
+    label: "Manage",
+    exact: true,
+  },
+  {
+    href: "/manage/orders",
+    icon: "ShoppingCartIcon",
+    label: "Orders",
+  },
+  { href: "#", icon: "LineChartIcon", label: "Analytics" },
+]
+
 interface SettingsLayoutProps {
   children: React.ReactNode
 }
+
+const SHOW_ON = ["/manage", "/manage/orders"]
 
 export default async function SettingsLayout({
   children,
@@ -25,5 +42,14 @@ export default async function SettingsLayout({
   if (!serverSession) {
     return redirect("/api/auth/signin?callbackUrl=/manage")
   }
-  return <>{children}</>
+  return (
+    <div className="flex w-full">
+      <RestroSidebar
+        sidebarItems={sidebarItems}
+        showOn={SHOW_ON}
+        showLast={false}
+      />
+      <div className="w-full flex-1 p-4 py-6 sm:px-6">{children}</div>
+    </div>
+  )
 }
