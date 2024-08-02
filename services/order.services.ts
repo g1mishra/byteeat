@@ -16,10 +16,19 @@ async function createOrder(
   total = 0
 ): Promise<Order> {
   try {
-    const session = await getServerSession(authOptions)
+    const resp = await prisma.restaurant.findUnique({
+      where: { id: restaurantId },
+      select: {
+        user: {
+          select: {
+            id: true,
+          },
+        },
+      },
+    })
 
-    if (!session?.user?.userId) {
-      throw new Error("User ID is required")
+    if (!resp) {
+      throw new Error("Restaurant not found")
     }
 
     return await prisma.order.create({
@@ -30,7 +39,7 @@ async function createOrder(
         tableNo,
         createdAt: new Date(),
         updatedAt: new Date(),
-        userId: session.user.userId,
+        userId: resp?.user?.id,
       },
     })
   } catch (error) {

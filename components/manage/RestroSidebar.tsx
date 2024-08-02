@@ -77,7 +77,7 @@ const RestroSidebar = ({
   showLast = true,
 }: {
   sidebarItems: SidebarItemType[]
-  showOn: string[]
+  showOn?: string[]
   showLast?: boolean
 }) => {
   const pathname = usePathname()
