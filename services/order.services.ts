@@ -133,12 +133,28 @@ async function getTodayOrdersByRestaurant(
 ) {
   // add condition where cancelled orders are not included
   try {
+    // Convert input timestamp to IST
+    const istTimestamp = new Date(timestamp.getTime() + 5.5 * 60 * 60 * 1000)
+
+    // Get IST year, month, and day
+    const year = istTimestamp.getUTCFullYear()
+    const month = istTimestamp.getUTCMonth()
+    const day = istTimestamp.getUTCDate()
+
+    // Create IST start and end of day, then convert back to UTC for database query
+    const startOfDay = new Date(
+      Date.UTC(year, month, day, 0, 0, 0, 0) - 5.5 * 60 * 60 * 1000
+    )
+    const endOfDay = new Date(
+      Date.UTC(year, month, day, 23, 59, 59, 999) - 5.5 * 60 * 60 * 1000
+    )
+
     return await prisma.order.findMany({
       where: {
         restaurantId,
         createdAt: {
-          gte: new Date(timestamp.setHours(0, 0, 0, 0)),
-          lte: new Date(timestamp.setHours(23, 59, 59, 999)),
+          gte: startOfDay,
+          lte: endOfDay,
         },
         status: {
           not: "CANCELLED",
@@ -161,12 +177,28 @@ async function getTodayOrdersAllRestaurants(timestamp: Date) {
       throw new Error("User ID is required")
     }
 
-    return await prisma.order.findMany({
+    // Convert input timestamp to IST
+    const istTimestamp = new Date(timestamp.getTime() + 5.5 * 60 * 60 * 1000)
+
+    // Get IST year, month, and day
+    const year = istTimestamp.getUTCFullYear()
+    const month = istTimestamp.getUTCMonth()
+    const day = istTimestamp.getUTCDate()
+
+    // Create IST start and end of day, then convert back to UTC for database query
+    const startOfDay = new Date(
+      Date.UTC(year, month, day, 0, 0, 0, 0) - 5.5 * 60 * 60 * 1000
+    )
+    const endOfDay = new Date(
+      Date.UTC(year, month, day, 23, 59, 59, 999) - 5.5 * 60 * 60 * 1000
+    )
+
+    const orders = await prisma.order.findMany({
       where: {
         userId: session.user.userId,
         createdAt: {
-          gte: new Date(timestamp.setHours(0, 0, 0, 0)),
-          lte: new Date(timestamp.setHours(23, 59, 59, 999)),
+          gte: startOfDay,
+          lte: endOfDay,
         },
         status: {
           not: "CANCELLED",
@@ -174,6 +206,8 @@ async function getTodayOrdersAllRestaurants(timestamp: Date) {
       },
       orderBy: { createdAt: "desc" },
     })
+
+    return orders
   } catch (error) {
     throw new Error(
       `Failed to get today's orders of all restaurants: ${

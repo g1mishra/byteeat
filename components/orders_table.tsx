@@ -1,6 +1,6 @@
 "use client"
 
-import React from "react"
+import React, { useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { updateOrder } from "@/services/order.services"
@@ -116,15 +116,18 @@ export const dcolumns: ColumnDef<Order>[] = [
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
+  polling?: boolean
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  polling = false,
 }: DataTableProps<TData, TValue>) {
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   )
+  const router = useRouter()
   const table = useReactTable({
     data,
     columns,
@@ -135,6 +138,15 @@ export function DataTable<TData, TValue>({
       columnFilters,
     },
   })
+
+  useEffect(() => {
+    if (polling) {
+      const interval = setInterval(() => {
+        router.refresh()
+      }, 5000)
+      return () => clearInterval(interval)
+    }
+  }, [polling, router])
 
   return (
     <div className="w-full rounded-md border">
