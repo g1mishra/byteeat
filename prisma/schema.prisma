@@ -129,6 +129,7 @@ model User {
   accounts      Account[]
   sessions      Session[]
   restaurants   Restaurant[]
+  orders        Order[]
 
   @@map("users")
 }
@@ -170,6 +171,8 @@ model Order {
   createdAt    DateTime    @default(now()) @db.Timestamptz()
   updatedAt    DateTime    @updatedAt @db.Timestamptz()
   tableNo      Int         @default(0)
+  user         User        @relation(fields: [userId], references: [id])
+  userId       String
 
   @@index([status])
 }
