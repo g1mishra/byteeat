@@ -23,7 +23,7 @@ export const Sidebar: React.FC<SidebarProps> = ({heading, hrefsAndLinks}) => {
                     )
                 )
             }
-            
+
             </div>
         </div>
     )

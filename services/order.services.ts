@@ -1,9 +1,11 @@
 "use server"
 
 import { Order, OrderItem } from "@prisma/client"
+import { getServerSession } from "next-auth"
 
 import prisma from "@/lib/prisma"
 import { Cart } from "@/lib/types"
+import { authOptions } from "@/app/api/auth/authOption"
 
 export type OrderWithItems = Order & { orderItems?: OrderItem[] }
 
@@ -14,6 +16,12 @@ async function createOrder(
   total = 0
 ): Promise<Order> {
   try {
+    const session = await getServerSession(authOptions)
+
+    if (!session?.user?.userId) {
+      throw new Error("User ID is required")
+    }
+
     return await prisma.order.create({
       data: {
         restaurantId,
@@ -22,6 +30,7 @@ async function createOrder(
         tableNo,
         createdAt: new Date(),
         updatedAt: new Date(),
+        userId: session.user.userId,
       },
     })
   } catch (error) {
@@ -77,6 +86,26 @@ async function getAllOrdersByRestaurant(restaurantId: string) {
   }
 }
 
+// Get all orders of all restaurants
+async function getAllOrdersAllRestaurants() {
+  try {
+    const session = await getServerSession(authOptions)
+
+    if (!session?.user?.userId) {
+      throw new Error("User ID is required")
+    }
+
+    return await prisma.order.findMany({
+      where: { userId: session.user.userId },
+      orderBy: { createdAt: "desc" },
+    })
+  } catch (error) {
+    throw new Error(
+      `Failed to get all orders of all restaurants: ${(error as Error).message}`
+    )
+  }
+}
+
 // Get order by ID
 async function getOrderWithItemsById(orderId: string, includeItems = false) {
   try {
@@ -115,6 +144,36 @@ async function getTodayOrdersByRestaurant(
   }
 }
 
+async function getTodayOrdersAllRestaurants(timestamp: Date) {
+  try {
+    const session = await getServerSession(authOptions)
+
+    if (!session?.user?.userId) {
+      throw new Error("User ID is required")
+    }
+
+    return await prisma.order.findMany({
+      where: {
+        userId: session.user.userId,
+        createdAt: {
+          gte: new Date(timestamp.setHours(0, 0, 0, 0)),
+          lte: new Date(timestamp.setHours(23, 59, 59, 999)),
+        },
+        status: {
+          not: "CANCELLED",
+        },
+      },
+      orderBy: { createdAt: "desc" },
+    })
+  } catch (error) {
+    throw new Error(
+      `Failed to get today's orders of all restaurants: ${
+        (error as Error).message
+      }`
+    )
+  }
+}
+
 async function cancelledOrdersByRestaurant(restaurantId: string) {
   try {
     return await prisma.order.findMany({
@@ -138,7 +197,9 @@ export {
   cancelledOrdersByRestaurant,
   createOrder,
   getAllOrdersByRestaurant,
+  getAllOrdersAllRestaurants,
   getOrderWithItemsById,
   getTodayOrdersByRestaurant,
+  getTodayOrdersAllRestaurants,
   updateOrder,
 }
