@@ -31,7 +31,7 @@ async function OrderTable({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {order?.orderItems?.map((orderItem) => (
+          {order?.orderItems?.map((orderItem) => (  
             <TableRow>
               <TableCell className="font-medium">{orderItem.name}</TableCell>
               <TableCell>{orderItem.portion}</TableCell>
