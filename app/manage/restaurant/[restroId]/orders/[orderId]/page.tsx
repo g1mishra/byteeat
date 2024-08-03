@@ -1,3 +1,4 @@
+import { getRestaurantSlug } from "@/services/restaurantService"
 import { getOrderWithItemsById } from "services/order.services"
 
 import {
@@ -9,7 +10,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { getRestaurantSlug } from "@/services/restaurantService";
 
 async function OrderTable({
   params,
@@ -18,11 +18,9 @@ async function OrderTable({
 }) {
   const order = await getOrderWithItemsById(params.orderId, true)
   const restauntName = await getRestaurantSlug(params.restroId)
-  console.log("restauntName", restauntName)
 
   return (
     <div>
-
       <h1>Order Details for {restauntName?.slug}</h1>
       <Table>
         <TableCaption>Order Details</TableCaption>

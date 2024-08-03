@@ -32,7 +32,7 @@ interface SettingsLayoutProps {
   children: React.ReactNode
 }
 
-const SHOW_ON = ["/manage", "/manage/orders"]
+const HIDE_ON = ["/manage/restaurant"]
 
 export default async function SettingsLayout({
   children,
@@ -43,13 +43,12 @@ export default async function SettingsLayout({
     return redirect("/api/auth/signin?callbackUrl=/manage")
   }
   return (
-    <div className="flex w-full">
-      <RestroSidebar
-        sidebarItems={sidebarItems}
-        showOn={SHOW_ON}
-        showLast={false}
-      />
-      <div className="w-full flex-1 p-4 py-6 sm:px-6">{children}</div>
-    </div>
+    <RestroSidebar
+      sidebarItems={sidebarItems}
+      hideOn={HIDE_ON}
+      showLast={false}
+    >
+      {children}
+    </RestroSidebar>
   )
 }
