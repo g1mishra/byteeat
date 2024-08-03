@@ -5,12 +5,11 @@ import { usePathname } from "next/navigation"
 
 import { cn } from "@/lib/utils"
 
-const hrefsAndLinks = [
-  { href: `/manage/orders/current`, text: "Current Orders" },
-  { href: `/manage/orders/all`, text: "All Orders" },
-]
-
-const OrderNav = () => {
+const OrderNav = ({
+  hrefsAndLinks,
+}: {
+  hrefsAndLinks: { href: string; text: string }[]
+}) => {
   const pathname = usePathname()
   return (
     <div className="mb-8 flex flex-col gap-4 sm:flex-row">

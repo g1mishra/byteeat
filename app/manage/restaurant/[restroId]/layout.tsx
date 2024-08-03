@@ -52,12 +52,7 @@ const RestroLayout = async ({
     // profile
   ]
 
-  return (
-    <div className="flex w-full">
-      <RestroSidebar sidebarItems={sidebarItems} />
-      <div className="w-full flex-1 p-4 py-6 sm:px-6">{children}</div>
-    </div>
-  )
+  return <RestroSidebar sidebarItems={sidebarItems}>{children}</RestroSidebar>
 }
 
 export default RestroLayout

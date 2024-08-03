@@ -5,14 +5,6 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { updateOrder } from "@/services/order.services"
 import { Order, OrderStatus } from "@prisma/client"
-import {
-  ColumnDef,
-  ColumnFiltersState,
-  flexRender,
-  getCoreRowModel,
-  getFilteredRowModel,
-  useReactTable,
-} from "@tanstack/react-table"
 import { MoreHorizontal } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -24,22 +16,22 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
 
-function Actions(rowOrder: any) {
+interface DataTableProps {
+  columns: { header: string; accessor: keyof OrderI }[]
+  data: Order[]
+  polling?: boolean
+}
+
+const statuses = Object.values(OrderStatus)
+
+function Actions({ rowOrder }: { rowOrder: Order }) {
   const router = useRouter()
 
   const handleStatusChange = async (newStatus: OrderStatus) => {
     try {
       const updatedOrder = await updateOrder({
-        id: rowOrder.rowOrder.id,
+        id: rowOrder.id,
         status: newStatus,
       })
       console.log("Order status updated successfully", updatedOrder)
@@ -48,6 +40,7 @@ function Actions(rowOrder: any) {
       console.error("Failed to update order status", error)
     }
   }
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -59,7 +52,7 @@ function Actions(rowOrder: any) {
       <DropdownMenuContent align="end">
         <DropdownMenuLabel>Change status</DropdownMenuLabel>
         {statuses.map((curr) =>
-          curr != rowOrder.rowOrder.status ? (
+          curr !== rowOrder.status ? (
             <DropdownMenuItem
               key={curr}
               onClick={() => {
@@ -72,7 +65,7 @@ function Actions(rowOrder: any) {
         )}
         <DropdownMenuSeparator />
         <Link
-          href={`/manage/restaurant/${rowOrder.rowOrder.restaurantId}/orders/${rowOrder.rowOrder.id}`}
+          href={`/manage/restaurant/${rowOrder.restaurantId}/orders/${rowOrder.id}`}
         >
           <DropdownMenuItem>Open order</DropdownMenuItem>
         </Link>
@@ -81,63 +74,25 @@ function Actions(rowOrder: any) {
   )
 }
 
-const statuses = Object.values(OrderStatus)
-export const dcolumns: ColumnDef<Order>[] = [
-  {
-    accessorKey: "id",
-    header: "ID",
-  },
-  {
-    accessorKey: "total",
-    header: "Amount",
-  },
-  {
-    accessorKey: "tableNo",
-    header: "Table Number",
-  },
-  {
-    accessorKey: "status",
-    header: "Order Status",
-  },
-  {
-    accessorKey: "createdAt",
-    header: "Date",
-  },
-  {
-    id: "actions",
-    cell: ({ row }) => {
-      const rowOrder = row.original
-
-      return <Actions rowOrder={rowOrder} />
-    },
-  },
-]
-
-interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[]
-  data: TData[]
-  polling?: boolean
+interface OrderI extends Order {
+  action: string
 }
 
-export function DataTable<TData, TValue>({
-  columns,
-  data,
-  polling = false,
-}: DataTableProps<TData, TValue>) {
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  )
+export const dcolumns: {
+  header: string
+  accessor: keyof OrderI
+}[] = [
+  { header: "ID", accessor: "id" },
+  { header: "Amount", accessor: "total" },
+  { header: "Table Number", accessor: "tableNo" },
+  { header: "Order Status", accessor: "status" },
+  { header: "Date", accessor: "createdAt" },
+  { header: "Actions", accessor: "action" },
+]
+
+export function DataTable({ columns, data, polling = false }: DataTableProps) {
+  const [filter, setFilter] = React.useState<string>("")
   const router = useRouter()
-  const table = useReactTable({
-    data,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-    onColumnFiltersChange: setColumnFilters,
-    getFilteredRowModel: getFilteredRowModel(),
-    state: {
-      columnFilters,
-    },
-  })
 
   useEffect(() => {
     if (polling) {
@@ -148,15 +103,17 @@ export function DataTable<TData, TValue>({
     }
   }, [polling, router])
 
+  const filteredData = filter
+    ? data.filter((order) => order.status === filter)
+    : data
+
   return (
-    <div className="w-full rounded-md border">
-      <div className="flex items-center py-4">
+    <div className="w-full rounded-md border p-4">
+      <div className="flex flex-col items-start py-4 sm:flex-row sm:items-center">
         <select
-          value={(table.getColumn("status")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("status")?.setFilterValue(event.target.value)
-          }
-          className="max-w-sm"
+          value={filter}
+          onChange={(event) => setFilter(event.target.value)}
+          className="w-full rounded-md border p-2 sm:max-w-sm"
         >
           <option value="">All</option>
           <option value="pending">Pending</option>
@@ -164,48 +121,75 @@ export function DataTable<TData, TValue>({
           <option value="cancelled">Cancelled</option>
         </select>
       </div>
-      <Table>
-        <TableHeader>
-          {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id}>
-              {headerGroup.headers.map((header) => {
-                return (
-                  <TableHead key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                  </TableHead>
-                )
-              })}
-            </TableRow>
-          ))}
-        </TableHeader>
-        <TableBody>
-          {table.getRowModel().rows?.length ? (
-            table.getRowModel().rows.map((row) => (
-              <TableRow
-                key={row.id}
-                data-state={row.getIsSelected() && "selected"}
-              >
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell colSpan={columns.length} className="h-24 text-center">
-                No results.
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+      <div className="hidden overflow-x-auto sm:block">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead>
+            <tr>
+              {columns.map((column) => (
+                <th
+                  key={column.accessor as string}
+                  className="bg-gray-50 px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500"
+                >
+                  {column.header}
+                </th>
+              ))}
+              <th className="bg-gray-50 px-6 py-3" />
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-200 bg-white">
+            {filteredData.length > 0 ? (
+              filteredData.map((order) => (
+                <tr key={order.id}>
+                  {columns.map((column) => (
+                    <td
+                      key={column.accessor as string}
+                      className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900"
+                    >
+                      {column.accessor === "action" ? (
+                        <Actions rowOrder={order} />
+                      ) : (
+                        String(order[column.accessor])
+                      )}
+                    </td>
+                  ))}
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td
+                  colSpan={columns.length + 1}
+                  className="whitespace-nowrap px-6 py-4 text-center text-sm text-gray-500"
+                >
+                  No results.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+      <div className="block sm:hidden">
+        {filteredData.length > 0 ? (
+          filteredData.map((order) => (
+            <div
+              key={order.id}
+              className="mb-4 rounded-lg border p-4 shadow-sm"
+            >
+              {columns.map((column) => (
+                <div key={column.accessor as string} className="mb-2">
+                  <span className="font-semibold">{column.header}: </span>
+                  {column.accessor === "action" ? (
+                    <Actions rowOrder={order} />
+                  ) : (
+                    String(order[column.accessor])
+                  )}
+                </div>
+              ))}
+            </div>
+          ))
+        ) : (
+          <div className="h-24 text-center">No results.</div>
+        )}
+      </div>
     </div>
   )
 }

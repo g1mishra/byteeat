@@ -13,5 +13,9 @@ export default async function Orders() {
     total: JSON.parse(JSON.stringify(order.total)),
   }))
 
-  return <DataTable columns={dcolumns} data={formattedOrders} polling={true} />
+  return (
+    <>
+      <DataTable columns={dcolumns} data={formattedOrders} polling={true} />
+    </>
+  )
 }

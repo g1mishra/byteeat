@@ -45,7 +45,7 @@ const Restaurant = async () => {
   }
 
   return (
-    <div className="flex flex-1 flex-col space-y-6 p-4 pb-6 sm:p-10 sm:pb-16">
+    <div className="flex flex-1 flex-col space-y-6 p-4 pb-6">
       <div className="flex justify-between">
         <div className="space-y-0.5">
           <h2 className="text-xl  font-bold tracking-tight sm:text-2xl">

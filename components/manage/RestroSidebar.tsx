@@ -71,59 +71,68 @@ const SidebarItem = ({
   )
 }
 
-const RestroSidebar = ({
-  sidebarItems = [],
-  showOn = [],
-  showLast = true,
-}: {
+interface RestroSidebarProps {
+  children: React.ReactNode
   sidebarItems: SidebarItemType[]
-  showOn?: string[]
+  hideOn?: string[]
   showLast?: boolean
-}) => {
+}
+
+const RestroSidebar = ({
+  children,
+  sidebarItems = [],
+  hideOn = [],
+  showLast = true,
+}: RestroSidebarProps) => {
   const pathname = usePathname()
 
-  if (!sidebarItems.length) return null
-  if (!showOn.some((path) => pathname.startsWith(path))) return null
+  if (!sidebarItems.length) return <>{children} </>
 
-  let lastItem: SidebarItemType | undefined
-
-  if (showLast) {
-    lastItem = sidebarItems.pop()
+  if (hideOn && hideOn.some((path) => pathname.startsWith(path))) {
+    return <>{children}</>
   }
 
+  const itemsToShow = showLast ? sidebarItems.slice(0, -1) : sidebarItems
+  const lastItem = showLast ? sidebarItems[sidebarItems.length - 1] : undefined
+
   return (
-    <div className="bg-muted/40 hidden min-h-screen w-14 flex-col sm:flex">
-      <aside className="bg-background fixed inset-y-0 left-0 z-10 flex w-14 flex-col border-r">
-        <nav className="flex flex-col items-center gap-4 px-2 sm:py-5">
-          <TooltipProvider>
-            {sidebarItems.map(({ href, icon, label, exact }) => (
-              <SidebarItem
-                key={label}
-                href={href}
-                icon={icon}
-                label={label}
-                isActive={exact ? pathname === href : pathname.startsWith(href)}
-              />
-            ))}
-          </TooltipProvider>
-        </nav>
-        {lastItem && (
-          <nav className="mt-auto flex flex-col items-center gap-4 px-2 sm:py-5">
+    <div className="flex w-full sm:space-x-4">
+      <div className="bg-muted/40 flex min-h-screen w-14 shrink-0 flex-col">
+        <aside className="bg-background fixed inset-y-0 left-0 z-10 flex w-14 flex-col border-r">
+          <nav className="flex flex-col items-center gap-4 px-2 sm:py-5">
             <TooltipProvider>
-              <SidebarItem
-                href={lastItem.href}
-                icon={lastItem.icon}
-                label={lastItem.label}
-                isActive={
-                  lastItem.exact
-                    ? pathname === lastItem.href
-                    : pathname.startsWith(lastItem.href)
-                }
-              />
+              {itemsToShow.map(({ href, icon, label, exact }) => (
+                <SidebarItem
+                  key={label}
+                  href={href}
+                  icon={icon}
+                  label={label}
+                  isActive={
+                    exact ? pathname === href : pathname.startsWith(href)
+                  }
+                />
+              ))}
             </TooltipProvider>
           </nav>
-        )}
-      </aside>
+          {lastItem && (
+            <nav className="mt-auto flex flex-col items-center gap-4 px-2 sm:py-5">
+              <TooltipProvider>
+                <SidebarItem
+                  href={lastItem.href}
+                  icon={lastItem.icon}
+                  label={lastItem.label}
+                  isActive={
+                    lastItem.exact
+                      ? pathname === lastItem.href
+                      : pathname.startsWith(lastItem.href)
+                  }
+                />
+              </TooltipProvider>
+            </nav>
+          )}
+        </aside>
+      </div>
+      <div className="w-full flex-1 overflow-hidden p-4">{children}</div>
     </div>
   )
 }
