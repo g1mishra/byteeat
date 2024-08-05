@@ -5,7 +5,7 @@ import { addRestaurant } from "@/services/restaurantService"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useSession } from "next-auth/react"
 import { useForm } from "react-hook-form"
-import { z } from "zod"
+import { late, z } from "zod"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -35,11 +35,8 @@ const restaurantFormSchema = z.object({
     (x) => Number(x),
     z.number().int().min(1, { message: "Table size must be at least 1." })
   ),
-  // address: z.string().min(1, { message: "Address is required." }),
-  address_string: z
-    .string()
-    .min(1, { message: "Ex. 123 Main Street, Anytown" }),
-  city: z.string().default("Jalandhar"),
+  address_string: z.string().optional(),
+  city: z.string().min(1, { message: "City is required." }),
   state: z.string(),
   country: z.string().default("India"),
 })
@@ -62,10 +59,12 @@ export default function RestaurantCreateForm({
   const sessionData = session.data as any
   const router = useRouter()
 
+  form.watch("state")
+
   const onSubmit = async (data: RestaurantFormValues) => {
     try {
       if (!sessionData?.user?.userId) throw new Error("User not found")
-      const resp = await addRestaurant({
+      await addRestaurant({
         ...data,
         userId: sessionData?.user?.userId,
       })
@@ -165,17 +164,22 @@ export default function RestaurantCreateForm({
           render={({ field }) => (
             <FormItem>
               <FormLabel>City</FormLabel>
-              <Select onValueChange={(value) => field.onChange(value)}>
+              <Select
+                disabled={!form.getValues().state}
+                onValueChange={(value) => {
+                  field.onChange(value)
+                }}
+              >
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder={"Select city"} />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {(form.getValues().state != undefined
+                  {(form.getValues().state
                     ? state2city[form.getValues().state]
-                    : state2city["Punjab"]
-                  ).map((city: any) => (
+                    : null
+                  )?.map((city: any) => (
                     <SelectItem value={String(city)} key={city}>
                       {city}
                     </SelectItem>

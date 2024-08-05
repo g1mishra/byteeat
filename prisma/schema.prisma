@@ -204,7 +204,7 @@ model Subscription {
   restaurant       Restaurant         @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
   restaurantId     String             @unique
   plan             Plan               @relation(fields: [planType], references: [type])
-  planType         PlanType
+  planType         PlanType           @default(STARTER)
   startDate        DateTime           @default(now()) @db.Timestamptz()
   endDate          DateTime?          @db.Timestamptz()
   status           SubscriptionStatus @default(ACTIVE)

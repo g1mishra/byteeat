@@ -28,13 +28,13 @@ const Welcome = async ({
     includePrice: true,
   })
 
-  const tableNumber = Number(searchParams.tableNumber)
   if (!restaurant) return notFound()
+
+  const tableNumber = Number(searchParams.tableNumber)
   if (tableNumber === 0 || tableNumber > restaurant?.tableSize) {
     return redirect(`/${params.slug}`)
   }
   const address = formatAddress(restaurant as FullAdress)
-
   return (
     <>
       <Sidebar
@@ -83,7 +83,7 @@ export async function generateMetadata(
     response || {}
 
   return {
-    title: `${name} - Restaurant in ${city}, ${state}`,
+    title: `${name || slug} - Restaurant in ${city}, ${state}`,
     description: `Experience a delightful dining experience at ${name} in ${city}, ${state}. Located at ${address_string}, our restaurant offers a cozy atmosphere and delicious food. Book your table today!`,
     openGraph: {
       title: `${name} - Restaurant`,

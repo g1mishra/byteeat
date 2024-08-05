@@ -43,11 +43,6 @@ const RestaurantDetails = async ({ params }: any) => {
           <p>{formatAddress(response as FullAdress)}</p>
           <p>Table size: {response.tableSize}</p>
         </div>
-        <div className="flex flex-wrap justify-between gap-4 self-start sm:gap-x-6">
-          <Link href={`/${response.slug}`} target="_blank">
-            <Button>Menu Preview</Button>
-          </Link>
-        </div>
       </div>
       <div>
         {response?.ItemCategory?.map((menu) => (
