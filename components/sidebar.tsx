@@ -1,13 +1,10 @@
 "use client"
 
-import { get } from "https"
 import React from "react"
 import dynamic from "next/dynamic"
-import Link from "next/link"
-import { useParams } from "next/navigation"
-import { MenuIcon, ShoppingCart, X } from "lucide-react"
+import { MenuIcon, X } from "lucide-react"
 
-import { cn, getPathWithQuery } from "@/lib/utils"
+import { cn } from "@/lib/utils"
 
 import CartIcon from "./icons/cart"
 import LogoOrAvatar from "./logo-or-avatar"
@@ -45,7 +42,6 @@ export function Sidebar({
   ...props
 }: SidebarProps) {
   const [open, setOpen] = React.useState(false)
-  const params = useParams()
 
   return (
     <>

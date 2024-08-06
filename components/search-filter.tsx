@@ -47,7 +47,7 @@ const SearchAndFilter: React.FC<Props> = ({
   return (
     <div className="flex items-center justify-between">
       {openSearch ? (
-        <div className="w-full">
+        <div className="w-full self-end">
           <div className="relative">
             <Search className="text-muted-foreground absolute left-2 top-2.5 size-4" />
             <Input

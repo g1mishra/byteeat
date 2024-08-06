@@ -1,7 +1,10 @@
 "use server"
 
+import { PlanType, Restaurant, SubscriptionStatus } from "@prisma/client"
+
 import prisma from "@/lib/prisma"
 import { Slugify } from "@/lib/string"
+import { utcToIst } from "@/lib/utils"
 
 import { checkAuth } from "./utils.service"
 
@@ -92,6 +95,88 @@ const fetchRestaurantBySlug = async (
     throw error
   }
 }
+
+export type SubscriptionStatusResult = {
+  isActive: boolean
+  status: SubscriptionStatus | null
+  message: string
+  expirationDate: Date | null
+}
+
+async function fetchRestaurantSubscriptionStatus(
+  slug: string
+): Promise<SubscriptionStatusResult> {
+  if (!slug) {
+    throw new Error("Slug is required")
+  }
+
+  try {
+    const restaurant = await prisma.restaurant.findUnique({
+      where: { slug },
+      select: {
+        id: true,
+        subscription: {
+          select: {
+            status: true,
+            startDate: true,
+            freeTrialEndDate: true,
+            endDate: true,
+          },
+        },
+      },
+    })
+
+    if (!restaurant) {
+      throw new Error("Restaurant not found")
+    }
+
+    const subscription = restaurant.subscription
+
+    if (!subscription) {
+      return {
+        isActive: false,
+        status: null,
+        message: "No subscription found for this restaurant.",
+        expirationDate: null,
+      }
+    }
+
+    const now = utcToIst(new Date())
+    const expirationDate = subscription.endDate || subscription.freeTrialEndDate
+
+    if (subscription.status !== SubscriptionStatus.ACTIVE) {
+      return {
+        isActive: false,
+        status: subscription.status,
+        message: `Subscription is ${subscription.status.toLowerCase()}.`,
+        expirationDate,
+      }
+    }
+
+    if (expirationDate && now > expirationDate) {
+      return {
+        isActive: false,
+        status: subscription.status,
+        message: "Subscription has expired.",
+        expirationDate,
+      }
+    }
+
+    return {
+      isActive: true,
+      status: subscription.status,
+      message: "Subscription is active.",
+      expirationDate,
+    }
+  } catch (error) {
+    console.error("Error fetching subscription status:", error)
+    if (error instanceof Error && error.message === "Restaurant not found") {
+      throw new Error("NOT_FOUND")
+    }
+    throw error
+  }
+}
+
 const fetchRestaurant = async (
   restaurantId: string,
   userId: string,
@@ -164,11 +249,7 @@ export type FetchRestaurantReturnType = Awaited<
   ReturnType<typeof fetchRestaurant>
 >
 
-const addRestaurant = async (
-  restaurantData: RestaurantI & {
-    userId: string
-  }
-) => {
+const addRestaurant = async (restaurantData: Partial<Restaurant>) => {
   try {
     let baseSlug = Slugify(`${restaurantData.name} ${restaurantData.city}`)
     let slug = baseSlug
@@ -187,12 +268,37 @@ const addRestaurant = async (
       suffix++
     }
 
-    restaurantData["slug"] = slug
-    return await prisma.restaurant.create({
-      data: restaurantData as RestaurantI & {
-        slug: string
-        userId: string
-      },
+    restaurantData = {
+      ...restaurantData,
+      slug,
+      address_string: restaurantData?.address_string?.trim(),
+    }
+
+    return await prisma.$transaction(async (prisma) => {
+      // Create the restaurant
+      const newRestaurant = await prisma.restaurant.create({
+        data: restaurantData as Restaurant,
+      })
+
+      const now = utcToIst(new Date())
+
+      const freeTrialEndDate = utcToIst(
+        new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000)
+      )
+
+      // Create the subscription
+      await prisma.subscription.create({
+        data: {
+          restaurantId: newRestaurant.id,
+          planType: PlanType.STARTER,
+          startDate: now,
+          freeTrialEndDate: freeTrialEndDate,
+          status: SubscriptionStatus.ACTIVE,
+          // endDate is not set initially
+        },
+      })
+
+      return newRestaurant
     })
   } catch (error) {
     throw error
@@ -228,7 +334,10 @@ const deleteRestaurant = async (restaurantId: string): Promise<void> => {
     const user = await checkAuth(
       "You are not authorized to delete this restaurant"
     )
-    await prisma.restaurant.delete({
+    await prisma.restaurant.update({
+      data: {
+        isActive: false,
+      },
       where: {
         id: restaurantId,
         userId: user?.userId,
@@ -271,13 +380,14 @@ const addOrUpdateSocialLinks = async (
 }
 
 export {
+  addOrUpdateSocialLinks,
   addRestaurant,
   deleteRestaurant,
   fetchRestaurant,
   fetchRestaurantBySlug,
-  getRestaurantIdBySlug,
   fetchRestaurants,
+  fetchRestaurantSubscriptionStatus,
+  getRestaurantIdBySlug,
   getRestaurantSlug,
   updateRestaurant,
-  addOrUpdateSocialLinks,
 }

@@ -4,6 +4,7 @@ import React from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { DashboardIcon } from "@radix-ui/react-icons"
+import { GlobeIcon } from "lucide-react"
 
 import {
   Tooltip,
@@ -23,14 +24,15 @@ import {
 } from "../icons/siderbar-icons"
 
 const iconMap = {
-  DashboardIcon: DashboardIcon,
-  Package2Icon: Package2Icon,
-  ShoppingCartIcon: ShoppingCartIcon,
-  QrCodeIcon: QrCodeIcon,
-  PackageIcon: PackageIcon,
-  UsersIcon: UsersIcon,
-  LineChartIcon: LineChartIcon,
-  SettingsIcon: SettingsIcon,
+  DashboardIcon,
+  Package2Icon,
+  ShoppingCartIcon,
+  QrCodeIcon,
+  PackageIcon,
+  UsersIcon,
+  LineChartIcon,
+  SettingsIcon,
+  GlobeIcon,
 }
 
 export type SidebarItemType = {
@@ -38,6 +40,7 @@ export type SidebarItemType = {
   icon: keyof typeof iconMap
   label: string
   exact?: boolean
+  target?: string
 }
 
 const SidebarItem = ({
@@ -45,21 +48,22 @@ const SidebarItem = ({
   icon,
   label,
   isActive,
+  target,
 }: SidebarItemType & {
   isActive: boolean
 }) => {
-  if (!href) return null
   const Icon = iconMap[icon]
-  return (
+  return href ? (
     <Tooltip>
       <TooltipTrigger asChild>
         <Link
           href={href}
-          className={
+          target={target}
+          className={`${
             isActive
               ? "bg-primary text-primary-foreground group flex size-9 shrink-0 items-center justify-center gap-2 rounded-full text-lg font-semibold md:size-8 md:text-base"
               : "text-muted-foreground hover:text-foreground flex size-9 items-center justify-center rounded-lg transition-colors md:size-8"
-          }
+          }`}
           prefetch={false}
         >
           <Icon className="size-5" />
@@ -68,7 +72,7 @@ const SidebarItem = ({
       </TooltipTrigger>
       <TooltipContent side="right">{label}</TooltipContent>
     </Tooltip>
-  )
+  ) : null
 }
 
 interface RestroSidebarProps {
@@ -86,9 +90,10 @@ const RestroSidebar = ({
 }: RestroSidebarProps) => {
   const pathname = usePathname()
 
-  if (!sidebarItems.length) return <>{children} </>
-
-  if (hideOn && hideOn.some((path) => pathname.startsWith(path))) {
+  if (
+    !sidebarItems.length ||
+    (hideOn && hideOn.some((path) => pathname.startsWith(path)))
+  ) {
     return <>{children}</>
   }
 
@@ -101,12 +106,13 @@ const RestroSidebar = ({
         <aside className="bg-background fixed inset-y-0 left-0 z-10 flex w-14 flex-col border-r">
           <nav className="flex flex-col items-center gap-4 px-2 sm:py-5">
             <TooltipProvider>
-              {itemsToShow.map(({ href, icon, label, exact }) => (
+              {itemsToShow.map(({ href, icon, label, exact, target }) => (
                 <SidebarItem
                   key={label}
                   href={href}
                   icon={icon}
                   label={label}
+                  target={target}
                   isActive={
                     exact ? pathname === href : pathname.startsWith(href)
                   }

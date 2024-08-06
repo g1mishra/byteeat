@@ -44,6 +44,12 @@ const RestroLayout = async ({
     { href: "#", icon: "LineChartIcon", label: "Analytics" },
     // { href: "#", icon: "SettingsIcon", label: "Settings" },
     {
+      href: `/${response?.slug}`,
+      icon: "GlobeIcon",
+      label: "Menu Preview",
+      target: "_blank",
+    },
+    {
       label: "Settings",
       icon: "SettingsIcon",
       href: `/manage/restaurant/${params.restroId}/edit`,
