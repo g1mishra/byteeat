@@ -1,5 +1,6 @@
 "use server"
 
+import { redirect } from "next/navigation"
 import { getRestaurantSlug } from "@/services/restaurantService"
 import { Role } from "@prisma/client"
 import { getServerSession } from "next-auth"
@@ -19,7 +20,9 @@ const RestroLayout = async ({
   const response = await getRestaurantSlug(params.restroId)
   const session = await getServerSession(authOptions)
 
-  if (!session) throw new Error("Session not found")
+  if (!session) {
+    redirect("/api/auth/signin?callbackUrl=/manage")
+  }
 
   const sidebarItems: SidebarItemType[] = [
     {
@@ -72,7 +75,14 @@ const RestroLayout = async ({
     })
   }
 
-  return <RestroSidebar sidebarItems={sidebarItems} showLast={session.user.role === Role.OWNER}>{children}</RestroSidebar>
+  return (
+    <RestroSidebar
+      sidebarItems={sidebarItems}
+      showLast={session.user.role === Role.OWNER}
+    >
+      {children}
+    </RestroSidebar>
+  )
 }
 
 export default RestroLayout

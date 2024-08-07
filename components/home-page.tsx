@@ -8,18 +8,18 @@ import AnimatingEmoji from "./rolling_emojis"
 export default function HomePage() {
   return (
     <div className="flex min-h-dvh flex-col">
-      <header className="container flex h-14 items-center px-4 md:h-24 lg:px-6">
-        <Link
-          href="#"
-          className="flex items-center justify-center"
-          prefetch={false}
-        >
-          {/*<BinaryIcon className="size-6" />*/}
-          <Image src="/logo.svg" width={256} height={256} alt="ByteEat" />
-
-          {/*<span className="text-2xl font-bold">ByteEat</span>*/}
+      <header className="container flex h-14 items-center justify-between px-4 md:h-24 lg:px-6">
+        <Link href="#" prefetch={false} className="max-sm:mt-2">
+          <Image
+            src="/logo.png"
+            width={100}
+            height={100}
+            className="object-contain"
+            alt="ByteEat"
+            priority
+          />
         </Link>
-        <nav className="ml-auto flex gap-4 sm:gap-6">
+        <nav className="flex gap-4 sm:gap-6">
           <Link
             href="#features"
             className="text-sm font-medium underline-offset-4 hover:underline"
@@ -34,13 +34,13 @@ export default function HomePage() {
           >
             Pricing
           </Link>
-          <Link
+          {/* <Link
             href="#testimonials"
             className="text-sm font-medium underline-offset-4 hover:underline"
             prefetch={false}
           >
             Testimonials
-          </Link>
+          </Link> */}
         </nav>
       </header>
       <main className="flex-1">
@@ -258,15 +258,15 @@ export default function HomePage() {
           </div>
         </section>*/}
       </main>
-      <footer className="flex w-full shrink-0 flex-col items-center gap-2 border-t px-4 py-12 sm:flex-row md:px-6">
+      <footer className="flex w-full shrink-0 flex-col items-center justify-center gap-4 border-t px-4 py-12 sm:flex-row sm:justify-between md:px-6">
         <div className="flex items-center">
           <BinaryIcon className="mr-2 size-6" />
           <span className="text-sm">ByteEat</span>
         </div>
-        <p className="text-muted-foreground ml-auto text-xs">
+        <p className="text-muted-foreground text-xs">
           &copy; 2024 ByteEat. All rights reserved.
         </p>
-        <nav className="flex gap-4 sm:ml-auto sm:gap-6">
+        <nav className="flex gap-4 sm:gap-6">
           <Link
             href="/about"
             className="text-xs underline-offset-4 hover:underline"

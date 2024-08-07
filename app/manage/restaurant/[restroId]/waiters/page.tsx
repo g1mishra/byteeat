@@ -6,6 +6,7 @@ import { getServerSession } from "next-auth"
 import GenerateWaiterKey from "@/components/manage/waiters/generate-waiter-key"
 import WaiterDetails from "@/components/manage/waiters/waiter-details"
 import { authOptions } from "@/app/api/auth/authOption"
+import { redirect } from "next/navigation"
 
 export default async function Waiters({
   params: { restroId },
@@ -13,7 +14,7 @@ export default async function Waiters({
   params: { restroId: string }
 }) {
   const session = await getServerSession(authOptions)
-  if (!session) throw new Error("Unauthorized")
+  if (!session) redirect(`/api/auth/signin?callbackUrl=/manage/restaurant/${restroId}/waiters`)
 
   const waiters = await getWaiters(restroId)
   const restaurant = await fetchRestaurant(restroId, session.user.id, {

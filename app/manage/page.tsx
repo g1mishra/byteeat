@@ -1,5 +1,6 @@
 import dynamic from "next/dynamic"
 import Link from "next/link"
+import { redirect } from "next/navigation"
 import { fetchRestaurants } from "@/services/restaurantService"
 import { Role } from "@prisma/client"
 import { PlusIcon } from "lucide-react"
@@ -37,8 +38,7 @@ const Dashboard = () => {
 
 const Restaurant = async () => {
   const session = await getServerSession(authOptions)
-
-  if (!session) throw new Error()
+  if (!session) redirect("/api/auth/signin?callbackUrl=/manage")
 
   const restroResponse = await fetchRestaurants(session.user.id)
 

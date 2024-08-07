@@ -25,33 +25,51 @@ export async function getWaiters(restroId: string) {
 }
 
 export async function removeWaiter(userId: string, restroId: string | null) {
-  console.log("userid", userId)
   if (!restroId) {
     throw new Error("Missing restroId")
   }
 
   try {
-    // await prisma.userRestaurant.delete({
-    //   where: {
-    // userId_restaurantId: {
-    //   userId,
-    //   restaurantId: restroId,
-    // },
-    //   },
-    // })
+    await prisma.userRestaurant.delete({
+      where: {
+        userId_restaurantId: {
+          userId,
+          restaurantId: restroId,
+        },
+      },
+    })
 
     revalidatePath("/manage")
   } catch (error) {
-    throw new Error(`Failed to get user: ${(error as Error).message}`)
+    if (error instanceof Error) {
+      if (error.message.includes("Record to delete does not exist")) {
+        // The association doesn't exist, so we can consider this a successful removal
+        console.log(
+          `No association found for user ${userId} and restaurant ${restroId}`
+        )
+      } else {
+        throw new Error(`Failed to remove waiter: ${error.message}`)
+      }
+    } else {
+      throw new Error("An unknown error occurred while removing the waiter")
+    }
   }
 }
 
 export async function createJoiningKey(key: string, restaurantId: string) {
   const expiresAt = new Date(Date.now() + 15 * 60 * 1000) // 15 minutes from now
 
+  // it was getting called twice from the useEffect
   try {
-    const savedKey = await prisma.joiningKey.create({
-      data: {
+    const savedKey = await prisma.joiningKey.upsert({
+      where: {
+        restaurantId: restaurantId,
+      },
+      update: {
+        field: key,
+        expiresAt,
+      },
+      create: {
         field: key,
         restaurantId,
         expiresAt,
