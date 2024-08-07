@@ -26,11 +26,12 @@ const fetchRestaurants = async (userId: string) => {
     throw new Error("User ID is required")
   }
   try {
-    return await prisma.restaurant.findMany({
-      where: {
-        userId: userId,
-      },
+    const userWithRestaurants = await prisma.user.findUnique({
+      where: { id: userId },
+      include: { userRestaurants: { include: { restaurant: true } } },
     })
+
+    return userWithRestaurants?.userRestaurants.map((ur) => ur.restaurant)
   } catch (error) {
     throw error
   }
@@ -181,8 +182,9 @@ const fetchRestaurant = async (
   restaurantId: string,
   userId: string,
   options?: {
-    includeMenuItems: boolean
-    includePrice: boolean
+    includeMenuItems?: boolean
+    includePrice?: boolean
+    includeJoiningKey?: boolean
   }
 ) => {
   if (!restaurantId) {
@@ -194,12 +196,21 @@ const fetchRestaurant = async (
   }
 
   try {
+    const userWithRestaurants = await prisma.user.findUnique({
+      where: { id: userId },
+      include: { userRestaurants: true },
+    })
+
+    const restaurant = userWithRestaurants?.userRestaurants.find(
+      (r) => r.restaurantId === restaurantId
+    )
+
     return await prisma.restaurant.findUnique({
       where: {
-        id: restaurantId,
-        userId: userId,
+        id: restaurant?.restaurantId,
       },
       include: {
+        joiningKey: options?.includeJoiningKey ? true : false,
         ItemCategory: {
           orderBy: {
             id: "asc",
@@ -249,7 +260,10 @@ export type FetchRestaurantReturnType = Awaited<
   ReturnType<typeof fetchRestaurant>
 >
 
-const addRestaurant = async (restaurantData: Partial<Restaurant>) => {
+const addRestaurant = async (
+  restaurantData: Partial<Restaurant>,
+  userId: string
+) => {
   try {
     let baseSlug = Slugify(`${restaurantData.name} ${restaurantData.city}`)
     let slug = baseSlug
@@ -277,7 +291,10 @@ const addRestaurant = async (restaurantData: Partial<Restaurant>) => {
     return await prisma.$transaction(async (prisma) => {
       // Create the restaurant
       const newRestaurant = await prisma.restaurant.create({
-        data: restaurantData as Restaurant,
+        data: {
+          ...restaurantData as Restaurant,
+          userRestaurants: { create: { user: { connect: { id: userId } } } },
+        },
       })
 
       const now = utcToIst(new Date())
@@ -310,14 +327,11 @@ const updateRestaurant = async (restaurantData: Partial<RestaurantI>) => {
     if (!restaurantData.id) {
       throw new Error("Restaurant ID is required")
     }
-    const user = await checkAuth(
-      "You are not authorized to update this restaurant"
-    )
+    await checkAuth("You are not authorized to update this restaurant")
 
     return await prisma.restaurant.update({
       where: {
         id: restaurantData.id,
-        userId: user?.userId,
       },
       data: restaurantData,
     })
@@ -331,16 +345,13 @@ const deleteRestaurant = async (restaurantId: string): Promise<void> => {
     if (!restaurantId) {
       throw new Error("Restaurant ID is required")
     }
-    const user = await checkAuth(
-      "You are not authorized to delete this restaurant"
-    )
+    await checkAuth("You are not authorized to delete this restaurant")
     await prisma.restaurant.update({
       data: {
         isActive: false,
       },
       where: {
         id: restaurantId,
-        userId: user?.userId,
       },
     })
   } catch (error) {

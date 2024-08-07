@@ -1,4 +1,5 @@
 import dynamic from "next/dynamic"
+import { Role, User } from "@prisma/client"
 
 import { Button } from "../ui/button"
 
@@ -6,7 +7,19 @@ const WithCreateRestaurantDialog = dynamic(
   () => import("@/components/manage/dialog-trigger/with-create-restaurant"),
   { ssr: false }
 )
-const NoRestaurant = ({ className = "" }: { className?: string }) => {
+
+const WithJoinRestaurantDialog = dynamic(
+  () => import("@/components/manage/dialog-trigger/with-join-restaurant"),
+  { ssr: false }
+)
+
+const NoRestaurant = ({
+  className = "",
+  user,
+}: {
+  className?: string
+  user: User
+}) => {
   return (
     <>
       <div
@@ -19,13 +32,20 @@ const NoRestaurant = ({ className = "" }: { className?: string }) => {
             </p>
           </div>
           <span className="font-inter text-center text-base font-normal text-gray-400 lg:text-lg">
-            Create your first restaurant to get started
+            {user.role === Role.OWNER ? "Create" : "Join"} a restaurant to get
+            started
           </span>
         </div>
 
-        <WithCreateRestaurantDialog>
-          <Button>Create Restaurant</Button>
-        </WithCreateRestaurantDialog>
+        {user.role === Role.OWNER ? (
+          <WithCreateRestaurantDialog>
+            <Button>Create Restaurant</Button>
+          </WithCreateRestaurantDialog>
+        ) : (
+          <WithJoinRestaurantDialog>
+            <Button>Join Restaurant</Button>
+          </WithJoinRestaurantDialog>
+        )}
       </div>
     </>
   )

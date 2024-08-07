@@ -1,10 +1,14 @@
 "use server"
 
+import { redirect } from "next/navigation"
 import { getRestaurantSlug } from "@/services/restaurantService"
+import { Role } from "@prisma/client"
+import { getServerSession } from "next-auth"
 
 import RestroSidebar, {
   SidebarItemType,
 } from "@/components/manage/RestroSidebar"
+import { authOptions } from "@/app/api/auth/authOption"
 
 const RestroLayout = async ({
   children,
@@ -14,6 +18,11 @@ const RestroLayout = async ({
   params: { restroId: string }
 }) => {
   const response = await getRestaurantSlug(params.restroId)
+  const session = await getServerSession(authOptions)
+
+  if (!session) {
+    redirect("/api/auth/signin?callbackUrl=/manage")
+  }
 
   const sidebarItems: SidebarItemType[] = [
     {
@@ -39,6 +48,11 @@ const RestroLayout = async ({
       label: "QR Code",
       exact: true,
     },
+    {
+      href: `/manage/restaurant/${params.restroId}/waiters`,
+      icon: "UsersIcon",
+      label: "Waiters",
+    },
     // { href: "#", icon: "PackageIcon", label: "Products" },
     // { href: "#", icon: "UsersIcon", label: "Customers" },
     { href: "#", icon: "LineChartIcon", label: "Analytics" },
@@ -49,16 +63,26 @@ const RestroLayout = async ({
       label: "Menu Preview",
       target: "_blank",
     },
-    {
+    // profile
+  ]
+
+  if (session.user.role === Role.OWNER) {
+    sidebarItems.push({
       label: "Settings",
       icon: "SettingsIcon",
       href: `/manage/restaurant/${params.restroId}/edit`,
       exact: true,
-    },
-    // profile
-  ]
+    })
+  }
 
-  return <RestroSidebar sidebarItems={sidebarItems}>{children}</RestroSidebar>
+  return (
+    <RestroSidebar
+      sidebarItems={sidebarItems}
+      showLast={session.user.role === Role.OWNER}
+    >
+      {children}
+    </RestroSidebar>
+  )
 }
 
 export default RestroLayout

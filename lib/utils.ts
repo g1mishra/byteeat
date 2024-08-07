@@ -65,6 +65,7 @@ export const checkSubscriptionStatus = (subscription: Subscription | null) => {
 }
 
 export function parseSlug(pathname: string): string | null {
+  if (!pathname) return null
   for (const pattern of SLUG_PATTERNS) {
     const match = pathname.match(pattern)
     if (match && match[1]) {
@@ -72,4 +73,13 @@ export function parseSlug(pathname: string): string | null {
     }
   }
   return null
+}
+
+export const generateWaiterKey = () => {
+  const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+  let key = ""
+  for (let i = 0; i < 6; i++) {
+    key += characters[Math.floor(Math.random() * characters.length)]
+  }
+  return key
 }

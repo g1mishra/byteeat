@@ -9,7 +9,7 @@ import RestroSidebar, {
 import { authOptions } from "../api/auth/authOption"
 
 export const metadata: Metadata = {
-  title: "Restaurant Settings - ByteEat 🍔",
+  title: "Restaurant Settings",
   description: "Manage your restaurant - menu, tables, and more",
 }
 
@@ -42,6 +42,11 @@ export default async function SettingsLayout({
   if (!serverSession) {
     return redirect("/api/auth/signin?callbackUrl=/manage")
   }
+
+  if (!serverSession.user.role) {
+    return redirect("/onboarding")
+  }
+
   return (
     <RestroSidebar
       sidebarItems={sidebarItems}

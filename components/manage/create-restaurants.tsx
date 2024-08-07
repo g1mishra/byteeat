@@ -5,7 +5,7 @@ import { addRestaurant } from "@/services/restaurantService"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useSession } from "next-auth/react"
 import { useForm } from "react-hook-form"
-import { late, z } from "zod"
+import { z } from "zod"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -63,11 +63,11 @@ export default function RestaurantCreateForm({
 
   const onSubmit = async (data: RestaurantFormValues) => {
     try {
-      if (!sessionData?.user?.userId) throw new Error("User not found")
-      await addRestaurant({
-        ...data,
-        userId: sessionData?.user?.userId,
-      })
+      if (!sessionData?.user?.id) throw new Error("User not found")
+      await addRestaurant(
+        data,
+        sessionData.user.id
+      )
       toast({
         title: "Restaurant created successfully.",
       })

@@ -3,11 +3,11 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "@/app/api/auth/authOption"
 
 export async function checkAuth(msg?: string): Promise<{
-  name: string
+  name: string | null
   email: string
-  image: string
-  phone: string
-  userId: string
+  image: string | null
+  phone: string  | null
+  id: string
 }> {
   const session = await getServerSession(authOptions)
   if (!session || !session?.user) {

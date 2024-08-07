@@ -22,10 +22,10 @@ model Restaurant {
   country        String         @default("India")
   slug           String         @unique
   logoUrl        String         @default("")
+  joiningKey     JoiningKey?
   ItemCategory   ItemCategory[]
   SocialLinks    SocialLinks?
-  user           User           @relation(fields: [userId], references: [id])
-  userId         String
+  userRestaurants UserRestaurant[]
   Order          Order[]
   subscription   Subscription?
   createdAt      DateTime       @default(now()) @db.Timestamptz()
@@ -33,6 +33,16 @@ model Restaurant {
   isActive       Boolean        @default(true)
 
   @@index([slug])
+}
+
+model UserRestaurant {
+  id           String     @id @default(uuid())
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId       String
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  restaurantId String
+
+  @@unique([userId, restaurantId])
 }
 
 model ItemCategory {
@@ -126,9 +136,10 @@ model User {
   phone         String?      @unique
   password      String?
   image         String?
+  role          Role?
   accounts      Account[]
   sessions      Session[]
-  restaurants   Restaurant[]
+  userRestaurants UserRestaurant[]
   orders        Order[]
 
   @@map("users")
@@ -199,6 +210,11 @@ enum SubscriptionStatus {
   EXPIRED
 }
 
+enum Role {
+  OWNER
+  WAITER
+}
+
 model Subscription {
   id               String             @id @default(uuid())
   restaurant       Restaurant         @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
@@ -211,4 +227,13 @@ model Subscription {
   freeTrialEndDate DateTime?          @db.Timestamptz()
 
   @@index([status])
+}
+model JoiningKey {
+  id           String    @id @default(uuid())
+  field        String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  expiresAt    DateTime?
+  restaurantId String   @unique
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
 }
