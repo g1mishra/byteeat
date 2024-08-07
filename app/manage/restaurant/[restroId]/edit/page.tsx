@@ -1,4 +1,6 @@
+import { redirect } from "next/navigation"
 import { fetchRestaurant } from "@/services/restaurantService"
+import { Role } from "@prisma/client"
 import { getServerSession } from "next-auth"
 
 import UnAuthorized from "@/components/UnAuthorized"
@@ -10,7 +12,12 @@ const EditRestaurant = async ({ params }: any) => {
   const { restroId } = params
   const session = await getServerSession(authOptions)
   if (!session || !session?.user) return <UnAuthorized />
-  const response = await fetchRestaurant(restroId, session?.user?.userId)
+
+  if (session.user.role !== Role.OWNER) {
+    redirect("/manage")
+  }
+
+  const response = await fetchRestaurant(restroId, session?.user?.id)
   if (!response) return <UnAuthorized />
   return <EditPage response={response} />
 }

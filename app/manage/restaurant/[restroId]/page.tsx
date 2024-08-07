@@ -1,11 +1,9 @@
 import dynamic from "next/dynamic"
-import Link from "next/link"
 import { FullAdress, fetchRestaurant } from "@/services/restaurantService"
 import { PlusIcon } from "lucide-react"
 import { getServerSession } from "next-auth"
 
 import { formatAddress } from "@/lib/string"
-import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import UnAuthorized from "@/components/UnAuthorized"
 import LogoOrAvatar from "@/components/logo-or-avatar"
@@ -23,7 +21,7 @@ const RestaurantDetails = async ({ params }: any) => {
 
   const session = await getServerSession(authOptions)
   if (!session || !session?.user) return <UnAuthorized />
-  let response = await fetchRestaurant(restroId, session?.user?.userId, {
+  let response = await fetchRestaurant(restroId, session?.user?.id, {
     includeMenuItems: true,
     includePrice: true,
   })

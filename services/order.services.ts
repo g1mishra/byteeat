@@ -1,6 +1,6 @@
 "use server"
 
-import { Order, OrderItem } from "@prisma/client"
+import { Order, OrderItem, Role } from "@prisma/client"
 import { getServerSession } from "next-auth"
 
 import prisma from "@/lib/prisma"
@@ -19,9 +19,10 @@ async function createOrder(
     const resp = await prisma.restaurant.findUnique({
       where: { id: restaurantId },
       select: {
-        user: {
+        userRestaurants: {
           select: {
             id: true,
+            user: true,
           },
         },
       },
@@ -29,6 +30,12 @@ async function createOrder(
 
     if (!resp) {
       throw new Error("Restaurant not found")
+    }
+
+    const userId = resp?.userRestaurants.find((u) => u.user.role === Role.OWNER)?.id
+
+    if (!userId) {
+      throw new Error("User not found")
     }
 
     return await prisma.order.create({
@@ -39,7 +46,7 @@ async function createOrder(
         tableNo,
         createdAt: new Date(),
         updatedAt: new Date(),
-        userId: resp?.user?.id,
+        userId,
       },
     })
   } catch (error) {
@@ -100,12 +107,12 @@ async function getAllOrdersAllRestaurants() {
   try {
     const session = await getServerSession(authOptions)
 
-    if (!session?.user?.userId) {
+    if (!session?.user?.id) {
       throw new Error("User ID is required")
     }
 
     return await prisma.order.findMany({
-      where: { userId: session.user.userId },
+      where: { userId: session.user.id },
       orderBy: { createdAt: "desc" },
     })
   } catch (error) {
@@ -173,7 +180,7 @@ async function getTodayOrdersAllRestaurants(timestamp: Date) {
   try {
     const session = await getServerSession(authOptions)
 
-    if (!session?.user?.userId) {
+    if (!session?.user?.id) {
       throw new Error("User ID is required")
     }
 
@@ -195,7 +202,7 @@ async function getTodayOrdersAllRestaurants(timestamp: Date) {
 
     const orders = await prisma.order.findMany({
       where: {
-        userId: session.user.userId,
+        userId: session.user.id,
         createdAt: {
           gte: startOfDay,
           lte: endOfDay,

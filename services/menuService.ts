@@ -1,6 +1,6 @@
 "use server"
 
-import { Item, ItemType, PriceItemMap } from "@prisma/client"
+import { Item, PriceItemMap } from "@prisma/client"
 
 import prisma from "@/lib/prisma"
 

@@ -33,8 +33,8 @@ interface RootLayoutProps {
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <>
-      <html lang="en" suppressHydrationWarning>
-        <body
+      <html lang="en">
+        <body suppressHydrationWarning
           className={cn(
             "bg-background min-h-screen overflow-x-hidden font-sans antialiased",
             fontSans.variable

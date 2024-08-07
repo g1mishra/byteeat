@@ -104,7 +104,7 @@ const RestroSidebar = ({
     <div className="flex w-full sm:space-x-4">
       <div className="bg-muted/40 flex min-h-screen w-14 shrink-0 flex-col">
         <aside className="bg-background fixed inset-y-0 left-0 z-10 flex w-14 flex-col border-r">
-          <nav className="flex flex-col items-center gap-4 px-2 sm:py-5">
+          <nav className="flex flex-col items-center gap-4 px-2 py-5">
             <TooltipProvider>
               {itemsToShow.map(({ href, icon, label, exact, target }) => (
                 <SidebarItem
