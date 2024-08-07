@@ -114,4 +114,12 @@
   [data-radix-scroll-area-viewport]::-webkit-scrollbar {
     display: none
   }
+
+  @media screen and (max-width: 640px) {
+    /* to fix iphone zoom issue */
+    form input,
+    form textarea {
+      @apply text-base;
+    }
+  }
 }

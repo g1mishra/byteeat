@@ -42,7 +42,7 @@
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.51.1",
     "react-phone-input-2": "^2.15.1",
-    "sharp": "^0.33.4",
+    "sharp": "0.32",
     "tailwind-merge": "^2.2.2",
     "tailwindcss-animate": "^1.0.7",
     "vaul": "^0.9.1",

@@ -51,8 +51,8 @@ const ItemCard = memo(
             src={image}
             alt={item.dish}
             className="w-1/2 rounded-l object-cover sm:w-1/3 sm:object-cover"
-            width={300}
-            height={300}
+            width={500}
+            height={500}
           />
           <div className="flex w-1/2 flex-col gap-1 p-4 sm:w-2/3">
             <Link
