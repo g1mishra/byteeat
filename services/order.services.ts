@@ -31,8 +31,9 @@ async function createOrder(
     if (!resp) {
       throw new Error("Restaurant not found")
     }
-
+    console.log(resp)
     const userId = resp?.userRestaurants.find((u) => u.user.role === Role.OWNER)?.id
+    console.log(userId)
 
     if (!userId) {
       throw new Error("User not found")

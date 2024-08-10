@@ -25,7 +25,7 @@ interface DataTableProps {
 
 const statuses = Object.values(OrderStatus)
 
-function Actions({ rowOrder }: { rowOrder: Order }) {
+function Actions({ rowOrder, }: { rowOrder: Order }) {
   const router = useRouter()
 
   const handleStatusChange = async (newStatus: OrderStatus) => {
@@ -92,7 +92,28 @@ export const dcolumns: {
 
 export function DataTable({ columns, data, polling = false }: DataTableProps) {
   const [filter, setFilter] = React.useState<string>("")
+  const [connect, setConnect] = React.useState<boolean>(false)
+  const [server,setServer] = React.useState<any>(null)
   const router = useRouter()
+  const handleRequestDevice = async (): Promise<void> => {
+    try {
+        const selectedDevice: any = await (navigator as any).bluetooth.requestDevice({
+            filters: [{ services: ['000018F0-0000-1000-8000-00805F9B34FB'.toLowerCase()] }],
+            optionalServices: ['000018F0-0000-1000-8000-00805F9B34FB'.toLowerCase()]
+        });
+
+        const gattServer: any = await selectedDevice.gatt.connect();
+        setServer(gattServer);
+
+        // Handle the gattServer as needed
+        console.log('Connected to GATT server:', gattServer);
+        
+    } catch (error) {
+        console.error('Error:', error);
+        setConnect(false); // Ensure `setConnect` is defined in your scope
+    }
+};
+  
 
   useEffect(() => {
     if (polling) {
@@ -109,6 +130,9 @@ export function DataTable({ columns, data, polling = false }: DataTableProps) {
 
   return (
     <div className="w-full rounded-md border p-4">
+      <Button onClick={handleRequestDevice}>
+        Connect printer
+      </Button>
       <div className="flex flex-col items-start py-4 sm:flex-row sm:items-center">
         <select
           value={filter}
