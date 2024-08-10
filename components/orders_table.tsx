@@ -1,8 +1,6 @@
 "use client"
 
 import React, { useEffect, useState } from "react"
-import ReactDOMServer from 'react-dom/server';
-
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { getOrderWithItemsById, updateOrder } from "@/services/order.services"
@@ -100,15 +98,14 @@ function Actions({ rowOrder, server}: { rowOrder: Order, server: any }) {
         })
         .then((characteristic: any) => {
             const data: Uint8Array = new Uint8Array([
-                // Example ESC/POS command for text
-                //0x1B, 0x21, 0x00, // Select normal text
+
                 ...new TextEncoder().encode(receipt(restauntName?.slug, order.orderItems, total, tableNo)),
-                //0x1D, 0x56, 0x41 // Cut paper
             ]);
             return characteristic.writeValue(data);
         })
         .then(() => {
             console.log('Print command sent successfully.');
+            handleStatusChange('ACCEPTED')
         })
         .catch((error: any) => {
             console.error('Error:', error);
@@ -184,10 +181,15 @@ export function DataTable({ columns, data, polling = false }: DataTableProps) {
         });
 
         const gattServer: any = await selectedDevice.gatt.connect();
+
+        if(gattServer){
         setServer(gattServer);
+        setConnect(true);
+        console.log('Connected to GATT server:', gattServer);
+        }
 
         // Handle the gattServer as needed
-        console.log('Connected to GATT server:', gattServer);
+       
         
     } catch (error) {
         console.error('Error:', error);
@@ -212,7 +214,7 @@ export function DataTable({ columns, data, polling = false }: DataTableProps) {
   return (
     <div className="w-full rounded-md border p-4">
       <Button onClick={handleRequestDevice}>
-        Connect printer
+        {connect ? "Connected ✅" : "Connect to Printer"}
       </Button>
       <div className="flex flex-col items-start py-4 sm:flex-row sm:items-center">
         <select
