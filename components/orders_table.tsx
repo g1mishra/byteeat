@@ -1,10 +1,12 @@
 "use client"
 
-import React, { useEffect } from "react"
+import React, { useEffect, useState } from "react"
+import ReactDOMServer from 'react-dom/server';
+
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { updateOrder } from "@/services/order.services"
-import { Order, OrderStatus } from "@prisma/client"
+import { getOrderWithItemsById, updateOrder } from "@/services/order.services"
+import { Order, OrderItem, OrderStatus } from "@prisma/client"
 import { MoreHorizontal } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -16,17 +18,49 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { getRestaurantSlug } from "@/services/restaurantService"
 
 interface DataTableProps {
   columns: { header: string; accessor: keyof OrderI }[]
   data: Order[]
   polling?: boolean
 }
+interface ReceiptProps {
+  slug: string | undefined;
+  orderItems: OrderItem[]; // Ensure this is an array
+}
 
 const statuses = Object.values(OrderStatus)
 
-function Actions({ rowOrder, }: { rowOrder: Order }) {
+
+function receipt(slug: string | undefined, orderItems: OrderItem[], total: number, tableNo: number) {
+
+  let result = ''
+  result += '--------------------------------\n'
+  result += `\n\n${slug}\n\n`.replace('-',' ').toUpperCase()
+
+  result += '--------------------------------\n'
+  result += `Dine in: ${tableNo}\n`
+  
+  result += `Total: Rs. ${total}\n`
+  result += '--------------------------------\n'
+  // Add each order item
+  orderItems?.forEach((orderItem: any) => {
+    result += `${orderItem.name} ${orderItem.portion} ${orderItem.quantity}\n`;
+    result += `Rs. ${orderItem.price.toFixed(2)}\n\n`
+  });
+
+  result += '\n\n'
+  result += '--------------------------------\n'
+  result += '\n\n\n\n'
+
+  console.log(result,"here")
+  return result;
+}
+
+function Actions({ rowOrder, server}: { rowOrder: Order, server: any }) {
   const router = useRouter()
+
 
   const handleStatusChange = async (newStatus: OrderStatus) => {
     try {
@@ -40,6 +74,47 @@ function Actions({ rowOrder, }: { rowOrder: Order }) {
       console.error("Failed to update order status", error)
     }
   }
+
+  const handlePrint = async (orderId: string, restroId: string, tableNo: number) => {
+    console.log(server)
+    if (!server) return;
+   
+    const restauntName: {slug: string} | null = await getRestaurantSlug(restroId)
+    const order: any | null = await getOrderWithItemsById(orderId, true);
+
+    let total = 0;
+    order.orderItems?.forEach((orderItem: any) => {
+      total += orderItem.price * orderItem.quantity
+    });
+
+    console.log(total)
+    console.log(order.orderItems)
+    console.log(tableNo)
+
+    // Replace with your service and characteristic UUIDs
+    const PRINT_SERVICE_UUID: string = '000018F0-0000-1000-8000-00805F9B34FB'.toLowerCase();
+    const PRINT_CHARACTERISTIC_UUID: string = '00002AF1-0000-1000-8000-00805F9B34FB'.toLowerCase();
+    server.getPrimaryService(PRINT_SERVICE_UUID)
+        .then((service: any) => {
+            return service.getCharacteristic(PRINT_CHARACTERISTIC_UUID);
+        })
+        .then((characteristic: any) => {
+            const data: Uint8Array = new Uint8Array([
+                // Example ESC/POS command for text
+                //0x1B, 0x21, 0x00, // Select normal text
+                ...new TextEncoder().encode(receipt(restauntName?.slug, order.orderItems, total, tableNo)),
+                //0x1D, 0x56, 0x41 // Cut paper
+            ]);
+            return characteristic.writeValue(data);
+        })
+        .then(() => {
+            console.log('Print command sent successfully.');
+        })
+        .catch((error: any) => {
+            console.error('Error:', error);
+          });
+  };
+
 
   return (
     <DropdownMenu>
@@ -69,6 +144,12 @@ function Actions({ rowOrder, }: { rowOrder: Order }) {
         >
           <DropdownMenuItem>Open order</DropdownMenuItem>
         </Link>
+        
+        <Button
+          onClick={() => handlePrint(rowOrder.id, rowOrder.restaurantId, rowOrder.tableNo)} className="bg-white text-black"
+        >
+          <DropdownMenuItem>Print order</DropdownMenuItem>
+        </Button>
       </DropdownMenuContent>
     </DropdownMenu>
   )
@@ -170,7 +251,7 @@ export function DataTable({ columns, data, polling = false }: DataTableProps) {
                       className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900"
                     >
                       {column.accessor === "action" ? (
-                        <Actions rowOrder={order} />
+                        <Actions rowOrder={order} server={server}/>
                       ) : (
                         String(order[column.accessor])
                       )}
@@ -202,7 +283,7 @@ export function DataTable({ columns, data, polling = false }: DataTableProps) {
                 <div key={column.accessor as string} className="mb-2">
                   <span className="font-semibold">{column.header}: </span>
                   {column.accessor === "action" ? (
-                    <Actions rowOrder={order} />
+                    <Actions rowOrder={order} server={server}/>
                   ) : (
                     String(order[column.accessor])
                   )}

@@ -16,15 +16,16 @@ async function createOrder(
   total = 0
 ): Promise<Order> {
   try {
-    const resp = await prisma.restaurant.findUnique({
-      where: { id: restaurantId },
-      select: {
-        userRestaurants: {
-          select: {
-            id: true,
-            user: true,
-          },
+    const resp = await prisma.userRestaurant.findFirst({
+      where: {
+        restaurantId: restaurantId,
+        user: {
+          role: Role.OWNER,
         },
+      },
+      select: {
+        restaurantId: true,
+        userId: true,
       },
     })
 
@@ -32,7 +33,7 @@ async function createOrder(
       throw new Error("Restaurant not found")
     }
     console.log(resp)
-    const userId = resp?.userRestaurants.find((u) => u.user.role === Role.OWNER)?.id
+    const userId = resp.userId
     console.log(userId)
 
     if (!userId) {
