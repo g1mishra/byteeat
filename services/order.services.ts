@@ -32,9 +32,7 @@ async function createOrder(
     if (!resp) {
       throw new Error("Restaurant not found")
     }
-    console.log(resp)
     const userId = resp.userId
-    console.log(userId)
 
     if (!userId) {
       throw new Error("User not found")

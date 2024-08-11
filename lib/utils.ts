@@ -1,4 +1,4 @@
-import { Subscription, SubscriptionStatus } from "@prisma/client"
+import { OrderItem, Subscription, SubscriptionStatus } from "@prisma/client"
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 
@@ -42,7 +42,9 @@ export const getPathWithQuery = (href: string): string => {
 }
 
 export function utcToIst(utcDate: Date): Date {
-  return new Date(utcDate.getTime() + 5.5 * 60 * 60 * 1000)
+  if (!utcDate) return new Date()
+  const date = new Date(utcDate)
+  return new Date(date.getTime() + 5.5 * 60 * 60 * 1000)
 }
 
 export const checkSubscriptionStatus = (subscription: Subscription | null) => {
@@ -82,4 +84,28 @@ export const generateWaiterKey = () => {
     key += characters[Math.floor(Math.random() * characters.length)]
   }
   return key
+}
+
+export const generateReceipt = (
+  slug: string | undefined,
+  orderItems: OrderItem[],
+  total: number,
+  tableNo: number
+): string => {
+  const header = "--------------------------------\n"
+  const restaurantName = `\n\n${slug}\n\n`.replace("-", " ").toUpperCase()
+  const dineInInfo = `Dine in: ${tableNo}\n`
+  const totalInfo = `Total: Rs. ${total}\n`
+
+  const itemsInfo =
+    orderItems
+      ?.map(
+        (item: any) =>
+          `${item.name} ${item.portion} ${
+            item.quantity
+          }\nRs. ${item.price.toFixed(2)}\n\n`
+      )
+      .join("") || ""
+
+  return `${header}${restaurantName}${header}${dineInInfo}${totalInfo}${header}${itemsInfo}\n\n${header}\n\n\n\n`
 }

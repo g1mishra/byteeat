@@ -1,12 +1,14 @@
 "use client"
 
-import React, { useEffect, useState } from "react"
+import React, { useCallback, useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { getOrderWithItemsById, updateOrder } from "@/services/order.services"
-import { Order, OrderItem, OrderStatus } from "@prisma/client"
+import { getRestaurantSlug } from "@/services/restaurantService"
+import { Order, OrderStatus } from "@prisma/client"
 import { MoreHorizontal } from "lucide-react"
 
+import { generateReceipt, utcToIst } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -16,150 +18,110 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { getRestaurantSlug } from "@/services/restaurantService"
 
 interface DataTableProps {
   columns: { header: string; accessor: keyof OrderI }[]
   data: Order[]
-  polling?: boolean
-}
-interface ReceiptProps {
-  slug: string | undefined;
-  orderItems: OrderItem[]; // Ensure this is an array
-}
-
-const statuses = Object.values(OrderStatus)
-
-
-function receipt(slug: string | undefined, orderItems: OrderItem[], total: number, tableNo: number) {
-
-  let result = ''
-  result += '--------------------------------\n'
-  result += `\n\n${slug}\n\n`.replace('-',' ').toUpperCase()
-
-  result += '--------------------------------\n'
-  result += `Dine in: ${tableNo}\n`
-  
-  result += `Total: Rs. ${total}\n`
-  result += '--------------------------------\n'
-  // Add each order item
-  orderItems?.forEach((orderItem: any) => {
-    result += `${orderItem.name} ${orderItem.portion} ${orderItem.quantity}\n`;
-    result += `Rs. ${orderItem.price.toFixed(2)}\n\n`
-  });
-
-  result += '\n\n'
-  result += '--------------------------------\n'
-  result += '\n\n\n\n'
-
-  console.log(result,"here")
-  return result;
-}
-
-function Actions({ rowOrder, server}: { rowOrder: Order, server: any }) {
-  const router = useRouter()
-
-
-  const handleStatusChange = async (newStatus: OrderStatus) => {
-    try {
-      const updatedOrder = await updateOrder({
-        id: rowOrder.id,
-        status: newStatus,
-      })
-      console.log("Order status updated successfully", updatedOrder)
-      router.refresh()
-    } catch (error) {
-      console.error("Failed to update order status", error)
-    }
-  }
-
-  const handlePrint = async (orderId: string, restroId: string, tableNo: number) => {
-    console.log(server)
-    if (!server) return;
-   
-    const restauntName: {slug: string} | null = await getRestaurantSlug(restroId)
-    const order: any | null = await getOrderWithItemsById(orderId, true);
-
-    let total = 0;
-    order.orderItems?.forEach((orderItem: any) => {
-      total += orderItem.price * orderItem.quantity
-    });
-
-    console.log(total)
-    console.log(order.orderItems)
-    console.log(tableNo)
-
-    // Replace with your service and characteristic UUIDs
-    const PRINT_SERVICE_UUID: string = '000018F0-0000-1000-8000-00805F9B34FB'.toLowerCase();
-    const PRINT_CHARACTERISTIC_UUID: string = '00002AF1-0000-1000-8000-00805F9B34FB'.toLowerCase();
-    server.getPrimaryService(PRINT_SERVICE_UUID)
-        .then((service: any) => {
-            return service.getCharacteristic(PRINT_CHARACTERISTIC_UUID);
-        })
-        .then((characteristic: any) => {
-            const data: Uint8Array = new Uint8Array([
-
-                ...new TextEncoder().encode(receipt(restauntName?.slug, order.orderItems, total, tableNo)),
-            ]);
-            return characteristic.writeValue(data);
-        })
-        .then(() => {
-            console.log('Print command sent successfully.');
-            handleStatusChange('ACCEPTED')
-        })
-        .catch((error: any) => {
-            console.error('Error:', error);
-          });
-  };
-
-
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="size-8 p-0">
-          <span className="sr-only">Open menu</span>
-          <MoreHorizontal className="size-4" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuLabel>Change status</DropdownMenuLabel>
-        {statuses.map((curr) =>
-          curr !== rowOrder.status ? (
-            <DropdownMenuItem
-              key={curr}
-              onClick={() => {
-                handleStatusChange(curr)
-              }}
-            >
-              {curr}
-            </DropdownMenuItem>
-          ) : null
-        )}
-        <DropdownMenuSeparator />
-        <Link
-          href={`/manage/restaurant/${rowOrder.restaurantId}/orders/${rowOrder.id}`}
-        >
-          <DropdownMenuItem>Open order</DropdownMenuItem>
-        </Link>
-        
-        <Button
-          onClick={() => handlePrint(rowOrder.id, rowOrder.restaurantId, rowOrder.tableNo)} className="bg-white text-black"
-        >
-          <DropdownMenuItem>Print order</DropdownMenuItem>
-        </Button>
-      </DropdownMenuContent>
-    </DropdownMenu>
-  )
 }
 
 interface OrderI extends Order {
   action: string
 }
 
-export const dcolumns: {
-  header: string
-  accessor: keyof OrderI
-}[] = [
+const STATUSES = Object.values(OrderStatus)
+const PRINT_SERVICE_UUID = "000018f0-0000-1000-8000-00805f9b34fb"
+const PRINT_CHARACTERISTIC_UUID = "00002af1-0000-1000-8000-00805f9b34fb"
+
+const Actions = React.memo(
+  ({ rowOrder, server }: { rowOrder: Order; server: any }) => {
+    const router = useRouter()
+
+    const handleStatusChange = useCallback(
+      async (newStatus: OrderStatus) => {
+        try {
+          await updateOrder({ id: rowOrder.id, status: newStatus })
+          router.refresh()
+        } catch (error) {
+          console.error("Failed to update order status", error)
+        }
+      },
+      [rowOrder.id, router]
+    )
+
+    const handlePrint = useCallback(async () => {
+      if (!server) return
+
+      try {
+        const restaurantName = await getRestaurantSlug(rowOrder.restaurantId)
+        const order = await getOrderWithItemsById(rowOrder.id, true)
+
+        if (!order) {
+          console.error("Order not found.")
+          return
+        }
+
+        const total =
+          order.orderItems?.reduce(
+            (sum: number, item: any) => sum + item.price * item.quantity,
+            0
+          ) || 0
+
+        const service = await server.getPrimaryService(PRINT_SERVICE_UUID)
+        const characteristic = await service.getCharacteristic(
+          PRINT_CHARACTERISTIC_UUID
+        )
+
+        const receiptData = generateReceipt(
+          restaurantName?.slug,
+          order.orderItems,
+          total,
+          rowOrder.tableNo
+        )
+        await characteristic.writeValue(new TextEncoder().encode(receiptData))
+
+        console.log("Print command sent successfully.")
+        handleStatusChange("ACCEPTED")
+      } catch (error) {
+        console.error("Error:", error)
+      }
+    }, [server, rowOrder, handleStatusChange])
+
+    return (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" className="size-8 p-0">
+            <span className="sr-only">Open menu</span>
+            <MoreHorizontal className="size-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuLabel>Change status</DropdownMenuLabel>
+          {STATUSES.filter((status) => status !== rowOrder.status).map(
+            (status) => (
+              <DropdownMenuItem
+                key={status}
+                onClick={() => handleStatusChange(status)}
+              >
+                {status}
+              </DropdownMenuItem>
+            )
+          )}
+          <DropdownMenuSeparator />
+          <Link
+            href={`/manage/restaurant/${rowOrder.restaurantId}/orders/${rowOrder.id}`}
+          >
+            <DropdownMenuItem>Open order</DropdownMenuItem>
+          </Link>
+          <DropdownMenuItem onClick={handlePrint}>Print order</DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    )
+  }
+)
+
+Actions.displayName = "Actions"
+
+export const dcolumns: { header: string; accessor: keyof OrderI }[] = [
   { header: "ID", accessor: "id" },
   { header: "Amount", accessor: "total" },
   { header: "Table Number", accessor: "tableNo" },
@@ -168,44 +130,30 @@ export const dcolumns: {
   { header: "Actions", accessor: "action" },
 ]
 
-export function DataTable({ columns, data, polling = false }: DataTableProps) {
-  const [filter, setFilter] = React.useState<string>("")
-  const [connect, setConnect] = React.useState<boolean>(false)
-  const [server,setServer] = React.useState<any>(null)
-  const router = useRouter()
-  const handleRequestDevice = async (): Promise<void> => {
+export function DataTable({ columns, data }: DataTableProps) {
+  const [filter, setFilter] = useState<string>("")
+  const [isConnected, setIsConnected] = useState<boolean>(false)
+  const [server, setServer] = useState<any>(null)
+
+  const handleRequestDevice = useCallback(async (): Promise<void> => {
     try {
-        const selectedDevice: any = await (navigator as any).bluetooth.requestDevice({
-            filters: [{ services: ['000018F0-0000-1000-8000-00805F9B34FB'.toLowerCase()] }],
-            optionalServices: ['000018F0-0000-1000-8000-00805F9B34FB'.toLowerCase()]
-        });
+      const selectedDevice = await (navigator as any).bluetooth.requestDevice({
+        filters: [{ services: [PRINT_SERVICE_UUID] }],
+        optionalServices: [PRINT_SERVICE_UUID],
+      })
 
-        const gattServer: any = await selectedDevice.gatt.connect();
+      const gattServer = await selectedDevice.gatt.connect()
 
-        if(gattServer){
-        setServer(gattServer);
-        setConnect(true);
-        console.log('Connected to GATT server:', gattServer);
-        }
-
-        // Handle the gattServer as needed
-       
-        
+      if (gattServer) {
+        setServer(gattServer)
+        setIsConnected(true)
+        console.log("Connected to GATT server:", gattServer)
+      }
     } catch (error) {
-        console.error('Error:', error);
-        setConnect(false); // Ensure `setConnect` is defined in your scope
+      console.error("Error:", error)
+      setIsConnected(false)
     }
-};
-  
-
-  useEffect(() => {
-    if (polling) {
-      const interval = setInterval(() => {
-        router.refresh()
-      }, 5000)
-      return () => clearInterval(interval)
-    }
-  }, [polling, router])
+  }, [])
 
   const filteredData = filter
     ? data.filter((order) => order.status === filter)
@@ -213,9 +161,12 @@ export function DataTable({ columns, data, polling = false }: DataTableProps) {
 
   return (
     <div className="w-full rounded-md border p-4">
-      <Button onClick={handleRequestDevice}>
-        {connect ? "Connected ✅" : "Connect to Printer"}
-      </Button>
+      <div
+        className="max-w-max cursor-pointer rounded border px-4 py-2"
+        onClick={handleRequestDevice}
+      >
+        {isConnected ? "Connected ✅" : "Connect to Printer"}
+      </div>
       <div className="flex flex-col items-start py-4 sm:flex-row sm:items-center">
         <select
           value={filter}
@@ -234,7 +185,7 @@ export function DataTable({ columns, data, polling = false }: DataTableProps) {
             <tr>
               {columns.map((column) => (
                 <th
-                  key={column.accessor as string}
+                  key={column.accessor}
                   className="bg-gray-50 px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500"
                 >
                   {column.header}
@@ -249,11 +200,13 @@ export function DataTable({ columns, data, polling = false }: DataTableProps) {
                 <tr key={order.id}>
                   {columns.map((column) => (
                     <td
-                      key={column.accessor as string}
+                      key={column.accessor}
                       className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900"
                     >
                       {column.accessor === "action" ? (
-                        <Actions rowOrder={order} server={server}/>
+                        <Actions rowOrder={order} server={server} />
+                      ) : column.accessor === "createdAt" ? (
+                        utcToIst(order?.createdAt).toLocaleString("en-IN")
                       ) : (
                         String(order[column.accessor])
                       )}
@@ -282,10 +235,10 @@ export function DataTable({ columns, data, polling = false }: DataTableProps) {
               className="mb-4 rounded-lg border p-4 shadow-sm"
             >
               {columns.map((column) => (
-                <div key={column.accessor as string} className="mb-2">
+                <div key={column.accessor} className="mb-2">
                   <span className="font-semibold">{column.header}: </span>
                   {column.accessor === "action" ? (
-                    <Actions rowOrder={order} server={server}/>
+                    <Actions rowOrder={order} server={server} />
                   ) : (
                     String(order[column.accessor])
                   )}
