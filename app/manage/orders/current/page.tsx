@@ -8,7 +8,7 @@ import { useToast } from "@/components/ui/use-toast"
 import { DataTable, dcolumns } from "@/components/orders_table"
 
 // Sound to play when a new order is received
-const sound = new Audio("/new-order.wav") // Make sure to have the sound file in the public/sounds directory
+const sound = typeof window !== "undefined" ? new Audio("/new-order.wav") : null
 
 export default function Orders() {
   const [orders, setOrders] = useState<Order[]>([])
@@ -70,6 +70,7 @@ export default function Orders() {
   }, [toast])
 
   const playSound = () => {
+    if (!sound) return
     sound.play().catch((error) => console.error("Failed to play sound:", error))
   }
 
