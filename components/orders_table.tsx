@@ -8,7 +8,7 @@ import { getRestaurantSlug } from "@/services/restaurantService"
 import { Order, OrderStatus } from "@prisma/client"
 import { MoreHorizontal } from "lucide-react"
 
-import { generateReceipt, utcToIst } from "@/lib/utils"
+import { cn, generateReceipt, utcToIst } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -112,7 +112,11 @@ const Actions = React.memo(
           >
             <DropdownMenuItem>Open order</DropdownMenuItem>
           </Link>
-          <DropdownMenuItem onClick={handlePrint}>Print order</DropdownMenuItem>
+          {server ? (
+            <DropdownMenuItem onClick={handlePrint}>
+              Print order
+            </DropdownMenuItem>
+          ) : null}
         </DropdownMenuContent>
       </DropdownMenu>
     )
@@ -201,7 +205,12 @@ export function DataTable({ columns, data }: DataTableProps) {
                   {columns.map((column) => (
                     <td
                       key={column.accessor}
-                      className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900"
+                      className={cn(
+                        "whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-600",
+                        {
+                          "text-gray-900": order.status === "PENDING",
+                        }
+                      )}
                     >
                       {column.accessor === "action" ? (
                         <Actions rowOrder={order} server={server} />
