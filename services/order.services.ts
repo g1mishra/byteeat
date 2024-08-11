@@ -32,7 +32,6 @@ async function createOrder(
     if (!resp) {
       throw new Error("Restaurant not found")
     }
-
     const userId = resp.userId
 
     if (!userId) {

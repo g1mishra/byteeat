@@ -15,7 +15,7 @@ export default async function Orders() {
 
   return (
     <>
-      <DataTable columns={dcolumns} data={formattedOrders} polling={true} />
+      <DataTable columns={dcolumns} data={formattedOrders} />
     </>
   )
 }
