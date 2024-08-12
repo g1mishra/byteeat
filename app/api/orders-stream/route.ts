@@ -6,6 +6,8 @@ import { getServerSession } from "next-auth/next"
 import prisma from "@/lib/prisma"
 
 import { authOptions } from "../auth/authOption"
+// Hobby	10s	60s, Pro	15s	300s, Enterprise	15s	900s
+export const maxDuration = 60
 
 type EventData =
   | { type: "ping" }
