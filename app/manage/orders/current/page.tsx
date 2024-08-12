@@ -1,11 +1,13 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import { getTodayOrdersAllRestaurants } from "@/services/order.services"
-import { Order } from "@prisma/client"
+import {
+  getTodayOrdersAllRestaurants
+} from "@/services/order.services"
+import { Order, OrderStatus } from "@prisma/client"
+import { useCallback, useEffect, useRef, useState } from "react"
 
-import { useToast } from "@/components/ui/use-toast"
 import { DataTable, dcolumns } from "@/components/orders_table"
+import { useToast } from "@/components/ui/use-toast"
 
 // Sound to play when a new order is received
 const sound = typeof window !== "undefined" ? new Audio("/new-order.wav") : null
@@ -13,35 +15,32 @@ const sound = typeof window !== "undefined" ? new Audio("/new-order.wav") : null
 export default function Orders() {
   const [orders, setOrders] = useState<Order[]>([])
   const { toast } = useToast()
+  const eventSourceRef = useRef<EventSource | null>(null)
+  const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
-  useEffect(() => {
-    // Fetch initial orders
-    const fetchInitialOrders = async () => {
-      const date = new Date()
-      const initialOrders = await getTodayOrdersAllRestaurants(date)
-      setOrders(initialOrders)
+  const connectToEventSource = useCallback(() => {
+    // Close existing connection if any
+    if (eventSourceRef.current) {
+      eventSourceRef.current.close()
     }
 
-    fetchInitialOrders()
+    const newEventSource = new EventSource(`/api/orders-stream`)
 
-    // Set up SSE connection
-    const eventSource = new EventSource("/api/orders-stream")
+    newEventSource.onmessage = (event) => {
+      const data = JSON.parse(event.data)
 
-    eventSource.onmessage = (event) => {
-      if (event.data.includes("ping")) {
+      if (data.type === "ping") {
         // Ping event to keep the connection alive
         return
       }
 
-      if (event.data.includes("error")) {
-        const error = JSON.parse(event.data)
-        console.error("Error from server:", error)
+      if (data.type === "error") {
+        console.error("Error from server:", data.message)
         return
       }
 
-      if (event.data.includes("newOrder")) {
-        const data = JSON.parse(event.data)
-        const newOrder = data.order as Order
+      if (data.type === "newOrder") {
+        const newOrder = data.order
         setOrders((prevOrders) => {
           // Check if the order already exists
           const orderExists = prevOrders.some(
@@ -52,31 +51,89 @@ export default function Orders() {
               title: "New Order Received",
             })
             playSound() // Play sound when a new order is received
-            return [newOrder as unknown as Order, ...prevOrders]
+            return [newOrder, ...prevOrders]
           }
           return prevOrders
         })
       }
     }
 
-    eventSource.onerror = (error) => {
+    newEventSource.onerror = (error) => {
       console.error("EventSource failed:", error)
-      eventSource.close()
+      newEventSource.close()
+      eventSourceRef.current = null
+
+      // Clear any existing reconnect timeout
+      if (reconnectTimeoutRef.current) {
+        clearTimeout(reconnectTimeoutRef.current)
+      }
+
+      // Attempt to reconnect after 5 seconds
+      reconnectTimeoutRef.current = setTimeout(() => {
+        toast({
+          title: "Connection lost. Attempting to reconnect...",
+          variant: "destructive",
+        })
+        connectToEventSource()
+      }, 5000)
     }
 
-    return () => {
-      eventSource.close()
-    }
+    eventSourceRef.current = newEventSource
   }, [toast])
+
+  useEffect(() => {
+    // Fetch initial orders
+    const fetchInitialOrders = async () => {
+      try {
+        const date = new Date()
+        const initialOrders = await getTodayOrdersAllRestaurants(date)
+        setOrders(initialOrders as unknown as Order[])
+      } catch (error) {
+        console.error("Error fetching initial orders:", error)
+        toast({
+          title: "Failed to fetch initial orders",
+          variant: "destructive",
+        })
+      }
+    }
+
+    fetchInitialOrders()
+
+    // Set up SSE connection
+    connectToEventSource()
+
+    // Cleanup function
+    return () => {
+      if (eventSourceRef.current) {
+        eventSourceRef.current.close()
+      }
+      if (reconnectTimeoutRef.current) {
+        clearTimeout(reconnectTimeoutRef.current)
+      }
+    }
+  }, [connectToEventSource, toast])
 
   const playSound = () => {
     if (!sound) return
     sound.play().catch((error) => console.error("Failed to play sound:", error))
   }
 
+  const updateOrderStatus = (orderId: string, status: OrderStatus) => {
+    setOrders((prevOrders) =>
+      prevOrders.map((order) => {
+        if (order.id === orderId) {
+          return { ...order, status }
+        }
+        return order
+      })
+    )
+  }
+
   return (
-    <>
-      <DataTable columns={dcolumns} data={orders} />
-    </>
+    <DataTable
+      columns={dcolumns}
+      data={orders}
+      updateOrderStatus={updateOrderStatus}
+    />
   )
 }

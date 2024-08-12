@@ -1,14 +1,12 @@
 "use client"
 
-import React, { useCallback, useState } from "react"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
 import { getOrderWithItemsById, updateOrder } from "@/services/order.services"
 import { getRestaurantSlug } from "@/services/restaurantService"
 import { Order, OrderStatus } from "@prisma/client"
 import { MoreHorizontal } from "lucide-react"
+import Link from "next/link"
+import React, { useCallback, useState } from "react"
 
-import { cn, generateReceipt, utcToIst } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -18,10 +16,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { cn, generateReceipt, utcToIst } from "@/lib/utils"
 
 interface DataTableProps {
   columns: { header: string; accessor: keyof OrderI }[]
   data: Order[]
+  updateOrderStatus: (id: string, status: OrderStatus) => void
 }
 
 interface OrderI extends Order {
@@ -33,19 +33,25 @@ const PRINT_SERVICE_UUID = "000018f0-0000-1000-8000-00805f9b34fb"
 const PRINT_CHARACTERISTIC_UUID = "00002af1-0000-1000-8000-00805f9b34fb"
 
 const Actions = React.memo(
-  ({ rowOrder, server }: { rowOrder: Order; server: any }) => {
-    const router = useRouter()
-
+  ({
+    rowOrder,
+    server,
+    updateOrderStatus,
+  }: {
+    rowOrder: Order
+    server: any
+    updateOrderStatus: (id: string, status: OrderStatus) => void
+  }) => {
     const handleStatusChange = useCallback(
       async (newStatus: OrderStatus) => {
         try {
           await updateOrder({ id: rowOrder.id, status: newStatus })
-          router.refresh()
+          updateOrderStatus(rowOrder.id, newStatus)
         } catch (error) {
           console.error("Failed to update order status", error)
         }
       },
-      [rowOrder.id, router]
+      [rowOrder.id, updateOrderStatus]
     )
 
     const handlePrint = useCallback(async () => {
@@ -134,7 +140,11 @@ export const dcolumns: { header: string; accessor: keyof OrderI }[] = [
   { header: "Actions", accessor: "action" },
 ]
 
-export function DataTable({ columns, data }: DataTableProps) {
+export function DataTable({
+  columns,
+  data,
+  updateOrderStatus,
+}: DataTableProps) {
   const [filter, setFilter] = useState<string>("")
   const [isConnected, setIsConnected] = useState<boolean>(false)
   const [server, setServer] = useState<any>(null)
@@ -213,9 +223,14 @@ export function DataTable({ columns, data }: DataTableProps) {
                       )}
                     >
                       {column.accessor === "action" ? (
-                        <Actions rowOrder={order} server={server} />
+                        <Actions
+                          rowOrder={order}
+                          server={server}
+                          updateOrderStatus={updateOrderStatus}
+                        />
                       ) : column.accessor === "createdAt" ? (
-                        utcToIst(order?.createdAt).toLocaleString("en-IN")
+                        utcToIst(order?.createdAt)?.toLocaleString("en-IN") ||
+                        ""
                       ) : (
                         String(order[column.accessor])
                       )}
@@ -247,7 +262,11 @@ export function DataTable({ columns, data }: DataTableProps) {
                 <div key={column.accessor} className="mb-2">
                   <span className="font-semibold">{column.header}: </span>
                   {column.accessor === "action" ? (
-                    <Actions rowOrder={order} server={server} />
+                    <Actions
+                      rowOrder={order}
+                      server={server}
+                      updateOrderStatus={updateOrderStatus}
+                    />
                   ) : (
                     String(order[column.accessor])
                   )}

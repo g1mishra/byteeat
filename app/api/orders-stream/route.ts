@@ -1,8 +1,34 @@
 import { NextRequest, NextResponse } from "next/server"
+import { checkUserRestaurantPermission } from "@/services/restaurantService"
+import { Order } from "@prisma/client"
 import { getServerSession } from "next-auth/next"
 
 import prisma from "@/lib/prisma"
+
 import { authOptions } from "../auth/authOption"
+
+type EventData =
+  | { type: "ping" }
+  | { type: "newOrder"; order: Order }
+  | { type: "error"; message: string }
+
+const MAX_RETRIES = 3
+const RETRY_DELAY = 1000 // 1 second
+
+async function retryOperation<T>(
+  operation: () => Promise<T>,
+  retries = MAX_RETRIES
+): Promise<T> {
+  try {
+    return await operation()
+  } catch (error) {
+    if (retries > 0) {
+      await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY))
+      return retryOperation(operation, retries - 1)
+    }
+    throw error
+  }
+}
 
 export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions)
@@ -13,7 +39,6 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
-  // Set headers for SSE
   const headers = new Headers({
     "Content-Type": "text/event-stream",
     "Cache-Control": "no-cache",
@@ -22,39 +47,58 @@ export async function GET(req: NextRequest) {
 
   const stream = new ReadableStream({
     async start(controller) {
-      let isClosed = false
+      let isStreamActive = true
 
-      // Function to send events to the client
-      const sendEvent = (data: any) => {
-        if (!isClosed) {
-          controller.enqueue(`data: ${JSON.stringify(data)}\n\n`)
+      const sendEvent = (data: EventData) => {
+        if (isStreamActive) {
+          try {
+            controller.enqueue(`data: ${JSON.stringify(data)}\n\n`)
+          } catch (error) {
+            console.error("Error sending event:", error)
+            isStreamActive = false
+          }
         }
       }
 
-      // Send initial ping to establish connection
       sendEvent({ type: "ping" })
 
-      // Keep track of the last checked timestamp
       let lastChecked = new Date()
 
-      let fetchBy = {}
-      if (restaurantId && String(restaurantId).length > 10) {
-        fetchBy = { restaurantId: parseInt(restaurantId) }
-      } else {
-        fetchBy = { userId: session.user.id }
+      let fetchBy: { userId: string } | { restaurantId: string } = {
+        userId: session.user.id,
+      }
+      if (restaurantId) {
+        const hasPermission = await checkUserRestaurantPermission(
+          session.user.id,
+          restaurantId
+        )
+        if (!hasPermission) {
+          sendEvent({
+            type: "error",
+            message: "Unauthorized access to restaurant orders",
+          })
+          isStreamActive = false
+          controller.close()
+          return
+        }
+        fetchBy = { restaurantId }
       }
 
-      // Function to check for new orders
       const checkNewOrders = async () => {
+        if (!isStreamActive) return
+
         try {
-          const newOrders = await prisma.order.findMany({
-            where: {
-              ...fetchBy,
-              createdAt: { gt: lastChecked },
-              status: { not: "CANCELLED" },
-            },
-            orderBy: { createdAt: "asc" },
-          })
+          const newOrders = await retryOperation(() =>
+            prisma.order.findMany({
+              where: {
+                ...fetchBy,
+                createdAt: { gt: lastChecked },
+                status: { not: "CANCELLED" },
+              },
+              orderBy: { createdAt: "asc" },
+              take: 100,
+            })
+          )
 
           if (newOrders.length > 0) {
             newOrders.forEach((order) => {
@@ -68,16 +112,13 @@ export async function GET(req: NextRequest) {
         }
       }
 
-      // Check for new orders immediately
       await checkNewOrders()
 
-      // Set up interval to check for new orders
       const intervalId = setInterval(checkNewOrders, 5000) // Check every 5 seconds
 
-      // Handle client disconnect
       req.signal.addEventListener("abort", () => {
         clearInterval(intervalId)
-        isClosed = true
+        isStreamActive = false
         controller.close()
       })
     },
