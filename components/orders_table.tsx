@@ -1,12 +1,13 @@
 "use client"
 
+import React, { useCallback, useState } from "react"
+import Link from "next/link"
 import { getOrderWithItemsById, updateOrder } from "@/services/order.services"
 import { getRestaurantSlug } from "@/services/restaurantService"
 import { Order, OrderStatus } from "@prisma/client"
 import { MoreHorizontal } from "lucide-react"
-import Link from "next/link"
-import React, { useCallback, useState } from "react"
 
+import { cn, generateReceipt, utcToIst } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -16,12 +17,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { cn, generateReceipt, utcToIst } from "@/lib/utils"
+import { useRouter } from "next/navigation"
 
 interface DataTableProps {
   columns: { header: string; accessor: keyof OrderI }[]
   data: Order[]
-  updateOrderStatus: (id: string, status: OrderStatus) => void
+  updateOrderStatus?: (id: string, status: OrderStatus) => void
 }
 
 interface OrderI extends Order {
@@ -40,18 +41,22 @@ const Actions = React.memo(
   }: {
     rowOrder: Order
     server: any
-    updateOrderStatus: (id: string, status: OrderStatus) => void
+    updateOrderStatus?: (id: string, status: OrderStatus) => void
   }) => {
+    const router = useRouter()
     const handleStatusChange = useCallback(
       async (newStatus: OrderStatus) => {
         try {
           await updateOrder({ id: rowOrder.id, status: newStatus })
-          updateOrderStatus(rowOrder.id, newStatus)
+          updateOrderStatus?.(rowOrder.id, newStatus)
+          if (!updateOrderStatus || typeof updateOrderStatus === "undefined") {
+            router.refresh()
+          }
         } catch (error) {
           console.error("Failed to update order status", error)
         }
       },
-      [rowOrder.id, updateOrderStatus]
+      [router, rowOrder.id, updateOrderStatus]
     )
 
     const handlePrint = useCallback(async () => {
