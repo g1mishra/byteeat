@@ -15,6 +15,10 @@ type EventData =
 const MAX_RETRIES = 3
 const RETRY_DELAY = 1000 // 1 second
 
+export const runtime = "nodejs"
+// This is required to enable streaming
+export const dynamic = "force-dynamic"
+
 async function retryOperation<T>(
   operation: () => Promise<T>,
   retries = MAX_RETRIES
@@ -41,7 +45,7 @@ export async function GET(req: NextRequest) {
 
   const headers = new Headers({
     "Content-Type": "text/event-stream",
-    "Cache-Control": "no-cache",
+    "Cache-Control": "no-cache, no-transform",
     Connection: "keep-alive",
   })
 
@@ -62,9 +66,9 @@ export async function GET(req: NextRequest) {
 
       sendEvent({ type: "ping" })
 
-      let lastChecked = new Date()
+      let lastChecked: any = null
 
-      let fetchBy: { userId: string } | { restaurantId: string } = {
+      let fetchBy: any = {
         userId: session.user.id,
       }
       if (restaurantId) {
@@ -84,6 +88,14 @@ export async function GET(req: NextRequest) {
         fetchBy = { restaurantId }
       }
 
+      if (lastChecked) {
+        fetchBy = {
+          ...fetchBy,
+          createdAt: { gt: lastChecked },
+          status: { not: "CANCELLED" },
+        }
+      }
+
       const checkNewOrders = async () => {
         if (!isStreamActive) return
 
@@ -92,7 +104,6 @@ export async function GET(req: NextRequest) {
             prisma.order.findMany({
               where: {
                 ...fetchBy,
-                createdAt: { gt: lastChecked },
                 status: { not: "CANCELLED" },
               },
               orderBy: { createdAt: "asc" },

@@ -1,13 +1,11 @@
 "use client"
 
-import {
-  getTodayOrdersAllRestaurants
-} from "@/services/order.services"
-import { Order, OrderStatus } from "@prisma/client"
 import { useCallback, useEffect, useRef, useState } from "react"
+import { getTodayOrdersAllRestaurants } from "@/services/order.services"
+import { Order, OrderStatus } from "@prisma/client"
 
-import { DataTable, dcolumns } from "@/components/orders_table"
 import { useToast } from "@/components/ui/use-toast"
+import { DataTable, dcolumns } from "@/components/orders_table"
 
 // Sound to play when a new order is received
 const sound = typeof window !== "undefined" ? new Audio("/new-order.wav") : null
@@ -30,7 +28,6 @@ export default function Orders() {
       const data = JSON.parse(event.data)
 
       if (data.type === "ping") {
-        // Ping event to keep the connection alive
         return
       }
 
@@ -69,13 +66,7 @@ export default function Orders() {
       }
 
       // Attempt to reconnect after 5 seconds
-      reconnectTimeoutRef.current = setTimeout(() => {
-        toast({
-          title: "Connection lost. Attempting to reconnect...",
-          variant: "destructive",
-        })
-        connectToEventSource()
-      }, 5000)
+      reconnectTimeoutRef.current = setTimeout(connectToEventSource, 1)
     }
 
     eventSourceRef.current = newEventSource
