@@ -142,7 +142,7 @@ async function fetchRestaurantSubscriptionStatus(
       }
     }
 
-    const now = utcToIst(new Date())
+    const now = utcToIst(new Date()) || new Date()
     const expirationDate = subscription.endDate || subscription.freeTrialEndDate
 
     if (subscription.status !== SubscriptionStatus.ACTIVE) {
@@ -292,12 +292,13 @@ const addRestaurant = async (
       // Create the restaurant
       const newRestaurant = await prisma.restaurant.create({
         data: {
-          ...restaurantData as Restaurant,
+          ...(restaurantData as Restaurant),
           userRestaurants: { create: { user: { connect: { id: userId } } } },
         },
       })
 
-      const now = utcToIst(new Date())
+      const now = utcToIst(new Date()) || new Date()
+      
 
       const freeTrialEndDate = utcToIst(
         new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000)
@@ -390,6 +391,28 @@ const addOrUpdateSocialLinks = async (
   }
 }
 
+const checkUserRestaurantPermission = async (
+  userId: string,
+  restaurantId: string
+) => {
+  if (!userId || !restaurantId) {
+    throw new Error("User ID and restaurant ID are required")
+  }
+
+  try {
+    const userWithRestaurants = await prisma.user.findUnique({
+      where: { id: userId },
+      include: { userRestaurants: true },
+    })
+
+    return userWithRestaurants?.userRestaurants.some(
+      (ur) => ur.restaurantId === restaurantId
+    )
+  } catch (error) {
+    throw error
+  }
+}
+
 export {
   addOrUpdateSocialLinks,
   addRestaurant,
@@ -401,4 +424,7 @@ export {
   getRestaurantIdBySlug,
   getRestaurantSlug,
   updateRestaurant,
+
+  // checks
+  checkUserRestaurantPermission,
 }

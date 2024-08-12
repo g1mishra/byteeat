@@ -1,4 +1,9 @@
-import { OrderItem, Subscription, SubscriptionStatus } from "@prisma/client"
+import {
+  Order,
+  OrderItem,
+  Subscription,
+  SubscriptionStatus,
+} from "@prisma/client"
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 
@@ -41,10 +46,16 @@ export const getPathWithQuery = (href: string): string => {
   return url.pathname + url.search
 }
 
-export function utcToIst(utcDate: Date): Date {
-  if (!utcDate) return new Date()
-  const date = new Date(utcDate)
-  return new Date(date.getTime() + 5.5 * 60 * 60 * 1000)
+export function utcToIst(inputDate: Date): Date | null {
+  if (!inputDate) return null
+  const date = new Date(inputDate)
+
+  // Check if the input date is in UTC
+  if (date.toUTCString() === date.toString()) {
+    return new Date(date.getTime() + 5.5 * 60 * 60 * 1000)
+  } else {
+    return date
+  }
 }
 
 export const checkSubscriptionStatus = (subscription: Subscription | null) => {
@@ -108,4 +119,12 @@ export const generateReceipt = (
       .join("") || ""
 
   return `${header}${restaurantName}${header}${dineInInfo}${totalInfo}${header}${itemsInfo}\n\n${header}\n\n\n\n`
+}
+
+export type SerializedOrder = Omit<Order, "total"> & { total: string }
+export function serializeOrder(order: Order): SerializedOrder {
+  return {
+    ...order,
+    total: order.total.toString(),
+  }
 }
