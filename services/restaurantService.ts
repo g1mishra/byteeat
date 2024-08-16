@@ -4,7 +4,6 @@ import { PlanType, Restaurant, SubscriptionStatus } from "@prisma/client"
 
 import prisma from "@/lib/prisma"
 import { Slugify } from "@/lib/string"
-import { utcToIst } from "@/lib/utils"
 
 import { checkAuth } from "./utils.service"
 
@@ -141,9 +140,19 @@ async function fetchRestaurantSubscriptionStatus(
         expirationDate: null,
       }
     }
+    const now = new Date()
+    let expirationDate: Date | null = null
 
-    const now = utcToIst(new Date()) || new Date()
-    const expirationDate = subscription.endDate || subscription.freeTrialEndDate
+    if (subscription.freeTrialEndDate) {
+      expirationDate = new Date(subscription.freeTrialEndDate)
+    }
+
+    if (subscription.endDate) {
+      const endDate = new Date(subscription.endDate)
+      if (!expirationDate || endDate > expirationDate) {
+        expirationDate = endDate
+      }
+    }
 
     if (subscription.status !== SubscriptionStatus.ACTIVE) {
       return {
@@ -285,7 +294,7 @@ const addRestaurant = async (
     restaurantData = {
       ...restaurantData,
       slug,
-      address_string: restaurantData?.address_string?.trim(),
+      address_string: restaurantData?.address_string?.trim() || "",
     }
 
     return await prisma.$transaction(async (prisma) => {
@@ -297,12 +306,8 @@ const addRestaurant = async (
         },
       })
 
-      const now = utcToIst(new Date()) || new Date()
-      
-
-      const freeTrialEndDate = utcToIst(
-        new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000)
-      )
+      const now = new Date()
+      const freeTrialEndDate = new Date(now.getTime() + 30 * 24 * 3600 * 1000)
 
       // Create the subscription
       await prisma.subscription.create({

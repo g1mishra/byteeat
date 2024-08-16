@@ -4,10 +4,9 @@ import React, { useEffect, useState } from "react"
 import { createJoiningKey, updateJoiningKey } from "@/services/waiter.service"
 import { Prisma } from "@prisma/client"
 
+import { generateWaiterKey } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { generateWaiterKey } from "@/lib/utils"
-
 
 type RestaurantWithJoiningKey = Prisma.RestaurantGetPayload<{
   include: { joiningKey: true }
@@ -34,7 +33,7 @@ export default function GenerateWaiterKey({
 
     if (!restaurant.joiningKey) {
       createWaiterKey()
-    } else if (restaurant.joiningKey.expiresAt) {
+    } else if (restaurant?.joiningKey?.expiresAt) {
       const now = new Date()
       setIsExpired(now > new Date(restaurant.joiningKey.expiresAt))
     }

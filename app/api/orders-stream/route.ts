@@ -17,7 +17,6 @@ type EventData =
 const MAX_RETRIES = 3
 const RETRY_DELAY = 1000 // 1 second
 
-export const runtime = "nodejs"
 // This is required to enable streaming
 export const dynamic = "force-dynamic"
 
@@ -51,6 +50,8 @@ export async function GET(req: NextRequest) {
     Connection: "keep-alive",
   })
 
+  let lastChecked: any = null
+
   const stream = new ReadableStream({
     async start(controller) {
       let isStreamActive = true
@@ -67,8 +68,6 @@ export async function GET(req: NextRequest) {
       }
 
       sendEvent({ type: "ping" })
-
-      let lastChecked: any = null
 
       let fetchBy: any = {
         userId: session.user.id,
@@ -90,16 +89,16 @@ export async function GET(req: NextRequest) {
         fetchBy = { restaurantId }
       }
 
-      if (lastChecked) {
-        fetchBy = {
-          ...fetchBy,
-          createdAt: { gt: lastChecked },
-          status: { not: "CANCELLED" },
-        }
-      }
-
       const checkNewOrders = async () => {
         if (!isStreamActive) return
+
+        if (lastChecked) {
+          fetchBy = {
+            ...fetchBy,
+            createdAt: { gt: lastChecked },
+            status: { not: "CANCELLED" },
+          }
+        }
 
         try {
           const newOrders = await retryOperation(() =>

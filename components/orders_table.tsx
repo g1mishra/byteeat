@@ -2,12 +2,14 @@
 
 import React, { useCallback, useState } from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { getOrderWithItemsById, updateOrder } from "@/services/order.services"
 import { getRestaurantSlug } from "@/services/restaurantService"
 import { Order, OrderStatus } from "@prisma/client"
-import { MoreHorizontal } from "lucide-react"
+import { Loader2, MoreHorizontal } from "lucide-react"
 
-import { cn, generateReceipt, utcToIst } from "@/lib/utils"
+import { fromatDate } from "@/lib/dateUtils"
+import { cn, generateReceipt } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -17,9 +19,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { useRouter } from "next/navigation"
 
 interface DataTableProps {
+  isLoading?: boolean
   columns: { header: string; accessor: keyof OrderI }[]
   data: Order[]
   updateOrderStatus?: (id: string, status: OrderStatus) => void
@@ -146,6 +148,7 @@ export const dcolumns: { header: string; accessor: keyof OrderI }[] = [
 ]
 
 export function DataTable({
+  isLoading = false,
   columns,
   data,
   updateOrderStatus,
@@ -214,7 +217,16 @@ export function DataTable({
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200 bg-white">
-            {filteredData.length > 0 ? (
+            {isLoading ? (
+              <tr>
+                <td
+                  colSpan={columns.length + 1}
+                  className="whitespace-nowrap px-6 py-4 text-center text-sm text-gray-500"
+                >
+                  <Loading />
+                </td>
+              </tr>
+            ) : filteredData.length > 0 ? (
               filteredData.map((order) => (
                 <tr key={order.id}>
                   {columns.map((column) => (
@@ -234,8 +246,7 @@ export function DataTable({
                           updateOrderStatus={updateOrderStatus}
                         />
                       ) : column.accessor === "createdAt" ? (
-                        utcToIst(order?.createdAt)?.toLocaleString("en-IN") ||
-                        ""
+                        fromatDate(order?.createdAt) || ""
                       ) : (
                         String(order[column.accessor])
                       )}
@@ -257,7 +268,9 @@ export function DataTable({
         </table>
       </div>
       <div className="block sm:hidden">
-        {filteredData.length > 0 ? (
+        {isLoading ? (
+          <Loading />
+        ) : filteredData.length > 0 ? (
           filteredData.map((order) => (
             <div
               key={order.id}
@@ -286,3 +299,9 @@ export function DataTable({
     </div>
   )
 }
+
+const Loading = () => (
+  <div className="flex h-20 items-center justify-center rounded-lg">
+    <Loader2 className="text-primary size-8 animate-spin" />
+  </div>
+)
