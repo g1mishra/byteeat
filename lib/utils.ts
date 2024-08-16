@@ -46,37 +46,6 @@ export const getPathWithQuery = (href: string): string => {
   return url.pathname + url.search
 }
 
-export function utcToIst(inputDate: Date): Date | null {
-  if (!inputDate) return null
-  const date = new Date(inputDate)
-
-  // Check if the input date is in UTC
-  if (date.toUTCString() === date.toString()) {
-    return new Date(date.getTime() + 5.5 * 60 * 60 * 1000)
-  } else {
-    return date
-  }
-}
-
-export const checkSubscriptionStatus = (subscription: Subscription | null) => {
-  if (!subscription) return false
-  const now = new Date()
-
-  if (subscription.status !== SubscriptionStatus.ACTIVE) return false
-
-  if (subscription.freeTrialEndDate && now > subscription.freeTrialEndDate) {
-    // Free trial has ended
-    return false
-  }
-
-  if (subscription.endDate && now > subscription.endDate) {
-    // Paid subscription has ended
-    return false
-  }
-
-  return true
-}
-
 export function parseSlug(pathname: string): string | null {
   if (!pathname) return null
   for (const pattern of SLUG_PATTERNS) {

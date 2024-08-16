@@ -136,25 +136,20 @@ async function getOrderWithItemsById(orderId: string, includeItems = false) {
 
 async function getTodayOrdersByRestaurant(
   restaurantId: string,
-  timestamp: Date
+  timestamp: string // ISO string (UTC)
 ) {
-  // add condition where cancelled orders are not included
   try {
-    // Convert input timestamp to IST
-    const istTimestamp = new Date(timestamp.getTime() + 5.5 * 60 * 60 * 1000)
+    // Parse the input timestamp from ISO string (UTC)
+    const utcTimestamp = new Date(timestamp)
 
-    // Get IST year, month, and day
-    const year = istTimestamp.getUTCFullYear()
-    const month = istTimestamp.getUTCMonth()
-    const day = istTimestamp.getUTCDate()
+    // Get UTC year, month, and day
+    const year = utcTimestamp.getUTCFullYear()
+    const month = utcTimestamp.getUTCMonth()
+    const day = utcTimestamp.getUTCDate()
 
-    // Create IST start and end of day, then convert back to UTC for database query
-    const startOfDay = new Date(
-      Date.UTC(year, month, day, 0, 0, 0, 0) - 5.5 * 60 * 60 * 1000
-    )
-    const endOfDay = new Date(
-      Date.UTC(year, month, day, 23, 59, 59, 999) - 5.5 * 60 * 60 * 1000
-    )
+    // Create start and end of the day in UTC
+    const startOfDay = new Date(Date.UTC(year, month, day, 0, 0, 0, 0))
+    const endOfDay = new Date(Date.UTC(year, month, day, 23, 59, 59, 999))
 
     return await prisma.order.findMany({
       where: {
@@ -176,7 +171,7 @@ async function getTodayOrdersByRestaurant(
   }
 }
 
-async function getTodayOrdersAllRestaurants(timestamp: Date) {
+async function getTodayOrdersAllRestaurants(timestamp: string) {
   try {
     const session = await getServerSession(authOptions)
 
@@ -184,21 +179,16 @@ async function getTodayOrdersAllRestaurants(timestamp: Date) {
       throw new Error("User ID is required")
     }
 
-    // Convert input timestamp to IST
-    const istTimestamp = new Date(timestamp.getTime() + 5.5 * 60 * 60 * 1000)
+    const utcTimestamp = new Date(timestamp)
 
-    // Get IST year, month, and day
-    const year = istTimestamp.getUTCFullYear()
-    const month = istTimestamp.getUTCMonth()
-    const day = istTimestamp.getUTCDate()
+    // Get UTC year, month, and day
+    const year = utcTimestamp.getUTCFullYear()
+    const month = utcTimestamp.getUTCMonth()
+    const day = utcTimestamp.getUTCDate()
 
-    // Create IST start and end of day, then convert back to UTC for database query
-    const startOfDay = new Date(
-      Date.UTC(year, month, day, 0, 0, 0, 0) - 5.5 * 60 * 60 * 1000
-    )
-    const endOfDay = new Date(
-      Date.UTC(year, month, day, 23, 59, 59, 999) - 5.5 * 60 * 60 * 1000
-    )
+    // Create start and end of the day in UTC
+    const startOfDay = new Date(Date.UTC(year, month, day, 0, 0, 0, 0))
+    const endOfDay = new Date(Date.UTC(year, month, day, 23, 59, 59, 999))
 
     const orders = await prisma.order.findMany({
       where: {

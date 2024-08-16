@@ -12,6 +12,7 @@ const sound = typeof window !== "undefined" ? new Audio("/new-order.wav") : null
 
 export default function Orders({ params }: { params: { restroId: string } }) {
   const [orders, setOrders] = useState<Order[]>([])
+  const [isLoading, setIsLoading] = useState(true)
   const { toast } = useToast()
   const eventSourceRef = useRef<EventSource | null>(null)
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null)
@@ -82,8 +83,9 @@ export default function Orders({ params }: { params: { restroId: string } }) {
 
     // Fetch initial orders
     const fetchInitialOrders = async () => {
+      setIsLoading(true)
       try {
-        const date = new Date()
+        const date = new Date().toISOString()
         const initialOrders = await getTodayOrdersByRestaurant(
           params.restroId,
           date
@@ -95,13 +97,15 @@ export default function Orders({ params }: { params: { restroId: string } }) {
           title: "Failed to fetch initial orders",
           variant: "destructive",
         })
+      } finally {
+        setIsLoading(false)
       }
     }
 
-    fetchInitialOrders()
-
-    // Set up SSE connection
-    connectToEventSource()
+    fetchInitialOrders().finally(() => {
+      // Set up SSE connection
+      connectToEventSource()
+    })
 
     // Cleanup function
     return () => {
@@ -135,6 +139,7 @@ export default function Orders({ params }: { params: { restroId: string } }) {
       columns={dcolumns}
       data={orders}
       updateOrderStatus={updateOrderStatus}
+      isLoading={isLoading}
     />
   )
 }

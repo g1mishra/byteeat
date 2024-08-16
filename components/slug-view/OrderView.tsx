@@ -6,6 +6,7 @@ import { OrderWithItems } from "@/services/order.services"
 import { OrderItem } from "@prisma/client"
 import { Decimal } from "@prisma/client/runtime/library"
 
+import { fromatDate } from "@/lib/dateUtils"
 import { Badge } from "@/components/ui/badge"
 
 function getOrderToken(orderId: string, length: number = 6): string {
@@ -129,10 +130,7 @@ function OrderInfo({ orderDetails }: { orderDetails: OrderWithItems }) {
   return (
     <div className="grid gap-3">
       <OrderDetail label="Order Id" value={orderDetails.id} />
-      <OrderDetail
-        label="Date"
-        value={new Date(orderDetails.createdAt).toDateString()}
-      />
+      <OrderDetail label="Date" value={fromatDate(orderDetails.createdAt)} />
       <OrderDetail label="Table #" value={orderDetails.tableNo} />
     </div>
   )

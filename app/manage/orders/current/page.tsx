@@ -11,6 +11,7 @@ import { DataTable, dcolumns } from "@/components/orders_table"
 const sound = typeof window !== "undefined" ? new Audio("/new-order.wav") : null
 
 export default function Orders() {
+  const [isLoading, setIsLoading] = useState(true)
   const [orders, setOrders] = useState<Order[]>([])
   const { toast } = useToast()
   const eventSourceRef = useRef<EventSource | null>(null)
@@ -75,8 +76,9 @@ export default function Orders() {
   useEffect(() => {
     // Fetch initial orders
     const fetchInitialOrders = async () => {
+      setIsLoading(true)
       try {
-        const date = new Date()
+        const date = new Date().toISOString()
         const initialOrders = await getTodayOrdersAllRestaurants(date)
         setOrders(initialOrders as unknown as Order[])
       } catch (error) {
@@ -85,13 +87,15 @@ export default function Orders() {
           title: "Failed to fetch initial orders",
           variant: "destructive",
         })
+      } finally {
+        setIsLoading(false)
       }
     }
 
-    fetchInitialOrders()
-
-    // Set up SSE connection
-    connectToEventSource()
+    fetchInitialOrders().finally(() => {
+      // Set up SSE connection
+      connectToEventSource()
+    })
 
     // Cleanup function
     return () => {
@@ -125,6 +129,7 @@ export default function Orders() {
       columns={dcolumns}
       data={orders}
       updateOrderStatus={updateOrderStatus}
+      isLoading={isLoading}
     />
   )
 }
