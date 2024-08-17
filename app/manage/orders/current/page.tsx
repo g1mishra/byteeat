@@ -92,7 +92,7 @@ export default function Orders() {
       }
     }
 
-    fetchInitialOrders().finally(() => {
+    fetchInitialOrders().then(() => {
       // Set up SSE connection
       connectToEventSource()
     })
