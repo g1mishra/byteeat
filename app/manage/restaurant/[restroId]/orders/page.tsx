@@ -102,7 +102,7 @@ export default function Orders({ params }: { params: { restroId: string } }) {
       }
     }
 
-    fetchInitialOrders().finally(() => {
+    fetchInitialOrders().then(() => {
       // Set up SSE connection
       connectToEventSource()
     })
