@@ -19,6 +19,13 @@ export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <>
       <html lang="en">
+        <meta charSet="utf-8" />
+        <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"
+        />
+
         <body
           suppressHydrationWarning
           className={cn(
