@@ -1,5 +1,4 @@
-import { NextResponse } from "next/server"
-
+// lib/sitemapUtils.ts
 import prisma from "@/lib/prisma"
 
 const BASE_URL = process.env.NEXT_WEBSITE_URL || "https://byteeat.in"
@@ -15,30 +14,7 @@ export async function generateSitemaps() {
   return sitemaps
 }
 
-export async function GET() {
-  try {
-    const dynamicSitemaps = await generateSitemaps()
-
-    const sitemaps = [
-      `${BASE_URL}/sitemap.xml`,
-      ...dynamicSitemaps.map((sitemap) => sitemap.url),
-    ]
-
-    const sitemapIndexXML = await buildSitemapIndex(sitemaps)
-
-    return new NextResponse(sitemapIndexXML, {
-      headers: {
-        "Content-Type": "application/xml",
-        "Content-Length": Buffer.byteLength(sitemapIndexXML).toString(),
-      },
-    })
-  } catch (error) {
-    console.error("Error generating sitemap index:", error)
-    return NextResponse.error()
-  }
-}
-
-async function buildSitemapIndex(sitemaps: string[]) {
+export async function buildSitemapIndex(sitemaps: string[]) {
   let xml = '<?xml version="1.0" encoding="UTF-8"?>'
   xml += '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
 
