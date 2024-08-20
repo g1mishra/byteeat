@@ -116,6 +116,8 @@ export default function Orders({ params }: { params: { restroId: string } }) {
       }
     }
 
+    fetchInitialOrders()
+
     // Cleanup function
     return () => {
       if (eventSourceRef.current) {
