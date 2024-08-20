@@ -3,9 +3,11 @@ import { checkUserRestaurantPermission } from "@/services/restaurantService"
 import { Order } from "@prisma/client"
 import { getServerSession } from "next-auth/next"
 
+import { getStartAndEndOfDay } from "@/lib/dateUtils"
 import prisma from "@/lib/prisma"
 
 import { authOptions } from "../auth/authOption"
+
 // Hobby	10s	60s, Pro	15s	300s, Enterprise	15s	900s
 export const maxDuration = 60
 
@@ -35,10 +37,14 @@ async function retryOperation<T>(
   }
 }
 
-export async function GET(req: NextRequest) {
+export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions)
-  const { searchParams } = new URL(req.url)
-  const restaurantId = searchParams.get("restaurantId")
+  const body = await req.json()
+  const restaurantId = body?.restaurantId
+  const lastCheckedTS = body?.lastCheckedTS || null
+  const date = body?.date
+
+  const { startOfDay, endOfDay } = getStartAndEndOfDay(date)
 
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
@@ -50,7 +56,7 @@ export async function GET(req: NextRequest) {
     Connection: "keep-alive",
   })
 
-  let lastChecked: any = null
+  let lastChecked = lastCheckedTS
 
   const stream = new ReadableStream({
     async start(controller) {
@@ -91,13 +97,10 @@ export async function GET(req: NextRequest) {
 
       const checkNewOrders = async () => {
         if (!isStreamActive) return
-
-        if (lastChecked) {
-          fetchBy = {
-            ...fetchBy,
-            createdAt: { gt: lastChecked },
-            status: { not: "CANCELLED" },
-          }
+        fetchBy = {
+          ...fetchBy,
+          createdAt: { gt: lastChecked || startOfDay, lte: endOfDay },
+          status: { not: "CANCELLED" },
         }
 
         try {
@@ -105,7 +108,6 @@ export async function GET(req: NextRequest) {
             prisma.order.findMany({
               where: {
                 ...fetchBy,
-                status: { not: "CANCELLED" },
               },
               orderBy: { createdAt: "asc" },
               take: 100,

@@ -3,6 +3,7 @@
 import { Order, OrderItem, Role } from "@prisma/client"
 import { getServerSession } from "next-auth"
 
+import { getStartAndEndOfDay } from "@/lib/dateUtils"
 import prisma from "@/lib/prisma"
 import { Cart } from "@/lib/types"
 import { authOptions } from "@/app/api/auth/authOption"
@@ -179,16 +180,7 @@ async function getTodayOrdersAllRestaurants(timestamp: string) {
       throw new Error("User ID is required")
     }
 
-    const utcTimestamp = new Date(timestamp)
-
-    // Get UTC year, month, and day
-    const year = utcTimestamp.getUTCFullYear()
-    const month = utcTimestamp.getUTCMonth()
-    const day = utcTimestamp.getUTCDate()
-
-    // Create start and end of the day in UTC
-    const startOfDay = new Date(Date.UTC(year, month, day, 0, 0, 0, 0))
-    const endOfDay = new Date(Date.UTC(year, month, day, 23, 59, 59, 999))
+    const { startOfDay, endOfDay } = getStartAndEndOfDay(timestamp)
 
     const orders = await prisma.order.findMany({
       where: {

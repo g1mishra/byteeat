@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 import { getTodayOrdersByRestaurant } from "@/services/order.services"
 import { Order, OrderStatus } from "@prisma/client"
+import { EventSource } from "extended-eventsource"
 
 import { useToast } from "@/components/ui/use-toast"
 import { DataTable, dcolumns } from "@/components/orders_table"
@@ -16,6 +17,7 @@ export default function Orders({ params }: { params: { restroId: string } }) {
   const { toast } = useToast()
   const eventSourceRef = useRef<EventSource | null>(null)
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const lastCheckedTSRef = useRef<string | null>(null)
 
   const connectToEventSource = useCallback(() => {
     if (!params.restroId) return
@@ -25,11 +27,21 @@ export default function Orders({ params }: { params: { restroId: string } }) {
       eventSourceRef.current.close()
     }
 
-    const newEventSource = new EventSource(
-      `/api/orders-stream?restaurantId=${params.restroId}`
-    )
+    const newEventSource = new EventSource(`/api/orders-stream`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        lastCheckedTS: lastCheckedTSRef.current || null,
+        date: new Date().toISOString(),
+        restaurantId: params.restroId,
+      }),
+      withCredentials: true,
+    })
 
     newEventSource.onmessage = (event) => {
+      if (!event.data) return
       const data = JSON.parse(event.data)
 
       if (data.type === "ping") {
@@ -53,6 +65,7 @@ export default function Orders({ params }: { params: { restroId: string } }) {
             toast({
               title: "New Order Received",
             })
+            lastCheckedTSRef.current = newOrder.createdAt
             playSound() // Play sound when a new order is received
             return [newOrder, ...prevOrders]
           }
@@ -99,13 +112,11 @@ export default function Orders({ params }: { params: { restroId: string } }) {
         })
       } finally {
         setIsLoading(false)
+        connectToEventSource()
       }
     }
 
-    fetchInitialOrders().then(() => {
-      // Set up SSE connection
-      connectToEventSource()
-    })
+    fetchInitialOrders()
 
     // Cleanup function
     return () => {
