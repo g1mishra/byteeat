@@ -6,6 +6,7 @@ yarn.lock
 pnpm-lock.yaml
 .*
 public
+!public/**/*.js
 CHANGELOG.md
 .yarn
 dist

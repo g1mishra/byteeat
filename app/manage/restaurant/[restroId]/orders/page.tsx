@@ -1,10 +1,12 @@
 "use client"
 
 import { useCallback, useEffect, useRef, useState } from "react"
+import { useNotifications } from "@/hook/useNotifications"
 import { getTodayOrdersByRestaurant } from "@/services/order.services"
 import { Order, OrderStatus } from "@prisma/client"
 import { EventSource } from "extended-eventsource"
 
+import { debounce } from "@/lib/utils"
 import { useToast } from "@/components/ui/use-toast"
 import { DataTable, dcolumns } from "@/components/orders_table"
 
@@ -18,6 +20,21 @@ export default function Orders({ params }: { params: { restroId: string } }) {
   const eventSourceRef = useRef<EventSource | null>(null)
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const lastCheckedTSRef = useRef<string | null>(null)
+
+  const { pushOrder } = useNotifications()
+
+  const playSoundAndToast = useCallback(() => {
+    debounce(() => {
+      if (sound) {
+        sound
+          .play()
+          .catch((error) => console.error("Failed to play sound:", error))
+      }
+      toast({
+        title: "New Order Received",
+      })
+    }, 500)()
+  }, [toast])
 
   const connectToEventSource = useCallback(() => {
     if (!params.restroId) return
@@ -66,7 +83,8 @@ export default function Orders({ params }: { params: { restroId: string } }) {
               title: "New Order Received",
             })
             lastCheckedTSRef.current = newOrder.createdAt
-            playSound() // Play sound when a new order is received
+            playSoundAndToast()
+            pushOrder(newOrder)
             return [newOrder, ...prevOrders]
           }
           return prevOrders
@@ -89,7 +107,7 @@ export default function Orders({ params }: { params: { restroId: string } }) {
     }
 
     eventSourceRef.current = newEventSource
-  }, [params.restroId, toast])
+  }, [params.restroId, playSoundAndToast, pushOrder, toast])
 
   useEffect(() => {
     if (!params.restroId) return
@@ -128,11 +146,6 @@ export default function Orders({ params }: { params: { restroId: string } }) {
       }
     }
   }, [params.restroId, connectToEventSource, toast])
-
-  const playSound = () => {
-    if (!sound) return
-    sound.play().catch((error) => console.error("Failed to play sound:", error))
-  }
 
   const updateOrderStatus = (orderId: string, status: OrderStatus) => {
     setOrders((prevOrders) =>
