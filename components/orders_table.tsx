@@ -22,6 +22,7 @@ import {
 
 interface DataTableProps {
   isLoading?: boolean
+  reFetchInitialOrders?: () => void
   columns: { header: string; accessor: keyof OrderI }[]
   data: Order[]
   updateOrderStatus?: (id: string, status: OrderStatus) => void
@@ -148,6 +149,7 @@ export const dcolumns: { header: string; accessor: keyof OrderI }[] = [
 ]
 
 export function DataTable({
+  reFetchInitialOrders,
   isLoading = false,
   columns,
   data,
@@ -224,6 +226,22 @@ export function DataTable({
                   className="whitespace-nowrap px-6 py-4 text-center text-sm text-gray-500"
                 >
                   <Loading />
+                </td>
+              </tr>
+            ) : reFetchInitialOrders ? (
+              <tr>
+                <td
+                  colSpan={columns.length + 1}
+                  className="flex flex-col items-center whitespace-nowrap px-6 py-4 text-center text-sm text-gray-500"
+                >
+                  Failed to fetch orders.
+                  <Button
+                    variant="ghost"
+                    className="ml-2"
+                    onClick={reFetchInitialOrders}
+                  >
+                    Retry
+                  </Button>
                 </td>
               </tr>
             ) : filteredData.length > 0 ? (

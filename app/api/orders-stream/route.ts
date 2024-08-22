@@ -38,81 +38,79 @@ async function retryOperation<T>(
 }
 
 export async function POST(req: NextRequest) {
-  const session = await getServerSession(authOptions)
-  const body = await req.json()
-  const restaurantId = body?.restaurantId
-  const lastCheckedTS = body?.lastCheckedTS || null
-  const date = body?.date
+  try {
+    const session = await getServerSession(authOptions)
+    const body = await req.json()
+    const restaurantId = body?.restaurantId
+    const lastCheckedTS = body?.lastCheckedTS || null
+    const date = body?.date
 
-  const { startOfDay, endOfDay } = getStartAndEndOfDay(date)
+    const { startOfDay, endOfDay } = getStartAndEndOfDay(date)
 
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  }
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
 
-  const headers = new Headers({
-    "Content-Type": "text/event-stream",
-    "Cache-Control": "no-cache, no-transform",
-    Connection: "keep-alive",
-  })
+    const headers = new Headers({
+      "Content-Type": "text/event-stream",
+      "Cache-Control": "no-cache, no-transform",
+      Connection: "keep-alive",
+    })
 
-  let lastChecked = lastCheckedTS
+    let lastChecked = lastCheckedTS
 
-  const stream = new ReadableStream({
-    async start(controller) {
-      let isStreamActive = true
+    const stream = new ReadableStream({
+      async start(controller) {
+        let isStreamActive = true
 
-      const sendEvent = (data: EventData) => {
-        if (isStreamActive) {
-          try {
-            controller.enqueue(`data: ${JSON.stringify(data)}\n\n`)
-          } catch (error) {
-            console.error("Error sending event:", error)
-            isStreamActive = false
+        const sendEvent = (data: EventData) => {
+          if (isStreamActive) {
+            try {
+              controller.enqueue(`data: ${JSON.stringify(data)}\n\n`)
+            } catch (error) {
+              console.error("Error sending event:", error)
+              isStreamActive = false
+            }
           }
         }
-      }
 
-      sendEvent({ type: "ping" })
+        sendEvent({ type: "ping" })
 
-      let fetchBy: any = {
-        userId: session.user.id,
-      }
-      if (restaurantId) {
-        const hasPermission = await checkUserRestaurantPermission(
-          session.user.id,
-          restaurantId
-        )
-        if (!hasPermission) {
-          sendEvent({
-            type: "error",
-            message: "Unauthorized access to restaurant orders",
-          })
-          isStreamActive = false
-          controller.close()
-          return
+        let fetchBy: any = {
+          userId: session.user.id,
         }
-        fetchBy = { restaurantId }
-      }
-
-      const checkNewOrders = async () => {
-        if (!isStreamActive) return
-        fetchBy = {
-          ...fetchBy,
-          createdAt: { gt: lastChecked || startOfDay, lte: endOfDay },
-          status: { not: "CANCELLED" },
-        }
-
-        try {
-          const newOrders = await retryOperation(() =>
-            prisma.order.findMany({
-              where: {
-                ...fetchBy,
-              },
-              orderBy: { createdAt: "asc" },
-              take: 100,
-            })
+        if (restaurantId) {
+          const hasPermission = await checkUserRestaurantPermission(
+            session.user.id,
+            restaurantId
           )
+          if (!hasPermission) {
+            sendEvent({
+              type: "error",
+              message: "Unauthorized access to restaurant orders",
+            })
+            isStreamActive = false
+            controller.close()
+            return
+          }
+          fetchBy = { restaurantId }
+        }
+
+        const checkNewOrders = async () => {
+          if (!isStreamActive) return
+          fetchBy = {
+            ...fetchBy,
+            createdAt: { gt: lastChecked || startOfDay, lte: endOfDay },
+            status: { not: "CANCELLED" },
+          }
+
+          const newOrders = await prisma.order.findMany({
+            where: {
+              ...fetchBy,
+            },
+            orderBy: { createdAt: "asc" },
+            take: 100,
+          })
 
           if (newOrders.length > 0) {
             newOrders.forEach((order) => {
@@ -120,26 +118,29 @@ export async function POST(req: NextRequest) {
             })
             lastChecked = newOrders[newOrders.length - 1].createdAt
           }
-        } catch (error) {
-          console.error("Error checking for new orders:", error)
-          sendEvent({ type: "error", message: "Error checking for new orders" })
         }
-      }
 
-      await checkNewOrders()
+        await checkNewOrders()
 
-      const intervalId = setInterval(checkNewOrders, 5000) // Check every 5 seconds
+        const intervalId = setInterval(checkNewOrders, 5000) // Check every 5 seconds
 
-      req.signal.addEventListener("abort", () => {
-        clearInterval(intervalId)
-        isStreamActive = false
-        controller.close()
-      })
-    },
-    cancel() {
-      console.log("Stream canceled")
-    },
-  })
+        req.signal.addEventListener("abort", () => {
+          clearInterval(intervalId)
+          isStreamActive = false
+          controller.close()
+        })
+      },
+      cancel() {
+        console.log("Stream canceled")
+      },
+    })
 
-  return new NextResponse(stream, { headers })
+    return new NextResponse(stream, { headers })
+  } catch (error) {
+    console.error("Error creating orders stream:", error)
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    )
+  }
 }

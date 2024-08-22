@@ -107,7 +107,12 @@ async function fetchRestaurantSubscriptionStatus(
   slug: string
 ): Promise<SubscriptionStatusResult> {
   if (!slug) {
-    throw new Error("Slug is required")
+    return {
+      isActive: false,
+      status: null,
+      message: "Restaurant slug is required.",
+      expirationDate: null,
+    }
   }
 
   try {

@@ -22,34 +22,11 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
-  const slug = parseSlug(url.pathname)
-  if (slug) {
-    const subscriptionCheckUrl = new URL(`/api/check-subscription`, request.url)
-    subscriptionCheckUrl.searchParams.set("slug", slug)
-    try {
-      const response = await fetch(subscriptionCheckUrl.toString(), {
-        method: "GET",
-        headers: {
-          "X-Middleware-Request": "true",
-        },
-      })
-
-      if (response.status === 404) {
-        return NextResponse.next()
-      } else if (!response.ok) {
-        return NextResponse.redirect(
-          new URL(`/${slug}/subscription-expired`, request.url)
-        )
-      }
-    } catch (error) {
-      console.error("Error checking subscription:", error)
-      return NextResponse.next()
-    }
-  }
-
   return NextResponse.next()
 }
 
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
+  matcher: [
+    "/((?!api|_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|manifest.json|service-worker.js|worker-sentry.js).*)",
+  ],
 }
