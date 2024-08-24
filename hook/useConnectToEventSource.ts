@@ -60,7 +60,7 @@ const useConnectToEventSource = (
 
         reconnectTimeoutRef.current = setTimeout(() => {
           connect()
-        }, 500)
+        }, 100)
       }
 
       eventSourceRef.current = newEventSource
@@ -68,7 +68,7 @@ const useConnectToEventSource = (
       console.error("Error connecting to event source:", error)
       setTimeout(() => {
         connect()
-      }, 5000)
+      }, 1000)
     }
   }, [url, restaurantId, newOrderCallback])
 
@@ -82,6 +82,13 @@ const useConnectToEventSource = (
       reconnectTimeoutRef.current = null
     }
   }, [])
+
+  useEffect(() => {
+    return () => {
+      disconnect()
+      console.log("Disconnected from event source")
+    }
+  }, [disconnect])
 
   return { connect, disconnect }
 }

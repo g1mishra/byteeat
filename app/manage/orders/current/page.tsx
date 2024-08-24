@@ -22,11 +22,7 @@ export default function Orders() {
   const { toast } = useToast()
   const { pushOrder } = useNotifications()
 
-  const { connect, disconnect } = useConnectToEventSource(
-    ENDPOINT,
-    null,
-    handleNewOrder
-  )
+  const { connect } = useConnectToEventSource(ENDPOINT, null, handleNewOrder)
 
   const fetchInitialOrders = useCallback(async () => {
     setIsLoading(true)
@@ -76,12 +72,7 @@ export default function Orders() {
   useEffect(() => {
     if (initialOrdersFetched.current) return
     fetchInitialOrders()
-
-    // Cleanup function
-    return () => {
-      disconnect()
-    }
-  }, [disconnect, fetchInitialOrders])
+  }, [fetchInitialOrders])
 
   const updateOrderStatus = (orderId: string, status: OrderStatus) => {
     setOrders((prevOrders) =>

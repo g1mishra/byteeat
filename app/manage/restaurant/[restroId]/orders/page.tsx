@@ -22,7 +22,7 @@ export default function Orders({ params }: { params: { restroId: string } }) {
   const { toast } = useToast()
   const { pushOrder } = useNotifications()
 
-  const { connect, disconnect } = useConnectToEventSource(
+  const { connect } = useConnectToEventSource(
     ENDPOINT,
     params.restroId,
     handleNewOrder
@@ -80,10 +80,7 @@ export default function Orders({ params }: { params: { restroId: string } }) {
     if (!params.restroId) return
     if (initialOrdersFetched.current) return
     fetchInitialOrders()
-    return () => {
-      disconnect()
-    }
-  }, [params.restroId, disconnect, fetchInitialOrders])
+  }, [params.restroId, fetchInitialOrders])
 
   const updateOrderStatus = (orderId: string, status: OrderStatus) => {
     setOrders((prevOrders) =>
