@@ -8,6 +8,7 @@ import { Toaster } from "@/components/ui/toaster"
 import { ThemeProvider } from "@/components/theme-provider"
 
 import AuthContext from "./AuthContext"
+import QueryProvider from "../components/QueryProvider"
 
 export const metadata = siteMetadata
 
@@ -29,16 +30,16 @@ export default function RootLayout({ children }: RootLayoutProps) {
         <body
           suppressHydrationWarning
           className={cn(
-            "bg-background min-h-screen overflow-x-hidden font-sans antialiased",
+            "bg-background relative flex min-h-screen flex-col overflow-x-hidden font-sans antialiased",
             fontSans.variable
           )}
         >
-          <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
-            <main className="relative flex min-h-screen flex-col">
+          <QueryProvider>
+            <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
               <AuthContext>{children}</AuthContext>
-            </main>
-            <Toaster />
-          </ThemeProvider>
+              <Toaster />
+            </ThemeProvider>
+          </QueryProvider>
         </body>
       </html>
     </>

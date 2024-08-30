@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from "react"
 import { getAllOrdersByRestaurant } from "@/services/order.services"
-import { Order } from "@prisma/client"
+import { Order, OrderStatus } from "@prisma/client"
 
-import { DataTable, dcolumns } from "@/components/orders_table"
+import { OrdersTableRenderer, dcolumns } from "@/components/OrdersTableRenderer"
 
 export default function Orders({ params }: { params: { restroId: string } }) {
   const [orders, setOrders] = useState<Order[]>([])
@@ -26,5 +26,28 @@ export default function Orders({ params }: { params: { restroId: string } }) {
     fetchOrders()
   }, [params.restroId])
 
-  return <DataTable columns={dcolumns} data={orders} isLoading={isLoading} />
+  const updateOrderStatus = async (id: string, status: OrderStatus) => {
+    try {
+      setOrders((prevOrders) => {
+        const index = prevOrders.findIndex((order) => order.id === id)
+        if (index !== -1) {
+          const updatedOrders = [...prevOrders]
+          updatedOrders[index].status = status
+          return updatedOrders
+        }
+        return prevOrders
+      })
+    } catch (error) {
+      console.error("Error updating order status:", error)
+    }
+  }
+
+  return (
+    <OrdersTableRenderer
+      columns={dcolumns}
+      data={orders}
+      isLoading={isLoading}
+      updateOrderStatus={updateOrderStatus}
+    />
+  )
 }

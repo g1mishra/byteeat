@@ -8,16 +8,15 @@ import { Order, OrderStatus } from "@prisma/client"
 
 import { debounce } from "@/lib/utils"
 import { useToast } from "@/components/ui/use-toast"
-import { DataTable, dcolumns } from "@/components/orders_table"
+import { OrdersTableRenderer, dcolumns } from "@/components/OrdersTableRenderer"
 
-// Sound to play when a new order is received
 const sound = typeof window !== "undefined" ? new Audio("/new-order.wav") : null
 const ENDPOINT = "/api/orders-stream"
 
 export default function Orders({ params }: { params: { restroId: string } }) {
   const [orders, setOrders] = useState<Order[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  const [failedToFetch, setFailedToFetch] = useState(false)
+  const [failedToFetch, setFailedToFetch] = useState(true)
   const initialOrdersFetched = useRef(false)
   const { toast } = useToast()
   const { pushOrder } = useNotifications()
@@ -83,18 +82,19 @@ export default function Orders({ params }: { params: { restroId: string } }) {
   }, [params.restroId, fetchInitialOrders])
 
   const updateOrderStatus = (orderId: string, status: OrderStatus) => {
-    setOrders((prevOrders) =>
-      prevOrders.map((order) => {
-        if (order.id === orderId) {
-          return { ...order, status }
-        }
-        return order
-      })
-    )
+    setOrders((prevOrders) => {
+      const index = prevOrders.findIndex((order) => order.id === orderId)
+      if (index !== -1) {
+        const updatedOrders = [...prevOrders]
+        updatedOrders[index].status = status
+        return updatedOrders
+      }
+      return prevOrders
+    })
   }
 
   return (
-    <DataTable
+    <OrdersTableRenderer
       columns={dcolumns}
       data={orders}
       updateOrderStatus={updateOrderStatus}

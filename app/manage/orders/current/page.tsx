@@ -8,7 +8,7 @@ import { Order, OrderStatus } from "@prisma/client"
 
 import { debounce } from "@/lib/utils"
 import { useToast } from "@/components/ui/use-toast"
-import { DataTable, dcolumns } from "@/components/orders_table"
+import { OrdersTableRenderer, dcolumns } from "@/components/OrdersTableRenderer"
 
 // Sound to play when a new order is received
 const sound = typeof window !== "undefined" ? new Audio("/new-order.wav") : null
@@ -86,7 +86,7 @@ export default function Orders() {
   }
 
   return (
-    <DataTable
+    <OrdersTableRenderer
       columns={dcolumns}
       data={orders}
       updateOrderStatus={updateOrderStatus}

@@ -90,6 +90,10 @@ export const generateReceipt = (
   return `${header}${restaurantName}${header}${dineInInfo}${totalInfo}${header}${itemsInfo}\n\n${header}\n\n\n\n`
 }
 
+export function getOrderToken(orderId: string, length: number = 6): string {
+  return orderId.slice(-length)
+}
+
 export type SerializedOrder = Omit<Order, "total"> & { total: string }
 export function serializeOrder(order: Order): SerializedOrder {
   return {
