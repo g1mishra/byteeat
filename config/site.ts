@@ -1,6 +1,10 @@
 import type { Metadata } from "next"
 
 export const siteMetadata: Metadata = {
+  metadataBase: new URL(`https://www.byteeat.in`),
+  alternates: {
+    canonical: "./",
+  },
   title: {
     default: "ByteEat - Digital Menu & Restaurant Management Platform",
     template: "%s | ByteEat",

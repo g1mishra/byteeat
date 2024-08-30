@@ -29,6 +29,7 @@
     "@radix-ui/react-switch": "^1.0.3",
     "@radix-ui/react-toast": "^1.1.5",
     "@radix-ui/react-tooltip": "^1.1.2",
+    "@tanstack/react-query": "^5.52.2",
     "@tanstack/react-table": "^8.19.3",
     "aws-sdk": "^2.1603.0",
     "class-variance-authority": "^0.7.0",

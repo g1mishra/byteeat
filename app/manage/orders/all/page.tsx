@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { getAllOrdersAllRestaurants } from "@/services/order.services"
 import { Order } from "@prisma/client"
 
-import { DataTable, dcolumns } from "@/components/orders_table"
+import { OrdersTableRenderer, dcolumns } from "@/components/OrdersTableRenderer"
 
 export default function Orders() {
   const [orders, setOrders] = useState<Order[]>([])
@@ -26,5 +26,11 @@ export default function Orders() {
     fetchOrders()
   }, [])
 
-  return <DataTable columns={dcolumns} data={orders} isLoading={isLoading} />
+  return (
+    <OrdersTableRenderer
+      columns={dcolumns}
+      data={orders}
+      isLoading={isLoading}
+    />
+  )
 }

@@ -1,7 +1,7 @@
 // lib/sitemapUtils.ts
 import prisma from "@/lib/prisma"
 
-const BASE_URL = process.env.NEXT_WEBSITE_URL || "https://byteeat.in"
+const BASE_URL = "https://www.byteeat.in"
 
 export async function generateSitemaps() {
   const restaurantCount = await prisma.restaurant.count()
