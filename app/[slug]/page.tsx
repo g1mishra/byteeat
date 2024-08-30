@@ -95,12 +95,13 @@ export async function generateMetadata(
 
   return {
     title: `${name || slug} - Restaurant in ${city}, ${state}`,
+
     description: `Experience a delightful dining experience at ${name} in ${city}, ${state}. Located at ${address_string}, our restaurant offers a cozy atmosphere and delicious food. Book your table today!`,
     openGraph: {
       title: `${name} - Restaurant`,
       description: `Visit ${name} in ${city} for a memorable dining experience. Located at ${address_string}, we provide a cozy ambiance and great food. Discover our menu and make a reservation today!`,
       images: [logoUrl || "", ...previousImages],
-      url: `https://byteeat.in/${slug}`,
+      url: `https://www.byteeat.in/${slug}`,
       type: "website",
       siteName: "ByteEat",
     },
