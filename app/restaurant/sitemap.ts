@@ -30,7 +30,7 @@ export default async function sitemap({
 
   // Create the sitemap entries
   const dynamicEntries = restaurants.map((restaurant) => ({
-    url: `${BASE_URL}/restaurant/${restaurant.slug}`,
+    url: `${BASE_URL}/${restaurant.slug}`,
     lastModified: restaurant.updatedAt,
     changeFrequency: "monthly" as const,
     priority: 0.6,
