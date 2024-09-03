@@ -1,8 +1,10 @@
-import React from "react"
-import { printOrder, useBluetoothPrinter } from "@/hook/useBluetoothPrinter"
+import React, { useCallback } from "react"
+import { useRouter } from "next/navigation"
+import { useBluetoothPrinter } from "@/hook/useBluetoothPrinter"
 import useMediaQuery from "@/hook/useMediaQuery"
-import { getOrderWithItemsById } from "@/services/order.services"
+import { getOrderWithItemsById, updateOrder } from "@/services/order.services"
 import { getRestaurantSlug } from "@/services/restaurantService"
+import { OrderStatus } from "@prisma/client"
 import { useQuery } from "@tanstack/react-query"
 
 import { generateReceipt } from "@/lib/utils"
@@ -38,6 +40,7 @@ interface OrderDetailsProps {
   restaurantId: string
   isOpen: boolean
   onClose: () => void
+  updateOrderStatus?: (id: string, status: OrderStatus) => void
 }
 
 export const OrderDetails: React.FC<OrderDetailsProps> = ({
@@ -45,10 +48,12 @@ export const OrderDetails: React.FC<OrderDetailsProps> = ({
   orderId,
   isOpen,
   onClose,
+  updateOrderStatus,
 }) => {
   const isDesktop = useMediaQuery("(min-width: 768px)")
-  const { server, isConnected } = useBluetoothPrinter()
+  const { server, isConnected, printOrder } = useBluetoothPrinter()
   const { toast } = useToast()
+  const router = useRouter()
 
   const { data: order, isLoading } = useQuery({
     queryKey: ["order", orderId],
@@ -63,27 +68,38 @@ export const OrderDetails: React.FC<OrderDetailsProps> = ({
       }),
   })
 
+  const handleStatusChange = useCallback(
+    async (newStatus: OrderStatus) => {
+      try {
+        await updateOrder({ id: orderId, status: newStatus })
+        updateOrderStatus?.(orderId, newStatus)
+        if (!updateOrderStatus || typeof updateOrderStatus === "undefined") {
+          router.refresh()
+        }
+      } catch (error) {
+        console.error("Failed to update order status", error)
+      }
+    },
+    [router, orderId, updateOrderStatus]
+  )
+
   const handlePrint = async () => {
-    if (!server) return
-    if (!isConnected) {
-      toast({
-        title: "Printer not connected",
-        description: "Please connect to a printer to print the order",
-      })
-      return
+    try {
+      if (!order) return
+      if (!restaurant) return
+
+      const receiptData = generateReceipt(
+        restaurant.name,
+        order.orderItems,
+        order.total.toString(),
+        order.tableNo
+      )
+
+      await printOrder(receiptData)
+      await handleStatusChange("ACCEPTED")
+    } catch (error) {
+      console.error("Failed to print order", error)
     }
-
-    if (!order) return
-    if (!restaurant) return
-
-    const receiptData = generateReceipt(
-      restaurant.name,
-      order.orderItems,
-      order.total.toNumber(),
-      order.tableNo
-    )
-
-    await printOrder(server, receiptData)
   }
   if (!orderId) return null
 

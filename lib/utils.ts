@@ -1,8 +1,6 @@
 import {
   Order,
-  OrderItem,
-  Subscription,
-  SubscriptionStatus,
+  OrderItem
 } from "@prisma/client"
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
@@ -69,26 +67,34 @@ export const generateWaiterKey = () => {
 export const generateReceipt = (
   slug: string | undefined,
   orderItems: OrderItem[],
-  total: number,
+  total: string,
   tableNo: number
 ): string => {
-  const header = "--------------------------------\n"
-  const restaurantName = `\n\n${slug}\n\n`.replace("-", " ").toUpperCase()
-  const dineInInfo = `Dine in: ${tableNo}\n`
-  const totalInfo = `Total: Rs. ${total}\n`
+  const width = 32; // Standard width for many small thermal printers
+  const line = '-'.repeat(width) + '\n';
+  const center = (text: string) => text.padStart((width + text.length) / 2).padEnd(width);
+  const right = (text: string) => text.padStart(width);
 
-  const itemsInfo =
-    orderItems
-      ?.map(
-        (item: any) =>
-          `${item.name} ${item.portion} ${
-            item.quantity
-          }\nRs. ${item.price.toFixed(2)}\n\n`
-      )
-      .join("") || ""
+  const header = line;
+  const restaurantName = center(slug?.replace('-', ' ').toUpperCase() || '') + '\n';
+  const dineInInfo = `Table: ${tableNo}\n`;
+  const totalInfo = right(`Total: Rs. ${total}`) + '\n';
 
-  return `${header}${restaurantName}${header}${dineInInfo}${totalInfo}${header}${itemsInfo}\n\n${header}\n\n\n\n`
-}
+  const itemsInfo = orderItems
+    ?.map((item: any) => {
+      const itemName = item.name.length > 20 ? item.name.slice(0, 17) + '...' : item.name;
+      const itemLine = `${itemName} ${item.portion}`;
+      const quantityPrice = right(`${item.quantity}x ${item.price.toFixed(2)}`);
+      return `${itemLine}\n${quantityPrice}\n`;
+    })
+    .join('\n') || '';
+
+  const currentDate = new Date().toLocaleString();
+  const dateInfo = center(currentDate) + '\n';
+  const cutLine = '\n' + center('- - - - - - - - - - - - - - - -') + '\n\n'; // Add cut line and minimal space
+
+  return `${header}${restaurantName}${header}${dineInInfo}${line}${itemsInfo}${line}${totalInfo}${line}${dateInfo}${cutLine}\n`;
+};
 
 export function getOrderToken(orderId: string, length: number = 6): string {
   return orderId.slice(-length)
