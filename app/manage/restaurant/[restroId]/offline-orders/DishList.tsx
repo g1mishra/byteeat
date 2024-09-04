@@ -1,6 +1,5 @@
 "use client"
 
-import dynamic from "next/dynamic"
 import { MenuItemI } from "@/services/menuService"
 
 import { Button } from "@/components/ui/button"
@@ -14,18 +13,18 @@ import VegOrNonVeg from "@/components/veg-or-nonveg"
 
 const DishList = ({
   menu,
-  slug,
+  onSelect,
 }: {
   menu: {
     id: string
     categoryName: string
     Item: MenuItemI[]
   }
-  slug: string
+  onSelect: (item: MenuItemI) => void
 }) => {
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
-      {menu?.Item?.map((item) => (
+      {menu.Item.map((item) => (
         <Card className="flex h-full flex-col justify-between">
           <CardHeader>
             <CardTitle className="flex items-center gap-x-1 text-base">
@@ -53,7 +52,11 @@ const DishList = ({
             </div>
           </CardHeader>
           <div className="mt-auto">
-            <Button className="w-full rounded-none" variant="secondary">
+            <Button
+              className="w-full rounded-none"
+              variant="secondary"
+              onClick={() => onSelect(item)}
+            >
               Add
             </Button>
           </div>

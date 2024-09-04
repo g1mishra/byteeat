@@ -46,9 +46,9 @@ const RestaurantDetails = async ({ params }: any) => {
         </div>
         <Link
           className={cn(buttonVariants({ variant: "default" }))}
-          href={`/manage/restaurant/${restroId}/offline`}
+          href={`/manage/restaurant/${restroId}/offline-orders`}
         >
-          Offline
+          Offline Orders
         </Link>
       </div>
       <div>
