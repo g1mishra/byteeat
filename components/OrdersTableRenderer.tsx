@@ -6,6 +6,7 @@ import { useBluetoothPrinter } from "@/hook/useBluetoothPrinter"
 import useMediaQuery from "@/hook/useMediaQuery"
 import { Order, OrderStatus } from "@prisma/client"
 
+
 import OrderList from "./OrderList"
 import OrderTable from "./OrderTable"
 import Loading from "./loader"
@@ -45,7 +46,7 @@ export function OrdersTableRenderer({
   updateOrderStatus,
 }: DataTableProps) {
   const [filter, setFilter] = useState<string>("")
-  const { isConnected, handleRequestDevice } = useBluetoothPrinter()
+  const { handleRequestDevice, isConnected } = useBluetoothPrinter()
   const [currentOrder, setCurrentOrder] = useState<Order | null>(null)
   const isMobile = useMediaQuery("(max-width: 768px)")
 
@@ -117,6 +118,7 @@ export function OrdersTableRenderer({
           restaurantId={currentOrder?.restaurantId}
           isOpen={!!currentOrder}
           onClose={handleCloseOrderDetails}
+          updateOrderStatus={updateOrderStatus}
         />
       )}
     </div>
