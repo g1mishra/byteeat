@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next"
 
 import prisma from "@/lib/prisma"
 
-const BASE_URL = process.env.NEXT_WEBSITE_URL || "https://byteeat.in"
+const BASE_URL = "https://www.byteeat.in"
 
 export async function generateSitemaps() {
   const restaurantCount = await prisma.restaurant.count()
@@ -30,7 +30,7 @@ export default async function sitemap({
 
   // Create the sitemap entries
   const dynamicEntries = restaurants.map((restaurant) => ({
-    url: `${BASE_URL}/restaurant/${restaurant.slug}`,
+    url: `${BASE_URL}/${restaurant.slug}`,
     lastModified: restaurant.updatedAt,
     changeFrequency: "monthly" as const,
     priority: 0.6,

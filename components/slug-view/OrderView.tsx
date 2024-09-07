@@ -8,10 +8,9 @@ import { Decimal } from "@prisma/client/runtime/library"
 
 import { fromatDate } from "@/lib/dateUtils"
 import { Badge } from "@/components/ui/badge"
+import { getOrderToken } from "@/lib/utils"
 
-function getOrderToken(orderId: string, length: number = 6): string {
-  return orderId.slice(-length)
-}
+
 
 export default function OrderView({
   orderDetails,

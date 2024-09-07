@@ -6,6 +6,7 @@ import { Role } from "@prisma/client"
 import { PlusIcon } from "lucide-react"
 import { getServerSession } from "next-auth"
 
+import { Button } from "@/components/ui/button"
 import {
   Card,
   CardDescription,
@@ -66,27 +67,58 @@ const Restaurant = async () => {
               <Link
                 key={restaurant.id}
                 href={`/manage/restaurant/${restaurant.id}`}
+                className="block h-full"
               >
-                <Card key={restaurant.id}>
+                <Card
+                  key={restaurant.id}
+                  className="hover:bg-accent flex h-full flex-col justify-between transition-colors duration-200"
+                >
                   <CardHeader>
-                    <CardTitle>{restaurant.name}</CardTitle>
-                    <CardDescription>
+                    <CardTitle className="text-lg font-semibold">
+                      {restaurant.name}
+                    </CardTitle>
+                    <CardDescription className="text-sm">
                       {restaurant.address_string}
                     </CardDescription>
                   </CardHeader>
+                  <div className="mt-auto p-4">
+                    <Button variant="outline" className="w-full">
+                      Manage
+                    </Button>
+                  </div>
                 </Card>
               </Link>
             ))}
             {session.user.role === Role.OWNER ? (
               <WithCreateRestaurantDialog>
-                <Card className="flex items-center justify-center p-6 hover:cursor-pointer">
-                  <PlusIcon size={24} />
+                <Card className="hover:border-primary flex h-full flex-col items-center justify-center border-2 border-dashed p-4 transition-colors duration-200">
+                  <CardHeader>
+                    <CardTitle className="text-lg font-semibold">
+                      Create New Restaurant
+                    </CardTitle>
+                  </CardHeader>
+                  <div className="mt-auto">
+                    <Button variant="outline" className="w-full">
+                      <PlusIcon size={16} className="mr-2" />
+                      Create
+                    </Button>
+                  </div>
                 </Card>
               </WithCreateRestaurantDialog>
             ) : (
               <WithJoinRestaurantDialog>
-                <Card className="flex items-center justify-center p-6 hover:cursor-pointer">
-                  <PlusIcon size={24} />
+                <Card className="hover:border-primary flex h-full flex-col items-center justify-center border-2 border-dashed p-4 transition-colors duration-200">
+                  <CardHeader>
+                    <CardTitle className="text-lg font-semibold">
+                      Join an existing restaurant
+                    </CardTitle>
+                  </CardHeader>
+                  <div className="mt-auto">
+                    <Button variant="outline" className="w-full">
+                      <PlusIcon size={16} className="mr-2" />
+                      Join
+                    </Button>
+                  </div>
                 </Card>
               </WithJoinRestaurantDialog>
             )}

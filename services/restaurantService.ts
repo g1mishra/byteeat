@@ -250,7 +250,13 @@ const fetchRestaurant = async (
   }
 }
 
-const getRestaurantSlug = async (restaurantId: string) => {
+const getRestaurantSlug = async (
+  restaurantId: string,
+  select?: {
+    slug?: boolean
+    name?: boolean
+  }
+) => {
   if (!restaurantId) {
     throw new Error("Restaurant ID is required")
   }
@@ -260,9 +266,11 @@ const getRestaurantSlug = async (restaurantId: string) => {
       where: {
         id: restaurantId,
       },
-      select: {
-        slug: true,
-      },
+      select: select
+        ? select
+        : {
+            slug: true,
+          },
     })
   } catch (error) {
     console.error("error", error)

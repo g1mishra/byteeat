@@ -3,7 +3,7 @@ import { NextResponse } from "next/server"
 
 import { buildSitemapIndex, generateSitemaps } from "@/lib/sitemapUtils"
 
-const BASE_URL = process.env.NEXT_WEBSITE_URL || "https://byteeat.in"
+const BASE_URL = "https://www.byteeat.in"
 
 export async function GET() {
   try {
