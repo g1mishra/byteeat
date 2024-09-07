@@ -17,7 +17,9 @@ const EditRestaurant = async ({ params }: any) => {
     redirect("/manage")
   }
 
-  const response = await fetchRestaurant(restroId, session?.user?.id)
+  const response = await fetchRestaurant(restroId, session?.user?.id, {
+    includeSocialLinks: true,
+  })
   if (!response) return <UnAuthorized />
   return <EditPage response={response} />
 }

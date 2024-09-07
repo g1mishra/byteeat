@@ -4,7 +4,7 @@ import { getServerSession } from "next-auth"
 import UnAuthorized from "@/components/UnAuthorized"
 import { authOptions } from "@/app/api/auth/authOption"
 
-import Orders from "./Orders"
+import QuickOrder from "./QuickOrder"
 
 export default async function OfflineOrdersPage({
   params,
@@ -23,9 +23,5 @@ export default async function OfflineOrdersPage({
 
   if (!response) return <UnAuthorized />
 
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 p-8">
-      <Orders restaurant={response} />
-    </div>
-  )
+  return <QuickOrder restaurant={response as any} />
 }
