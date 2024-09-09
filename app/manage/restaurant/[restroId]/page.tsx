@@ -1,9 +1,12 @@
 import dynamic from "next/dynamic"
+import Link from "next/link"
 import { FullAdress, fetchRestaurant } from "@/services/restaurantService"
 import { PlusIcon } from "lucide-react"
 import { getServerSession } from "next-auth"
 
 import { formatAddress } from "@/lib/string"
+import { cn } from "@/lib/utils"
+import { Button, buttonVariants } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import UnAuthorized from "@/components/UnAuthorized"
 import LogoOrAvatar from "@/components/logo-or-avatar"
@@ -41,6 +44,12 @@ const RestaurantDetails = async ({ params }: any) => {
           <p>{formatAddress(response as FullAdress)}</p>
           <p>Table size: {response.tableSize}</p>
         </div>
+        <Link
+          className={cn(buttonVariants({ variant: "default" }))}
+          href={`/manage/restaurant/${restroId}/offline-orders`}
+        >
+          Offline Orders
+        </Link>
       </div>
       <div>
         {response?.ItemCategory?.map((menu) => (

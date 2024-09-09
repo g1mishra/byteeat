@@ -199,6 +199,7 @@ const fetchRestaurant = async (
     includeMenuItems?: boolean
     includePrice?: boolean
     includeJoiningKey?: boolean
+    includeSocialLinks?: boolean
   }
 ) => {
   if (!restaurantId) {
@@ -241,7 +242,7 @@ const fetchRestaurant = async (
               : false,
           },
         },
-        SocialLinks: true,
+        SocialLinks: options?.includeSocialLinks ? true : false,
       },
     })
   } catch (error) {

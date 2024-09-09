@@ -1,6 +1,6 @@
 "use server"
 
-import { Order, OrderItem, Role } from "@prisma/client"
+import { Order, OrderItem, OrderType, Role } from "@prisma/client"
 import { getServerSession } from "next-auth"
 
 import { getStartAndEndOfDay } from "@/lib/dateUtils"
@@ -14,12 +14,13 @@ export type OrderWithItems = Order & { orderItems?: OrderItem[] }
 async function createOrder(
   restaurantId: string,
   tableNo: number,
-  total = 0
+  total = 0,
+  type: OrderType = OrderType.OFFLINE
 ): Promise<Order> {
   try {
     const resp = await prisma.userRestaurant.findFirst({
       where: {
-        restaurantId: restaurantId,
+        restaurantId,
         user: {
           role: Role.OWNER,
         },
@@ -48,6 +49,7 @@ async function createOrder(
         createdAt: new Date(),
         updatedAt: new Date(),
         userId,
+        type, // Add this field
       },
     })
   } catch (error) {

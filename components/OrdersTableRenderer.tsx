@@ -31,6 +31,7 @@ interface OrderI extends Order {
 
 export const dcolumns: { header: string; accessor: keyof OrderI }[] = [
   { header: "Order Token", accessor: "id" },
+  { header: "Order Type", accessor: "type" },
   { header: "Amount", accessor: "total" },
   { header: "Table Number", accessor: "tableNo" },
   { header: "Order Status", accessor: "status" },
