@@ -75,10 +75,13 @@ const fetchRestaurantBySlug = async (
         ItemCategory: options?.includeMenuItems
           ? {
               orderBy: {
-                id: "asc",
+                position: "asc", // Order categories by position
               },
               include: {
                 Item: {
+                  orderBy: {
+                    position: "asc", // Order items within each category by position
+                  },
                   include: options?.includePrice
                     ? {
                         PriceItemMap: true,

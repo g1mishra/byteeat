@@ -38,7 +38,7 @@ const RestaurantDetails = async ({ params }: any) => {
           <LogoOrAvatar
             name={response?.name}
             src={response?.logoUrl || ""}
-            className="object-left max-sm:w-auto max-sm:min-w-32 max-sm:object-contain"
+            className="max-w-52"
           />
           <h1 className="mt-2 text-4xl font-bold">{response.name}</h1>
           <p>{formatAddress(response as FullAdress)}</p>
