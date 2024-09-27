@@ -67,17 +67,21 @@ export const generateWaiterKey = () => {
 export const generateReceipt = (
   slug: string | undefined,
   orderItems: OrderItem[],
+  subtotal: string,
   total: string,
+  discount: number,
   tableNo: number
 ): string => {
-  const width = 32; // Standard width for many small thermal printers
+  const width = 32;
   const line = '-'.repeat(width) + '\n';
   const center = (text: string) => text.padStart((width + text.length) / 2).padEnd(width);
   const right = (text: string) => text.padStart(width);
 
   const header = line;
   const restaurantName = center(slug?.replace('-', ' ').toUpperCase() || '') + '\n';
-  const dineInInfo = `Table: ${tableNo}\n`;
+  const dineInInfo = `Table: ${tableNo === 0 ? 'N/A' : tableNo}\n`;
+  const subtotalInfo = right(`Subtotal: Rs. ${subtotal}`) + '\n';
+  const discountInfo = discount > 0 ? right(`Discount: ${discount}%`) + '\n' : '';
   const totalInfo = right(`Total: Rs. ${total}`) + '\n';
 
   const itemsInfo = orderItems
@@ -91,9 +95,9 @@ export const generateReceipt = (
 
   const currentDate = new Date().toLocaleString();
   const dateInfo = center(currentDate) + '\n';
-  const cutLine = '\n' + center('- - - - - - - - - - - - - - - -') + '\n\n'; // Add cut line and minimal space
+  const cutLine = '\n' + center('- - - - - - - - - - - - - - - -') + '\n\n';
 
-  return `${header}${restaurantName}${header}${dineInInfo}${line}${itemsInfo}${line}${totalInfo}${line}${dateInfo}${cutLine}\n`;
+  return `${header}${restaurantName}${header}${dineInInfo}${line}${itemsInfo}${line}${subtotalInfo}${discountInfo}${totalInfo}${line}${dateInfo}${cutLine}\n`;
 };
 
 export function getOrderToken(orderId: string, length: number = 6): string {

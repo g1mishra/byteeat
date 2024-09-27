@@ -27,19 +27,25 @@ const RestroLayout = async ({
   const sidebarItems: SidebarItemType[] = [
     {
       href: `/manage`,
-      icon: "DashboardIcon",
+      icon: "HomeIcon",
       label: "Manage",
       exact: true,
     },
     {
       href: `/manage/restaurant/${params.restroId}`,
-      icon: "Package2Icon",
+      icon: "LayoutDashboardIcon",
       label: "Dashboard",
       exact: true,
     },
     {
+      href: `/manage/restaurant/${params.restroId}/manual-order`,
+      icon: "PlusCircleIcon",
+      label: "Manual Order",
+      exact: true,
+    },
+    {
       href: `/manage/restaurant/${params.restroId}/orders`,
-      icon: "ShoppingCartIcon",
+      icon: "ShoppingBagIcon",
       label: "Orders",
     },
     {
@@ -49,30 +55,32 @@ const RestroLayout = async ({
       exact: true,
     },
     {
-      href: `/manage/restaurant/${params.restroId}/waiters`,
-      icon: "UsersIcon",
-      label: "Waiters",
+      href: `/manage/restaurant/${params.restroId}/analytics`,
+      icon: "BarChart3Icon",
+      label: "Analytics",
     },
-    // { href: "#", icon: "PackageIcon", label: "Products" },
-    // { href: "#", icon: "UsersIcon", label: "Customers" },
-    { href: "#", icon: "LineChartIcon", label: "Analytics" },
-    // { href: "#", icon: "SettingsIcon", label: "Settings" },
     {
       href: `/${response?.slug}`,
       icon: "GlobeIcon",
-      label: "Menu Preview",
+      label: "Live Menu",
       target: "_blank",
     },
-    // profile
   ]
 
   if (session.user.role === Role.OWNER) {
-    sidebarItems.push({
-      label: "Settings",
-      icon: "SettingsIcon",
-      href: `/manage/restaurant/${params.restroId}/edit`,
-      exact: true,
-    })
+    sidebarItems.push(
+      {
+        href: `/manage/restaurant/${params.restroId}/waiters`,
+        icon: "UsersIcon",
+        label: "Waiters",
+      },
+      {
+        label: "Settings",
+        icon: "SettingsIcon",
+        href: `/manage/restaurant/${params.restroId}/edit`,
+        exact: true,
+      }
+    )
   }
 
   return (

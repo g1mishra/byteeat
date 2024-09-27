@@ -1,16 +1,16 @@
-import dynamic from "next/dynamic"
-import Link from "next/link"
 import { FullAdress, fetchRestaurant } from "@/services/restaurantService"
 import { PlusIcon } from "lucide-react"
 import { getServerSession } from "next-auth"
+import dynamic from "next/dynamic"
+import Link from "next/link"
 
-import { formatAddress } from "@/lib/string"
-import { cn } from "@/lib/utils"
-import { Button, buttonVariants } from "@/components/ui/button"
+import { authOptions } from "@/app/api/auth/authOption"
+import LogoOrAvatar from "@/components/logo-or-avatar"
+import { buttonVariants } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import UnAuthorized from "@/components/UnAuthorized"
-import LogoOrAvatar from "@/components/logo-or-avatar"
-import { authOptions } from "@/app/api/auth/authOption"
+import { formatAddress } from "@/lib/string"
+import { cn } from "@/lib/utils"
 
 import MenuCardList from "../MenuCardList"
 
@@ -46,9 +46,9 @@ const RestaurantDetails = async ({ params }: any) => {
         </div>
         <Link
           className={cn(buttonVariants({ variant: "default" }))}
-          href={`/manage/restaurant/${restroId}/offline-orders`}
+          href={`/manage/restaurant/${restroId}/manual-order`}
         >
-          Offline Orders
+          Manual Order
         </Link>
       </div>
       <div>

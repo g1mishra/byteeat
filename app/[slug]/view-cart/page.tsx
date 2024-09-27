@@ -15,6 +15,7 @@ import { Separator } from "@/components/ui/separator"
 import { useToast } from "@/components/ui/use-toast"
 
 import { useCart } from "../../store/CartProvider"
+import { OrderType } from "@prisma/client"
 
 const CheckoutDialog = dynamic(() => import("@/components/CheckoutModal"), {
   ssr: false,
@@ -64,7 +65,15 @@ export default function ViewCart() {
           success: false,
         }
       }
-      const resp = await createOrder(restoId.id, Number(table), total?.price)
+      const resp = await createOrder(
+        restoId.id,
+        Number(table),
+        total?.price,
+        OrderType.QR,
+        "PENDING",
+        total?.price,
+        0
+      )
       if (!resp || !resp.id) {
         return {
           success: false,

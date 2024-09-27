@@ -89,10 +89,12 @@ export const OrderDetails: React.FC<OrderDetailsProps> = ({
       if (!restaurant) return
 
       const receiptData = generateReceipt(
-        restaurant.name,
-        order.orderItems,
-        order.total.toString(),
-        order.tableNo
+        restaurant?.name,
+        order?.orderItems,
+        order?.subtotal?.toString(),
+        order?.total?.toString(),
+        parseInt(order?.discount?.toString()),
+        order?.tableNo
       )
 
       await printOrder(receiptData)

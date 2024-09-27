@@ -28,7 +28,7 @@ const LogoOrAvatar = ({ name, src, className = "" }: Props) => {
   }
 
   return (
-    <div className="flex size-14 max-h-max items-center justify-center rounded-full bg-gray-200">
+    <div className="flex size-14 items-center justify-center rounded-full bg-gray-200">
       <span className="font-bold uppercase text-gray-600">
         {avatarName(name)}
       </span>

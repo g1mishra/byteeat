@@ -1,10 +1,24 @@
 "use client"
 
-import React from "react"
+import {
+  BarChart3Icon,
+  ClipboardIcon,
+  ClipboardListIcon,
+  GlobeIcon,
+  HomeIcon,
+  LayoutDashboardIcon,
+  ListOrderedIcon,
+  PackageIcon,
+  PencilIcon,
+  PlusCircleIcon,
+  QrCodeIcon,
+  SettingsIcon,
+  ShoppingBagIcon,
+  UsersIcon,
+} from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { DashboardIcon } from "@radix-ui/react-icons"
-import { GlobeIcon } from "lucide-react"
+import React from "react"
 
 import {
   Tooltip,
@@ -13,26 +27,21 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 
-import {
-  LineChartIcon,
-  Package2Icon,
-  PackageIcon,
-  QrCodeIcon,
-  SettingsIcon,
-  ShoppingCartIcon,
-  UsersIcon,
-} from "../icons/siderbar-icons"
-
 const iconMap = {
-  DashboardIcon,
-  Package2Icon,
-  ShoppingCartIcon,
+  HomeIcon,
+  LayoutDashboardIcon,
+  ShoppingBagIcon,
+  ClipboardIcon,
   QrCodeIcon,
   PackageIcon,
   UsersIcon,
-  LineChartIcon,
+  BarChart3Icon,
   SettingsIcon,
   GlobeIcon,
+  ListOrderedIcon,
+  PencilIcon,
+  PlusCircleIcon,
+  ClipboardListIcon,
 }
 
 export type SidebarItemType = {

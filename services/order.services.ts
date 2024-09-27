@@ -1,6 +1,6 @@
 "use server"
 
-import { Order, OrderItem, OrderType, Role } from "@prisma/client"
+import { Order, OrderItem, OrderStatus, OrderType, Role } from "@prisma/client"
 import { getServerSession } from "next-auth"
 
 import { getStartAndEndOfDay } from "@/lib/dateUtils"
@@ -15,7 +15,10 @@ async function createOrder(
   restaurantId: string,
   tableNo: number,
   total = 0,
-  type: OrderType = OrderType.OFFLINE
+  type: OrderType,
+  status: OrderStatus = "PENDING",
+  subtotal = 0,
+  discount = 0,
 ): Promise<Order> {
   try {
     const resp = await prisma.userRestaurant.findFirst({
@@ -43,8 +46,10 @@ async function createOrder(
     return await prisma.order.create({
       data: {
         restaurantId,
-        status: "PENDING",
+        status: status || "PENDING",
         total,
+        subtotal: subtotal || total,
+        discount,
         tableNo,
         createdAt: new Date(),
         updatedAt: new Date(),

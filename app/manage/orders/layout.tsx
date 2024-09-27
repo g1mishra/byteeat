@@ -1,7 +1,7 @@
-import OrderNav from "../../../components/manage/order-nav"
+import OrderNav from "@/components/manage/order-nav"
 
 const hrefsAndLinks = [
-  { href: `/manage/orders/current`, text: "Current Orders" },
+  { href: `/manage/orders/current`, text: "Today's Orders" },
   { href: `/manage/orders/all`, text: "All Orders" },
 ]
 
