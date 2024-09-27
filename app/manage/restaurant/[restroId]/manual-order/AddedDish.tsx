@@ -1,12 +1,12 @@
 "use client"
 
-import { MinusIcon, PlusIcon, Trash2Icon } from "lucide-react"
 import { Fragment, useState } from "react"
+import { MinusIcon, PlusIcon, Trash2Icon } from "lucide-react"
 
+import { Cart } from "@/lib/types"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Cart } from "@/lib/types"
 
 type AddedDishProps = {
   addedDishes: Cart[]
@@ -14,6 +14,8 @@ type AddedDishProps = {
   onAdd: (dish: Cart, action: "INC" | "DEC") => void
   discount: number
   setDiscount: (discount: number) => void
+  totalPrice: number
+  subtotalPrice: number
 }
 
 export default function AddedDish({
@@ -22,12 +24,9 @@ export default function AddedDish({
   addedDishes,
   discount,
   setDiscount,
+  totalPrice,
+  subtotalPrice,
 }: AddedDishProps) {
-
-  const totalPrice =
-    addedDishes.reduce((total, dish) => total + dish.price * dish.quantity, 0) *
-    (1 - Math.min(discount, 100) / 100)
-
   const handleRemove = (dish: Cart) => {
     onRemove(dish.id, dish.portion)
   }
@@ -102,9 +101,19 @@ export default function AddedDish({
           className="w-20 text-right"
         />
       </div>
-      <div className="mt-4 flex items-center justify-between font-bold">
-        <span>Total:</span>
-        <span>₹{totalPrice.toFixed(2)}</span>
+      <div className="mt-4 border-t pt-4">
+        <div className="flex items-center justify-between">
+          <span className="text-sm text-gray-600">Subtotal:</span>
+          <span className="text-sm">₹{subtotalPrice.toFixed(2)}</span>
+        </div>
+        <div className="mt-2 flex items-center justify-between">
+          <span className="text-sm text-gray-600">Discount:</span>
+          <span className="text-sm">-₹{(subtotalPrice - totalPrice).toFixed(2)}</span>
+        </div>
+        <div className="mt-2 flex items-center justify-between font-bold">
+          <span>Total:</span>
+          <span>₹{totalPrice.toFixed(2)}</span>
+        </div>
       </div>
     </Fragment>
   )

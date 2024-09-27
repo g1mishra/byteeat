@@ -68,9 +68,11 @@ const OrderTableAction = React.memo(
 
         const receiptData = generateReceipt(
           restaurantName?.name,
-          order.orderItems,
-          rowOrder.total?.toString() || "0",
-          rowOrder.tableNo
+          order?.orderItems,
+          order?.subtotal?.toString(),
+          order?.total?.toString(),
+          parseInt(order?.discount?.toString()),
+          order?.tableNo
         )
 
         await printOrder(receiptData)

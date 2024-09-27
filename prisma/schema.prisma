@@ -173,13 +173,15 @@ enum OrderStatus {
 }
 
 enum OrderType {
-  ONLINE
-  OFFLINE
+  QR
+  MANUAL
 }
 
 model Order {
   id           String      @id @default(uuid())
   orderItems   OrderItem[]
+  subtotal     Decimal     @db.Decimal(10, 2) @default(0)
+  discount     Decimal     @db.Decimal(10, 2) @default(0)
   total        Decimal     @db.Decimal(10, 2)
   restaurant   Restaurant  @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
   restaurantId String
@@ -189,7 +191,7 @@ model Order {
   tableNo      Int         @default(0)
   user         User        @relation(fields: [userId], references: [id])
   userId       String
-  type         OrderType   @default(ONLINE)
+  type         OrderType   @default(QR)
 }
 
 enum PlanType {

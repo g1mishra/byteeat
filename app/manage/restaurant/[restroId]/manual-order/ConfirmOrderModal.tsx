@@ -1,6 +1,8 @@
+import { useEffect } from "react"
+import { useBluetoothPrinter } from "@/hook/useBluetoothPrinter"
 import useMediaQuery from "@/hook/useMediaQuery"
-import { MenuItemI } from "@/services/menuService"
 
+import { Cart } from "@/lib/types"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -17,13 +19,15 @@ import {
   DrawerTitle,
 } from "@/components/ui/drawer"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Cart } from "@/lib/types"
 
 type ConfirmOrderModalProps = {
   open: boolean
   onClose: () => void
   onConfirm: () => void
   addedDishes: Cart[]
+  subtotal: number
+  discount: number
+  total: number
 }
 
 export default function ConfirmOrderModal({
@@ -31,13 +35,12 @@ export default function ConfirmOrderModal({
   onClose,
   onConfirm,
   addedDishes,
+  subtotal,
+  discount,
+  total,
 }: ConfirmOrderModalProps) {
   const isMobile = useMediaQuery("(max-width: 640px)")
-
-  const totalPrice = addedDishes.reduce(
-    (total, dish) => total + (dish?.price ?? 0),
-    0
-  )
+  const { isConnected } = useBluetoothPrinter()
 
   const content = (
     <>
@@ -47,20 +50,50 @@ export default function ConfirmOrderModal({
           {addedDishes.map((dish, index) => (
             <li key={index} className="flex justify-between">
               <span>
-                {dish.name}{" "}
-                {dish.portion && `(${dish.portion})`}
+                {dish.name} {dish.portion && `(${dish.portion})`}
               </span>
               <span>₹{dish.price.toFixed(2)}</span>
             </li>
           ))}
         </ul>
       </ScrollArea>
-      <div className="mt-4 flex justify-between font-semibold">
-        <span>Total:</span>
-        <span>₹{totalPrice.toFixed(2)}</span>
+
+      {/* // discount */}
+      <div className="mt-4 border-t pt-4">
+        <div className="flex items-center justify-between">
+          <span className="text-sm text-gray-600">Subtotal:</span>
+          <span className="text-sm">₹{subtotal.toFixed(2)}</span>
+        </div>
+        <div className="mt-2 flex items-center justify-between">
+          <span className="text-sm text-gray-600">Discount:</span>
+          <span className="text-sm">-₹{(subtotal - total).toFixed(2)}</span>
+        </div>
+        <div className="mt-2 flex items-center justify-between font-bold">
+          <span>Total:</span>
+          <span>₹{total.toFixed(2)}</span>
+        </div>
       </div>
     </>
   )
+
+  const confirmButtonLabel = isConnected
+    ? "Confirm Order & Print"
+    : "Confirm Order"
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (open) {
+        if (event.key === "Enter") {
+          onConfirm()
+        } else if (event.key === "Escape") {
+          onClose()
+        }
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown)
+    return () => window.removeEventListener("keydown", handleKeyDown)
+  }, [open, onConfirm, onClose])
 
   if (isMobile) {
     return (
@@ -74,7 +107,7 @@ export default function ConfirmOrderModal({
             <Button variant="outline" onClick={onClose}>
               Cancel
             </Button>
-            <Button onClick={onConfirm}>Confirm Order</Button>
+            <Button onClick={onConfirm}>{confirmButtonLabel}</Button>
           </DrawerFooter>
         </DrawerContent>
       </Drawer>
@@ -83,7 +116,7 @@ export default function ConfirmOrderModal({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Confirm Your Order</DialogTitle>
         </DialogHeader>
@@ -92,7 +125,7 @@ export default function ConfirmOrderModal({
           <Button variant="outline" onClick={onClose}>
             Cancel
           </Button>
-          <Button onClick={onConfirm}>Confirm Order</Button>
+          <Button onClick={onConfirm}>{confirmButtonLabel}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

@@ -25,32 +25,38 @@ const OrderTable: React.FC<OrderTableProps> = ({
   handleOpenOrderDetails,
 }) => {
   return (
-    <div className="overflow-x-auto">
+    <div className="overflow-x-auto rounded-lg shadow">
       <table className="min-w-full divide-y divide-gray-200">
-        <thead>
+        <thead className="bg-gray-50">
           <tr>
             {columns.map((column) => (
               <th
                 key={column.accessor}
-                className="bg-gray-50 px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500"
+                className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500"
               >
                 {column.header}
               </th>
             ))}
-            <th className="bg-gray-50 px-6 py-3" />
+            <th className="px-6 py-3" />
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-200 bg-white">
           {filteredData.length > 0 ? (
             filteredData.map((order) => (
-              <tr key={order.id}>
+              <tr
+                key={order.id}
+                className="transition duration-150 ease-in-out hover:bg-gray-50"
+              >
                 {columns.map((column) => (
                   <td
                     key={column.accessor}
                     className={cn(
-                      "whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-600",
+                      "whitespace-nowrap px-6 py-4 text-sm",
                       {
-                        "text-gray-900": order.status === "PENDING",
+                        "font-medium text-yellow-600": order.status === "PENDING",
+                        "font-medium text-red-600": order.status === "CANCELLED",
+                        "font-medium text-green-600": order.status === "ACCEPTED",
+                        "text-gray-600": !["PENDING", "CANCELLED", "ACCEPTED"].includes(order.status),
                       }
                     )}
                   >
@@ -63,9 +69,11 @@ const OrderTable: React.FC<OrderTableProps> = ({
                     ) : column.accessor === "createdAt" ? (
                       fromatDate(order?.createdAt) || ""
                     ) : column.accessor === "id" ? (
-                      <span className="text-sm text-gray-500">
+                      <span className="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-800">
                         {getOrderToken(order.id)?.toUpperCase()}
                       </span>
+                    ) : column.accessor === "tableNo" ? (
+                      order.tableNo === 0 ? "N/A" : order.tableNo
                     ) : (
                       String(order[column.accessor])
                     )}
@@ -77,9 +85,9 @@ const OrderTable: React.FC<OrderTableProps> = ({
             <tr>
               <td
                 colSpan={columns.length + 1}
-                className="whitespace-nowrap px-6 py-4 text-center text-sm text-gray-500"
+                className="px-6 py-4 text-center text-sm text-gray-500"
               >
-                No results.
+                No results found.
               </td>
             </tr>
           )}
