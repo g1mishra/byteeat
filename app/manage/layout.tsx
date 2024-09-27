@@ -16,16 +16,15 @@ export const metadata: Metadata = {
 const sidebarItems: SidebarItemType[] = [
   {
     href: `/manage`,
-    icon: "DashboardIcon",
+    icon: "HomeIcon",
     label: "Manage",
     exact: true,
   },
   {
     href: "/manage/orders",
-    icon: "ShoppingCartIcon",
+    icon: "ShoppingBagIcon",
     label: "Orders",
   },
-  { href: "#", icon: "LineChartIcon", label: "Analytics" },
 ]
 
 interface SettingsLayoutProps {
