@@ -9,11 +9,13 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion"
+import { useCart } from "@/app/store/CartProvider"
 
 import SearchAndFilter from "../search-filter"
 import { Separator } from "../ui/separator"
 import MenuItem from "./MenuItem"
 import { ItemsToRender } from "./type"
+import { useTotalQty } from "./util"
 
 const MenuPopover = dynamic(() => import("./MenuPopover"), { ssr: false })
 
@@ -23,6 +25,7 @@ type MenuViewProps = {
 }
 
 const MenuView: React.FC<MenuViewProps> = ({ data }) => {
+  const totalQty = useTotalQty()
   const [filters, setFilters] = useState({
     isFood: true,
     searchValue: "",
@@ -32,15 +35,17 @@ const MenuView: React.FC<MenuViewProps> = ({ data }) => {
     const food: ItemsToRender[] = []
     const bar: ItemsToRender[] = []
 
-    data.forEach((menu) => {
-      if (menu.Item && menu.Item.length > 0) {
-        if (menu.Item[0].type === "BAR") {
-          bar.push(menu)
-        } else {
-          food.push(menu)
+    if (data.length) {
+      data.forEach((menu) => {
+        if (menu.Item && menu.Item.length > 0) {
+          if (menu.Item[0].type === "BAR") {
+            bar.push(menu)
+          } else {
+            food.push(menu)
+          }
         }
-      }
-    })
+      })
+    }
 
     return { foodItems: food, barItems: bar }
   }, [data])
@@ -50,9 +55,7 @@ const MenuView: React.FC<MenuViewProps> = ({ data }) => {
 
     return items.map((category) => ({
       ...category,
-      Item: category.Item?.filter((item) =>
-        item.dish.toLowerCase().includes(query.toLowerCase())
-      ),
+      Item: category.Item?.filter((item) => item.dish.toLowerCase().includes(query.toLowerCase())),
     }))
   }, [])
 
@@ -95,6 +98,7 @@ const MenuView: React.FC<MenuViewProps> = ({ data }) => {
                     <MenuItem
                       key={item.id}
                       item={item}
+                      quantity={totalQty[item.id] || 0}
                       image={item.imgPath?.trim().split(";")[0]}
                     />
                   ))}

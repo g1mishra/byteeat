@@ -51,10 +51,7 @@ export default function QuickOrder({ restaurant }: QuickOrderProps) {
   const { handleRequestDevice, isConnected, printOrder } = useBluetoothPrinter()
 
   const subtotal = useMemo(() => {
-    return addedDishes.reduce(
-      (total, dish) => total + dish.price * dish.quantity,
-      0
-    )
+    return addedDishes.reduce((total, dish) => total + dish.price * dish.quantity, 0)
   }, [addedDishes])
 
   const totalPrice = useMemo(() => {
@@ -64,9 +61,7 @@ export default function QuickOrder({ restaurant }: QuickOrderProps) {
   function handleAddOrUpdate(dish: Cart, action: "INC" | "DEC") {
     setAddedDishes((prev) => {
       const temp = [...prev]
-      const existingDish = temp.find(
-        (d) => d.id === dish.id && d.portion === dish.portion
-      )
+      const existingDish = temp.find((d) => d.id === dish.id && d.portion === dish.portion)
       if (existingDish) {
         return temp.map((d) =>
           d.id === dish.id && d.portion === dish.portion
@@ -126,6 +121,7 @@ export default function QuickOrder({ restaurant }: QuickOrderProps) {
             quantity: dish.quantity,
             name: dish.name,
             price: dish.price,
+            addons: [],
           })),
           subtotal.toFixed(2),
           totalPrice.toFixed(2),
@@ -225,10 +221,7 @@ export default function QuickOrder({ restaurant }: QuickOrderProps) {
               <Leaf className="mr-2 size-4" />
               Veg
             </ToggleGroupItem>
-            <ToggleGroupItem
-              value="non-veg"
-              aria-label="Show non-vegetarian dishes"
-            >
+            <ToggleGroupItem value="non-veg" aria-label="Show non-vegetarian dishes">
               <Drumstick className="mr-2 size-4" />
               Non-Veg
             </ToggleGroupItem>
@@ -270,15 +263,10 @@ export default function QuickOrder({ restaurant }: QuickOrderProps) {
           </div>
           <ScrollArea className="max-h-[60vh] overflow-y-auto md:max-h-[calc(100vh-10rem)]">
             {filteredCategories
-              .filter(
-                (category) =>
-                  activeCategory === null || category.id === activeCategory
-              )
+              .filter((category) => activeCategory === null || category.id === activeCategory)
               .map((category) => (
                 <div key={category.id} className="mb-6">
-                  <h3 className="mb-2 text-xl font-semibold">
-                    {category.categoryName}
-                  </h3>
+                  <h3 className="mb-2 text-xl font-semibold">{category.categoryName}</h3>
                   <DishList
                     menu={category}
                     onSelect={handleAddOrUpdate}

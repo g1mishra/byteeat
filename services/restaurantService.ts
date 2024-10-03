@@ -85,6 +85,13 @@ const fetchRestaurantBySlug = async (
                   include: options?.includePrice
                     ? {
                         PriceItemMap: true,
+                        addons: {
+                          select: {
+                            id: true,
+                            name: true,
+                            price: true,
+                          },
+                        },
                       }
                     : {},
                 },
@@ -239,6 +246,13 @@ const fetchRestaurant = async (
                   include: options?.includePrice
                     ? {
                         PriceItemMap: true,
+                        addons: {
+                          select: {
+                            id: true,
+                            name: true,
+                            price: true,
+                          },
+                        },
                       }
                     : {},
                 }

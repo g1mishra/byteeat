@@ -59,35 +59,27 @@ const RestroLayout = async ({
       icon: "BarChart3Icon",
       label: "Analytics",
     },
-    {
-      href: `/${response?.slug}`,
-      icon: "GlobeIcon",
-      label: "Live Menu",
-      target: "_blank",
-    },
+
+    // Remove the addons item from here
   ]
 
   if (session.user.role === Role.OWNER) {
-    sidebarItems.push(
-      {
-        href: `/manage/restaurant/${params.restroId}/waiters`,
-        icon: "UsersIcon",
-        label: "Waiters",
-      },
-      {
-        label: "Settings",
-        icon: "SettingsIcon",
-        href: `/manage/restaurant/${params.restroId}/edit`,
-        exact: true,
-      }
-    )
+    sidebarItems.push({
+      href: `/manage/restaurant/${params.restroId}/waiters`,
+      icon: "UsersIcon",
+      label: "Waiters",
+    })
   }
 
+  sidebarItems.push({
+    href: `/${response?.slug}`,
+    icon: "GlobeIcon",
+    label: "Live Menu",
+    target: "_blank",
+  })
+
   return (
-    <RestroSidebar
-      sidebarItems={sidebarItems}
-      showLast={session.user.role === Role.OWNER}
-    >
+    <RestroSidebar sidebarItems={sidebarItems} showLast={false}>
       {children}
     </RestroSidebar>
   )

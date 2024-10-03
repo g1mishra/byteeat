@@ -1,15 +1,16 @@
 "use client"
 
-import { MenuItemWithPriceI, PriceItemMapI } from "@/services/menuService"
+import { FetchMenuItemResponse, PriceItemMapI } from "@/services/menuService"
 import { Minus, Plus } from "lucide-react"
 
-import { Button } from "@/components/ui/button"
 import { useCart } from "@/app/store/CartProvider"
+import { Button } from "@/components/ui/button"
+import { Cart } from "@/lib/types"
 
 const ItemInCart = ({
   response,
 }: {
-  response: MenuItemWithPriceI | undefined
+  response: FetchMenuItemResponse
 }) => {
   const { cart, setCart } = useCart()((state) => state)
 
@@ -30,7 +31,7 @@ const ItemInCart = ({
     }
   })
 
-  const handleCartUpdate = (item: any, operation: "inc" | "dec") => {
+  const handleCartUpdate = (item: Cart, operation: "inc" | "dec") => {
     setCart(
       {
         id: item.id,
@@ -38,8 +39,29 @@ const ItemInCart = ({
         price: item.price,
         quantity: item.quantity,
         portion: item.portion,
+        addons: item.addons || [],
       },
       operation
+    )
+  }
+
+  const handleAddonToggle = (item: Cart, addon: any) => {
+    const cartKey = item.portion ? `${item.id}-${item.portion}` : item.id
+    const currentItem = cart[cartKey] || { quantity: 0, addons: [] }
+    const updatedAddons = currentItem.addons.includes(addon.id)
+      ? currentItem.addons.filter((id: string) => id !== addon.id)
+      : [...currentItem.addons, addon.id]
+
+    setCart(
+      {
+        id: item.id,
+        name: item.name,
+        price: item.price,
+        quantity: currentItem.quantity,
+        portion: item.portion,
+        addons: updatedAddons,
+      },
+      "update"
     )
   }
 
@@ -86,6 +108,25 @@ const ItemInCart = ({
               </Button>
             )}
           </div>
+          {item?.addons && item?.addons?.length > 0 && (
+            <div className="mt-2">
+              <p className="text-sm font-medium">Addons:</p>
+              {item?.addons?.map((addon: any) => (
+                <div key={addon.id} className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id={`addon-${addon.id}`}
+                    checked={cart[item.id]?.addons?.includes(addon.id) || false}
+                    onChange={() => handleAddonToggle(item, addon)}
+                    className="mr-2"
+                  />
+                  <label htmlFor={`addon-${addon.id}`} className="text-sm">
+                    {addon.name} - ₹{addon.price}
+                  </label>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       ))}
     </div>

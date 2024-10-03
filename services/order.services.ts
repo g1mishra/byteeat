@@ -18,7 +18,7 @@ async function createOrder(
   type: OrderType,
   status: OrderStatus = "PENDING",
   subtotal = 0,
-  discount = 0,
+  discount = 0
 ): Promise<Order> {
   try {
     const resp = await prisma.userRestaurant.findFirst({
@@ -54,7 +54,7 @@ async function createOrder(
         createdAt: new Date(),
         updatedAt: new Date(),
         userId,
-        type, // Add this field
+        type,
       },
     })
   } catch (error) {
@@ -78,19 +78,29 @@ async function updateOrder(payload: Partial<Order>): Promise<Order> {
 
 // Batch create order items
 async function addOrderItems(orderId: string, items: Cart[]) {
-  const data = items.map((item) => ({
-    orderId,
-    name: item.name,
-    itemId: item.id,
-    portion: item.portion || "",
-    price: item.price,
-    quantity: item.quantity,
-  }))
-
   try {
-    return await prisma.orderItem.createMany({
-      data,
-    })
+    const orderItems = await prisma.$transaction(
+      items.map((item) =>
+        prisma.orderItem.create({
+          data: {
+            orderId,
+            name: item.name,
+            itemId: item.id,
+            portion: item.portion || "",
+            price: item.price,
+            quantity: item.quantity,
+            addons: {
+              create: item.addons?.map((addon) => ({
+                addonId: addon.id,
+                quantity: 1,
+              })),
+            },
+          },
+        })
+      )
+    )
+
+    return { count: orderItems.length }
   } catch (error) {
     throw new Error(`Failed to add order items: ${(error as Error).message}`)
   }
@@ -104,9 +114,7 @@ async function getAllOrdersByRestaurant(restaurantId: string) {
       orderBy: { createdAt: "desc" },
     })
   } catch (error) {
-    throw new Error(
-      `Failed to get orders by restaurant: ${(error as Error).message}`
-    )
+    throw new Error(`Failed to get orders by restaurant: ${(error as Error).message}`)
   }
 }
 
@@ -124,19 +132,53 @@ async function getAllOrdersAllRestaurants() {
       orderBy: { createdAt: "desc" },
     })
   } catch (error) {
-    throw new Error(
-      `Failed to get all orders of all restaurants: ${(error as Error).message}`
-    )
+    throw new Error(`Failed to get all orders of all restaurants: ${(error as Error).message}`)
   }
 }
 
 // Get order by ID
-async function getOrderWithItemsById(orderId: string, includeItems = false) {
+async function getOrderWithItemsById(orderId: string) {
   try {
-    return await prisma.order.findUnique({
+    const order = await prisma.order.findUnique({
       where: { id: orderId },
-      include: { orderItems: includeItems },
+      include: {
+        orderItems: {
+          include: {
+            addons: {
+              include: {
+                addon: true,
+              },
+            },
+          },
+        },
+      },
     })
+
+    if (!order) return null
+
+    // Pre-calculate totals including addons
+    const orderWithTotals = {
+      ...order,
+      orderItems: order.orderItems.map((item) => ({
+        ...item,
+        totalPrice:
+          item.price * item.quantity +
+          item.addons.reduce((sum, addon) => sum + addon.addon.price * addon.quantity, 0),
+        addons: item.addons.map((addon) => ({
+          ...addon,
+          totalPrice: addon.addon.price * addon.quantity,
+        })),
+      })),
+      itemsTotal: order.orderItems.reduce(
+        (sum, item) =>
+          sum +
+          item.price * item.quantity +
+          item.addons.reduce((addonSum, addon) => addonSum + addon.addon.price * addon.quantity, 0),
+        0
+      ),
+    }
+
+    return orderWithTotals
   } catch (error) {
     throw new Error(`Failed to get order by ID: ${(error as Error).message}`)
   }
@@ -173,9 +215,7 @@ async function getTodayOrdersByRestaurant(
       orderBy: { createdAt: "desc" },
     })
   } catch (error) {
-    throw new Error(
-      `Failed to get today's orders by restaurant: ${(error as Error).message}`
-    )
+    throw new Error(`Failed to get today's orders by restaurant: ${(error as Error).message}`)
   }
 }
 
@@ -205,11 +245,7 @@ async function getTodayOrdersAllRestaurants(timestamp: string) {
 
     return orders
   } catch (error) {
-    throw new Error(
-      `Failed to get today's orders of all restaurants: ${
-        (error as Error).message
-      }`
-    )
+    throw new Error(`Failed to get today's orders of all restaurants: ${(error as Error).message}`)
   }
 }
 
@@ -223,11 +259,7 @@ async function cancelledOrdersByRestaurant(restaurantId: string) {
       orderBy: { createdAt: "desc" },
     })
   } catch (error) {
-    throw new Error(
-      `Failed to get cancelled orders by restaurant: ${
-        (error as Error).message
-      }`
-    )
+    throw new Error(`Failed to get cancelled orders by restaurant: ${(error as Error).message}`)
   }
 }
 

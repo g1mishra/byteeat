@@ -29,6 +29,7 @@ const addMenuItemHelper = async (
       PriceItemMap: [],
       type: data.type || "FOOD",
       imgPath: data.imgPath || "",
+      addons: data.addons
     })
 
     const payload = data.PriceItemMap.map((price) => ({
@@ -66,6 +67,7 @@ const updateMenuItemHelper = async (
       imgPath: data.imgPath,
       type: data.type,
       isVeg: data.isVeg,
+      addons: data.addons,
     })
 
     const pricesToBeAdded: PriceItemMapI[] = []

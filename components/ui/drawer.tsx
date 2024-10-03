@@ -1,7 +1,10 @@
 import * as React from "react"
+import { X } from "lucide-react"
 import { Drawer as DrawerPrimitive } from "vaul"
 
 import { cn } from "@/lib/utils"
+
+// Add this import for the close icon
 
 const Drawer = ({
   shouldScaleBackground = true,
@@ -34,23 +37,45 @@ DrawerOverlay.displayName = DrawerPrimitive.Overlay.displayName
 
 const DrawerContent = React.forwardRef<
   React.ElementRef<typeof DrawerPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof DrawerPrimitive.Content>
->(({ className, children, ...props }, ref) => (
-  <DrawerPortal>
-    <DrawerOverlay />
-    <DrawerPrimitive.Content
-      ref={ref}
-      className={cn(
-        "bg-background fixed inset-x-0 bottom-0 z-50 mt-24 flex h-auto flex-col rounded-t-[10px] border",
-        className
-      )}
-      {...props}
-    >
-      <div className="bg-muted mx-auto mt-4 h-2 w-[100px] rounded-full" />
-      {children}
-    </DrawerPrimitive.Content>
-  </DrawerPortal>
-))
+  React.ComponentPropsWithoutRef<typeof DrawerPrimitive.Content> & {
+    hideHandle?: boolean
+    showCloseIcon?: boolean // Add this prop
+  }
+>(
+  (
+    {
+      className,
+      children,
+      hideHandle = false,
+      showCloseIcon = false,
+      ...props
+    },
+    ref
+  ) => (
+    <DrawerPortal>
+      <DrawerOverlay />
+      <DrawerPrimitive.Content
+        ref={ref}
+        className={cn(
+          "bg-background fixed inset-x-0 bottom-0 z-50 mt-24 flex h-auto flex-col rounded-t-[10px] border",
+          className
+        )}
+        {...props}
+      >
+        {showCloseIcon && (
+          <DrawerClose className="absolute -top-4  left-1/2 z-50 -translate-x-1/2 -translate-y-full rounded-full bg-black/50 p-2 shadow-md">
+            <X className="size-6 text-white" />
+            <span className="sr-only">Close</span>
+          </DrawerClose>
+        )}
+        {!hideHandle && (
+          <div className="bg-muted mx-auto mt-4 h-2 w-[100px] rounded-full" />
+        )}
+        {children}
+      </DrawerPrimitive.Content>
+    </DrawerPortal>
+  )
+)
 DrawerContent.displayName = "DrawerContent"
 
 const DrawerHeader = ({
