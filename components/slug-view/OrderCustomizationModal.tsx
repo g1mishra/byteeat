@@ -8,7 +8,7 @@ import VegOrNonVeg from "@/components/veg-or-nonveg"
 import { useCart } from "@/app/store/CartProvider"
 
 import QuantityActionButton from "../QuantityActionBtn"
-import { QuantityControlAction, changeItemQuantity } from "./util"
+import { QuantityControlAction, addonsArraysEqual, changeItemQuantity } from "./util"
 
 export interface OrderCustomizationModalEditMeta {
   id: string
@@ -98,7 +98,7 @@ const OrderCustomizationModal: React.FC<OrderCustomizationModalProps> = ({
 
     if (editMeta) {
       const portionChanged = selectedPortion !== editMeta.portion
-      const addonsChanged = !arraysEqual(selectedAddons, editMeta.addons)
+      const addonsChanged = !addonsArraysEqual(selectedAddons, editMeta.addons)
 
       if (portionChanged || addonsChanged) {
         changeItemQuantity(
@@ -283,16 +283,6 @@ const OrderCustomizationModal: React.FC<OrderCustomizationModalProps> = ({
   )
 }
 
-// Move arraysEqual outside the component
-const arraysEqual = (arr1: string[], arr2: string[]) => {
-  if (arr1.length !== arr2.length) return false
-  const set1 = new Set(arr1)
-  const set2 = new Set(arr2)
-  if (set1.size !== set2.size) return false
-  for (let value of set1) {
-    if (!set2.has(value)) return false
-  }
-  return true
-}
+
 
 export default React.memo(OrderCustomizationModal)

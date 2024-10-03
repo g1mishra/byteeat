@@ -1,6 +1,6 @@
 "use client"
 
-import { Fragment, useState } from "react"
+import { Fragment } from "react"
 import { MinusIcon, PlusIcon, Trash2Icon } from "lucide-react"
 
 import { Cart } from "@/lib/types"
@@ -45,13 +45,25 @@ export default function AddedDish({
       <ul className="grid grid-cols-1 gap-4">
         {addedDishes.map((dish) => (
           <li
-            key={`${dish.id}-${dish.portion}`}
+            key={`${dish.id}-${dish.portion}-${dish.addons?.map((a) => a.id).join("-")}`}
             className="flex items-center justify-between rounded-lg bg-gray-100 p-4"
           >
             <div>
               <h3 className="text-base font-medium">{dish.name}</h3>
               {dish.portion !== "Default" && (
                 <p className="text-sm text-gray-600">{dish.portion}</p>
+              )}
+              {dish.addons && dish.addons.length > 0 && (
+                <div className="mt-1">
+                  <p className="text-xs font-medium">Addons:</p>
+                  <ul className="list-inside list-disc text-xs text-gray-600">
+                    {dish.addons.map((addon) => (
+                      <li key={addon.id}>
+                        {addon.name} - ₹{addon.price}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               )}
               <p className="text-gray-500">₹{dish.price.toFixed(2)}</p>
             </div>

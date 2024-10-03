@@ -4,6 +4,7 @@ export type Cart = {
   price: number
   quantity: number
   portion?: string
+  isVeg?: boolean
   addons?: {
     id: string
     name?: string

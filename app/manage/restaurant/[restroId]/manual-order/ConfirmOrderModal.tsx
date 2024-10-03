@@ -1,4 +1,4 @@
-import { useEffect } from "react"
+import React, { useEffect } from "react"
 import { useBluetoothPrinter } from "@/hook/useBluetoothPrinter"
 import useMediaQuery from "@/hook/useMediaQuery"
 
@@ -43,7 +43,7 @@ export default function ConfirmOrderModal({
   const { isConnected } = useBluetoothPrinter()
 
   const content = (
-    <>
+    <React.Fragment>
       <ScrollArea className="h-[60vh] pr-4">
         <h3 className="mb-2 font-semibold">Order Summary:</h3>
         <ul className="space-y-2">
@@ -51,6 +51,9 @@ export default function ConfirmOrderModal({
             <li key={index} className="flex justify-between">
               <span>
                 {dish.name} {dish.portion && `(${dish.portion})`}
+                {dish?.addons?.length
+                  ? ` [${dish?.addons?.map((addon) => addon.name).join(", ")}]`
+                  : ""}
               </span>
               <span>₹{dish.price.toFixed(2)}</span>
             </li>
@@ -73,12 +76,10 @@ export default function ConfirmOrderModal({
           <span>₹{total.toFixed(2)}</span>
         </div>
       </div>
-    </>
+    </React.Fragment>
   )
 
-  const confirmButtonLabel = isConnected
-    ? "Confirm Order & Print"
-    : "Confirm Order"
+  const confirmButtonLabel = isConnected ? "Confirm Order & Print" : "Confirm Order"
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
