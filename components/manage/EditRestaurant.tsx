@@ -1,18 +1,17 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import {
   FetchRestaurantReturnType,
   addOrUpdateSocialLinks,
   updateRestaurant,
 } from "@/services/restaurantService"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { ItemCategory } from "@prisma/client"
 import { Pencil } from "lucide-react"
 import { useForm } from "react-hook-form"
 
 import "react-phone-input-2/lib/style.css"
-import { useRouter } from "next/navigation"
 import { z } from "zod"
 
 import { Button } from "@/components/ui/button"
@@ -33,12 +32,11 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 import { useToast } from "@/components/ui/use-toast"
 import CenterLoading from "@/components/center-loading"
 import LogoOrAvatar from "@/components/logo-or-avatar"
@@ -46,18 +44,17 @@ import state2city from "@/components/manage/utils/cities"
 import uploadImage from "@/components/manage/utils/uploadImage"
 
 const editRestaurantFormSchema = z.object({
+  name: z.string().min(1, { message: "Restaurant name is required" }),
   logoUrl: z.string().url().optional().or(z.literal("")),
   tableSize: z.preprocess(
     (x) => Number(x),
     z.number().int().min(1, { message: "Table size must be at least 1." })
   ),
-  address_string: z
-    .string()
-    .min(1, { message: "Ex. 123 Main Street, Anytown" }),
+  address_string: z.string().optional(),
   city: z.string().default("Jalandhar"),
   state: z.string(),
   country: z.string().default("India"),
-
+  slug: z.string(),
   SocialLinks: z.object({
     instagram: z.string().url().optional().or(z.literal("")),
     twitter: z.string().url().optional().or(z.literal("")),
@@ -73,7 +70,7 @@ export type EditRestaurantFormValues = z.infer<
   imgPath?: string
 }
 
-export default function EditPage({
+export default function EditRestaurant({
   response,
 }: {
   response: FetchRestaurantReturnType
@@ -82,12 +79,14 @@ export default function EditPage({
     resolver: zodResolver(editRestaurantFormSchema),
     mode: "onChange",
     defaultValues: {
+      name: response?.name,
       logoUrl: response?.logoUrl,
       tableSize: response?.tableSize,
       address_string: response?.address_string,
       city: response?.city,
       state: response?.state,
       country: response?.country,
+      slug: response?.slug,
       SocialLinks: {
         instagram: response?.SocialLinks?.instagram || "",
         twitter: response?.SocialLinks?.twitter || "",
@@ -184,7 +183,7 @@ export default function EditPage({
   }
 
   return (
-    <>
+    <div className="container relative mx-auto flex flex-col py-4">
       {loading && <CenterLoading />}
       <div className="flex w-full justify-between">
         <div className="relative max-w-max rounded border p-1">
@@ -208,19 +207,51 @@ export default function EditPage({
             <Pencil size={16} />
           </div>
         </div>
-        <Button
-          onClick={() => router.push(`/manage/restaurant/${response?.id}`)}
-        >
-          Back
-        </Button>
       </div>
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit, (errors) => {
             console.log("Error while submitting form", errors)
           })}
-          className="mt-6 grid gap-6 sm:grid-cols-2"
+          className="mt-6 grid gap-6 pb-16 sm:grid-cols-2" // Added padding-bottom
         >
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Restaurant Name</FormLabel>
+                <FormControl>
+                  <Input {...field} placeholder="Enter restaurant name" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="slug"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Slug</FormLabel>
+                <FormControl>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Input {...field} disabled className="bg-gray-100" />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>The slug cannot be edited as it is used in URLs.</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
           <FormField
             control={form.control}
             name="tableSize"
@@ -369,41 +400,19 @@ export default function EditPage({
               </FormItem>
             )}
           />
-
-          <div className="col-span-2">
-            <CategoryTable itemCategory={response?.ItemCategory} />
-          </div>
-
-          <Button
-            type="submit"
-            className="col-span-2 mx-auto mt-4 w-full max-w-52"
-          >
-            Save
-          </Button>
         </form>
       </Form>
-    </>
-  )
-}
-
-const CategoryTable = ({ itemCategory }: { itemCategory?: ItemCategory[] }) => {
-  if (!itemCategory) return null
-  return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableCell>Category Position</TableCell>
-          <TableCell>Category Name</TableCell>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {itemCategory.map((category, index) => (
-          <TableRow key={category.id}>
-            <TableCell>{index + 1}</TableCell>
-            <TableCell>{category.categoryName}</TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+      <div className="fixed inset-x-0 bottom-0 flex items-center justify-center border-t bg-white p-4">
+        <Button
+          type="submit"
+          className="mx-auto w-full max-w-52"
+          onClick={form.handleSubmit(onSubmit, (errors) => {
+            console.log("Error while submitting form", errors)
+          })}
+        >
+          Save
+        </Button>
+      </div>
+    </div>
   )
 }

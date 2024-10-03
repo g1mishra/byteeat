@@ -61,6 +61,7 @@ const MenuCardList = ({
                   category: menu.categoryName,
                   description: item.description || "",
                   PriceItemMap: item.PriceItemMap || [],
+                  addons: item.addons || [],
                 }}
                 restaurantSlug={slug}
               >

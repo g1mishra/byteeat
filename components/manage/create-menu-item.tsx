@@ -1,8 +1,9 @@
 "use client"
 
-import { useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
 import { addMenuItemHelper } from "@/services/helper.service"
+import { fetchRestaurantAddons } from "@/services/menuService"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { ItemType } from "@prisma/client"
 import { PlusIcon, Trash2 } from "lucide-react"
@@ -20,6 +21,7 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { MultiSelect } from "@/components/ui/multi-select"
 import { useToast } from "@/components/ui/use-toast"
 
 import {
@@ -63,6 +65,7 @@ export const menuFormSchema = z.object({
         message: "Portions must be unique.",
       }
     ),
+  addons: z.array(z.object({ id: z.string() })).optional(),
 })
 export type MenuFormValues = z.infer<typeof menuFormSchema> & {
   imgPath?: string
@@ -81,6 +84,23 @@ export default function MenuCreateForm({
 }: MenuCreateFormProps) {
   const imagesRef = useRef<(File | string)[]>([])
   const router = useRouter()
+  const [availableAddons, setAvailableAddons] = useState<
+    { label: string; value: string }[]
+  >([])
+
+  useEffect(() => {
+    const fetchAddons = async () => {
+      const addons = await fetchRestaurantAddons(restaurantId)
+      setAvailableAddons(
+        addons.map((addon: { name: string; price: number; id: string }) => ({
+          label: `${addon.name} - ₹${addon.price}`,
+          value: addon.id,
+        }))
+      )
+    }
+    fetchAddons()
+  }, [restaurantId])
+
   const form = useForm<MenuFormValues>({
     resolver: zodResolver(menuFormSchema),
     mode: "onChange",
@@ -404,6 +424,26 @@ export default function MenuCreateForm({
           </div>
         ))}
         <UploadItemImage imagesRef={imagesRef} uploadItemImage={""} />
+
+        <FormField
+          control={form.control}
+          name="addons"
+          render={({ field }) => (
+            <FormItem className="sm:col-span-2">
+              <FormLabel>Addons</FormLabel>
+              <FormControl>
+                <MultiSelect
+                  options={availableAddons}
+                  onValueChange={(newValues) => {
+                    field.onChange(newValues.map((addon) => ({ id: addon })))
+                  }}
+                  value={field?.value?.map((addon) => addon.id) ?? []}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
         <div className="flex w-full justify-center gap-4 max-sm:mt-2 max-sm:flex-col-reverse sm:col-span-2">
           <Button

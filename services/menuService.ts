@@ -1,6 +1,6 @@
 "use server"
 
-import { Item, PriceItemMap } from "@prisma/client"
+import { Addon, Item, PriceItemMap } from "@prisma/client"
 
 import prisma from "@/lib/prisma"
 
@@ -8,6 +8,7 @@ import { checkAuth } from "./utils.service"
 
 export interface MenuItemI extends Item {
   PriceItemMap?: PriceItemMapI[]
+  addons?: { id: string; name?: string; price?: number }[]
 }
 
 export interface PriceItemMapI extends Omit<PriceItemMap, "id"> {
@@ -28,6 +29,7 @@ const fetchMenuItem = async (menuId: string) => {
       },
       include: {
         PriceItemMap: true,
+        addons: true,
       },
     })
   } catch (error) {
@@ -35,11 +37,9 @@ const fetchMenuItem = async (menuId: string) => {
   }
 }
 
-export type MenuItemWithPriceI = MenuItemI & { PriceItemMap: PriceItemMapI[] }
+export type FetchMenuItemResponse = Awaited<ReturnType<typeof fetchMenuItem>>
 
-const addMenuItem = async (
-  menuData: Omit<MenuItemI, "id" | "position" | "isActive">
-) => {
+const addMenuItem = async (menuData: Omit<MenuItemI, "id" | "position" | "isActive">) => {
   try {
     await checkAuth("You are not authorized to add a menu item")
 
@@ -51,6 +51,11 @@ const addMenuItem = async (
         imgPath: menuData.imgPath,
         isVeg: menuData.isVeg,
         type: menuData.type,
+        addons: menuData.addons
+          ? {
+              connect: menuData.addons.map((addon) => ({ id: addon.id })),
+            }
+          : undefined,
       },
     })
   } catch (error) {
@@ -58,9 +63,7 @@ const addMenuItem = async (
   }
 }
 
-const updateMenuItem = async (
-  menuData: Partial<MenuItemI>
-): Promise<MenuItemI> => {
+const updateMenuItem = async (menuData: Partial<MenuItemI>): Promise<MenuItemI> => {
   if (!menuData.id) {
     throw new Error("Menu item id is required")
   }
@@ -78,6 +81,9 @@ const updateMenuItem = async (
         imgPath: menuData.imgPath,
         isVeg: menuData.isVeg,
         type: menuData.type,
+        addons: {
+          set: menuData.addons?.map((addon) => ({ id: addon.id })) || [],
+        },
       },
     })
   } catch (error) {
@@ -85,10 +91,7 @@ const updateMenuItem = async (
   }
 }
 
-const deleteMenuItem = async (
-  menuId: string,
-  categoryId: string
-): Promise<void> => {
+const deleteMenuItem = async (menuId: string, categoryId: string): Promise<void> => {
   try {
     if (!menuId) {
       throw new Error("Menu ID is required")
@@ -141,10 +144,7 @@ const fetchAllCategories = async (restaurantId: string): Promise<string[]> => {
   }
 }
 
-const addOrFetchCategory = async (
-  categoryName: string,
-  restaurantId: string
-) => {
+const addOrFetchCategory = async (categoryName: string, restaurantId: string) => {
   if (!categoryName) {
     throw new Error("Category name is required")
   }
@@ -179,10 +179,7 @@ const addOrFetchCategory = async (
   }
 }
 
-const updateCategory = async (
-  categoryName: string,
-  categoryId: string
-): Promise<ItemCategoryI> => {
+const updateCategory = async (categoryName: string, categoryId: string): Promise<ItemCategoryI> => {
   if (!categoryName) {
     throw new Error("Category name is required")
   }
@@ -207,9 +204,7 @@ const updateCategory = async (
   }
 }
 
-const fetchCategoryById = async (
-  categoryId: string
-): Promise<ItemCategoryI | null> => {
+const fetchCategoryById = async (categoryId: string): Promise<ItemCategoryI | null> => {
   try {
     return prisma.itemCategory.findUnique({
       where: {
@@ -318,6 +313,105 @@ const deleteItemPrice = async (priceIds: string[]) => {
   }
 }
 
+const fetchRestaurantAddons = async (restaurantId: string) => {
+  try {
+    await checkAuth("You are not authorized to fetch addons")
+    return await prisma.addon.findMany({
+      where: { restaurantId },
+    })
+  } catch (error) {
+    throw error
+  }
+}
+
+const addRestaurantAddon = async (addon: { name: string; price: number; restaurantId: string }) => {
+  try {
+    await checkAuth("You are not authorized to add an addon")
+    return await prisma.addon.create({
+      data: {
+        name: addon.name,
+        price: addon.price,
+        restaurant: { connect: { id: addon.restaurantId } },
+      },
+    })
+  } catch (error) {
+    throw error
+  }
+}
+
+const updateRestaurantAddon = async (addon: { id: string; name?: string; price?: number }) => {
+  try {
+    await checkAuth("You are not authorized to update this addon")
+    return await prisma.addon.update({
+      where: { id: addon.id },
+      data: {
+        name: addon.name,
+        price: addon.price,
+      },
+    })
+  } catch (error) {
+    throw error
+  }
+}
+
+const deleteRestaurantAddon = async (addonId: string) => {
+  try {
+    await checkAuth("You are not authorized to delete this addon")
+    await prisma.addon.delete({
+      where: { id: addonId },
+    })
+  } catch (error) {
+    throw error
+  }
+}
+
+const addAddonToMenuItem = async (itemId: string, addonId: string) => {
+  try {
+    await checkAuth("You are not authorized to add an addon to this item")
+    return await prisma.item.update({
+      where: { id: itemId },
+      data: {
+        addons: {
+          connect: { id: addonId },
+        },
+      },
+    })
+  } catch (error) {
+    throw error
+  }
+}
+
+const removeAddonFromMenuItem = async (itemId: string, addonId: string) => {
+  try {
+    await checkAuth("You are not authorized to remove an addon from this item")
+    return await prisma.item.update({
+      where: { id: itemId },
+      data: {
+        addons: {
+          disconnect: { id: addonId },
+        },
+      },
+    })
+  } catch (error) {
+    throw error
+  }
+}
+
+export async function addMultipleRestaurantAddons(
+  addons: Array<{ name: string; price: number; restaurantId: string }>
+) {
+  try {
+    await checkAuth("You are not authorized to add addons")
+    return await prisma.addon.createMany({
+      data: addons,
+      skipDuplicates: true,
+    })
+  } catch (error) {
+    console.error("Error adding multiple restaurant addons:", error)
+    throw new Error("Failed to add addons")
+  }
+}
+
 export {
   addItemPrice,
   addMenuItem,
@@ -334,4 +428,10 @@ export {
   deletePriceItem,
   deleteItemPrice,
   getCatIdNums,
+  fetchRestaurantAddons,
+  addRestaurantAddon,
+  updateRestaurantAddon,
+  deleteRestaurantAddon,
+  addAddonToMenuItem,
+  removeAddonFromMenuItem,
 }

@@ -1,40 +1,37 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useState } from "react"
 import dynamic from "next/dynamic"
 import Link from "next/link"
 import { useParams, useRouter } from "next/navigation"
 import { addOrderItems, createOrder } from "@/services/order.services"
 import { getRestaurantIdBySlug } from "@/services/restaurantService"
-import { ArrowLeft, Minus, Plus, Trash2 } from "lucide-react"
+import { OrderType } from "@prisma/client"
+import { ArrowLeft } from "lucide-react"
 
 import { Cart } from "@/lib/types"
 import { getPathWithQuery } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { useToast } from "@/components/ui/use-toast"
+import QuantityActionButton from "@/components/QuantityActionBtn"
+import { QuantityControlAction } from "@/components/slug-view/util"
 
 import { useCart } from "../../store/CartProvider"
-import { OrderType } from "@prisma/client"
 
 const CheckoutDialog = dynamic(() => import("@/components/CheckoutModal"), {
   ssr: false,
 })
 
 export default function ViewCart() {
-  const { cart, total, setCart, removeItem, clearCart } = useCart()(
-    (state) => state
-  )
+  const { cart, total, setCart, removeItem, clearCart } = useCart()((state) => state)
   const [showCheckoutDialog, setShowCheckoutDialog] = useState(false)
   const router = useRouter()
   const params = useParams()
 
   const { toast } = useToast()
 
-  const handleQuantityChange = (
-    operation: "inc" | "dec",
-    currentItem: Cart
-  ) => {
+  const handleQuantityChange = (operation: QuantityControlAction, currentItem: Cart) => {
     if (!currentItem) return
 
     setCart(
@@ -42,8 +39,8 @@ export default function ViewCart() {
         id: currentItem.id as string,
         name: currentItem.name,
         price: currentItem.price || 0,
-        quantity: currentItem?.quantity || 0,
         portion: currentItem.portion || "",
+        addons: currentItem.addons || [],
       },
       operation
     )
@@ -134,39 +131,28 @@ export default function ViewCart() {
           {Object.values(cart).map((item) => (
             <div
               key={item.id}
-              className="bg-background grid overflow-hidden rounded-lg border shadow-lg"
+              className="bg-background grid overflow-hidden rounded-lg drop-shadow"
             >
-              <div className="flex flex-col justify-between p-4">
-                <h3 className="mb-1 text-lg font-bold">
-                  {item.portion ? `${item.name} - ${item.portion}` : item.name}
-                </h3>
-                <div className="flex items-center justify-between">
-                  <div className="text-lg font-medium">₹{item.price}</div>
-                  <div className="flex items-center">
-                    <div className="bg-secondary text-primary flex items-center space-x-2 rounded-lg border">
-                      <button
-                        className="px-3 py-2"
-                        onClick={() => handleQuantityChange("dec", item)}
-                        disabled={item.quantity === 1}
-                      >
-                        <Minus size={16} />
-                      </button>
-                      <span className="text-base font-medium">
-                        {item.quantity}
-                      </span>
-                      <button
-                        className="px-3 py-2"
-                        onClick={() => handleQuantityChange("inc", item)}
-                      >
-                        <Plus size={16} />
-                      </button>
-                    </div>
-                    <Trash2
-                      size={20}
-                      className="ml-2 cursor-pointer text-red-500"
-                      onClick={() => removeItem(item)}
-                    />
+              <div className="flex justify-between p-4">
+                <div className="flex items-start">
+                  <div>
+                    <h3 className="text-base font-bold">{item.name}</h3>
+                    <p className="text-base font-semibold">₹{item.price}</p>
+                    <p className="text-sm text-gray-600">
+                      {item.portion}
+                      {item.addons && item.addons.length > 0
+                        ? `, ${item.addons.map((addon) => addon.name).join(", ")}`
+                        : ""}
+                    </p>
                   </div>
+                </div>
+                <div className="flex flex-col items-end">
+                  <QuantityActionButton
+                    buttonSize="compact"
+                    currentValue={item.quantity}
+                    onAction={(operation) => handleQuantityChange(operation, item)}
+                  />
+                  <span className="mt-2 text-base font-bold">₹{item.price * item.quantity}</span>
                 </div>
               </div>
             </div>
@@ -174,9 +160,9 @@ export default function ViewCart() {
         </div>
       )}
       {Object.values(cart).length > 0 && (
-        <div className="mt-8 flex w-full px-6">
-          <div className="bg-background w-full rounded-lg p-6 shadow-lg md:p-8">
-            <h2 className="mb-4 text-2xl font-bold">Order Summary</h2>
+        <div className="my-4 flex w-full px-6">
+          <div className="bg-background w-full rounded-lg p-4 drop-shadow md:p-6">
+            <h2 className="mb-2 text-lg font-bold">Order Summary</h2>
             <div className="mb-2 flex items-center justify-between">
               <div>Subtotal</div>
               <div>₹{total?.price?.toFixed(2)}</div>
@@ -187,16 +173,10 @@ export default function ViewCart() {
             </div>
             <Separator className="my-4" />
             <div className="mb-4 flex items-center justify-between">
-              <div className="text-lg font-medium">Total</div>
-              <div className="text-lg font-medium">
-                ₹{total?.price?.toFixed(2)}
-              </div>
+              <div className="text-base font-medium">Total</div>
+              <div className="text-base font-medium">₹{total?.price?.toFixed(2)}</div>
             </div>
-            <Button
-              size="lg"
-              className="w-full"
-              onClick={() => setShowCheckoutDialog(true)}
-            >
+            <Button size="lg" className="w-full" onClick={() => setShowCheckoutDialog(true)}>
               Proceed to Checkout
             </Button>
           </div>

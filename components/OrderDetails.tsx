@@ -1,5 +1,4 @@
-import React, { useCallback } from "react"
-import { useRouter } from "next/navigation"
+import React from "react"
 import { useBluetoothPrinter } from "@/hook/useBluetoothPrinter"
 import useMediaQuery from "@/hook/useMediaQuery"
 import { getOrderWithItemsById, updateOrder } from "@/services/order.services"
@@ -8,18 +7,8 @@ import { OrderStatus } from "@prisma/client"
 import { useQuery } from "@tanstack/react-query"
 
 import { generateReceipt } from "@/lib/utils"
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
-import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
-} from "@/components/ui/drawer"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Drawer, DrawerContent } from "@/components/ui/drawer"
 import {
   Table,
   TableBody,
@@ -33,7 +22,6 @@ import {
 import Loading from "./loader"
 import { Button } from "./ui/button"
 import { ScrollArea } from "./ui/scroll-area"
-import { useToast } from "./ui/use-toast"
 
 interface OrderDetailsProps {
   orderId: string
@@ -43,7 +31,7 @@ interface OrderDetailsProps {
   updateOrderStatus?: (id: string, status: OrderStatus) => void
 }
 
-export const OrderDetails: React.FC<OrderDetailsProps> = ({
+const OrderDetails: React.FC<OrderDetailsProps> = ({
   restaurantId,
   orderId,
   isOpen,
@@ -51,176 +39,152 @@ export const OrderDetails: React.FC<OrderDetailsProps> = ({
   updateOrderStatus,
 }) => {
   const isDesktop = useMediaQuery("(min-width: 768px)")
-  const { server, isConnected, printOrder } = useBluetoothPrinter()
-  const { toast } = useToast()
-  const router = useRouter()
+  const { isConnected, printOrder } = useBluetoothPrinter()
 
-  const { data: order, isLoading } = useQuery({
+  const { data: order, isLoading: isOrderLoading } = useQuery({
     queryKey: ["order", orderId],
-    queryFn: async () => await getOrderWithItemsById(orderId, true),
+    queryFn: () => getOrderWithItemsById(orderId),
   })
 
-  const { data: restaurant, isLoading: isRestaurantNameLoading } = useQuery({
-    queryKey: ["restaurant", order?.restaurantId],
-    queryFn: async () =>
-      await getRestaurantSlug(restaurantId || "", {
-        name: true,
-      }),
+  const { data: restaurant, isLoading: isRestaurantLoading } = useQuery({
+    queryKey: ["restaurant", restaurantId],
+    queryFn: () => getRestaurantSlug(restaurantId, { name: true }),
   })
-
-  const handleStatusChange = useCallback(
-    async (newStatus: OrderStatus) => {
-      try {
-        await updateOrder({ id: orderId, status: newStatus })
-        updateOrderStatus?.(orderId, newStatus)
-        if (!updateOrderStatus || typeof updateOrderStatus === "undefined") {
-          router.refresh()
-        }
-      } catch (error) {
-        console.error("Failed to update order status", error)
-      }
-    },
-    [router, orderId, updateOrderStatus]
-  )
 
   const handlePrint = async () => {
-    try {
-      if (!order) return
-      if (!restaurant) return
-
-      const receiptData = generateReceipt(
-        restaurant?.name,
-        order?.orderItems,
-        order?.subtotal?.toString(),
-        order?.total?.toString(),
-        parseInt(order?.discount?.toString()),
-        order?.tableNo
-      )
-
-      await printOrder(receiptData)
-      await handleStatusChange("ACCEPTED")
-    } catch (error) {
-      console.error("Failed to print order", error)
-    }
+    if (!order || !restaurant) return
+    const receiptData = generateReceipt(
+      restaurant.name,
+      order.orderItems?.map((item) => ({
+        id: item?.id ?? "",
+        itemId: item?.itemId ?? "",
+        orderId: item?.orderId ?? "",
+        portion: item?.portion ?? "",
+        quantity: item?.quantity ?? 0,
+        name: item?.name ?? "",
+        price: item?.price ?? 0,
+        addons:
+          item?.addons?.map((addon) => ({
+            id: addon?.id ?? "",
+            name: addon?.addon?.name ?? "",
+            price: addon?.addon?.price ?? 0,
+          })) ?? [],
+      })) ?? [],
+      order.subtotal.toString(),
+      order.total.toString(),
+      Number(order.discount),
+      order.tableNo
+    )
+    await printOrder(receiptData)
+    await updateOrder({ id: orderId, status: "ACCEPTED" })
+    updateOrderStatus?.(orderId, "ACCEPTED")
   }
-  if (!orderId) return null
 
-  const content = (
-    <>
-      {isLoading || isRestaurantNameLoading ? (
-        <Loading />
-      ) : order ? (
-        <>
-          <div className="mb-4 space-y-2 rounded-lg bg-gray-100 p-4 shadow-sm">
-            <p className="text-sm font-medium text-gray-600">
-              Table Number:{" "}
-              <span className="font-bold text-gray-900">{order.tableNo}</span>
-            </p>
-            {/* <p className="text-sm font-medium text-gray-600">
-              Order Status:{" "}
-              <span className="font-bold text-gray-900">{order.status}</span>
-            </p> */}
-            <p className="text-sm font-medium text-gray-600">
-              Order Time:{" "}
-              <span className="font-bold text-gray-900">
-                {order.createdAt.toLocaleString()}
-              </span>
-            </p>
-          </div>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-[200px]">Item</TableHead>
-                <TableHead>Portion</TableHead>
-                <TableHead>Quantity</TableHead>
-                <TableHead className="text-right">Price</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {order?.orderItems?.map((orderItem) => (
-                <TableRow className="whitespace-nowrap">
-                  <TableCell className="font-medium">
-                    {orderItem.name}
-                  </TableCell>
-                  <TableCell>{orderItem.portion}</TableCell>
-                  <TableCell>{orderItem.quantity}</TableCell>
-                  <TableCell className="text-right">
-                    {" "}
-                    &#x20b9; {orderItem.price.toString()}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-            <TableFooter>
-              <TableRow className="whitespace-nowrap">
-                <TableCell className="font-medium">Total</TableCell>
-                <TableCell></TableCell>
-                <TableCell></TableCell>
-                <TableCell className="text-right">
-                  &#x20b9; {order?.total.toString()}
-                </TableCell>
-              </TableRow>
-            </TableFooter>
-          </Table>
-          <div className="flex justify-center">
-            <Button
-              className="mt-4 w-full max-w-[200px]"
-              onClick={handlePrint}
-              disabled={!isConnected}
-            >
-              {isConnected ? "Print" : "Printer not connected"}
-            </Button>
-          </div>
-        </>
-      ) : (
-        <p>No order details found</p>
-      )}
-    </>
+  const renderOrderItem = (item: any) => (
+    <React.Fragment key={item.id}>
+      <TableRow>
+        <TableCell className="font-medium">{item.name}</TableCell>
+        <TableCell>{item.portion}</TableCell>
+        <TableCell>{item.quantity}</TableCell>
+        <TableCell className="whitespace-nowrap text-right">
+          ₹ {item.totalPrice.toFixed(2)}
+        </TableCell>
+      </TableRow>
+      {item.addons.map((addon: any) => (
+        <TableRow key={addon.id} className="bg-gray-50">
+          <TableCell className="pl-8 text-sm" colSpan={2}>
+            {addon.addon.name}
+          </TableCell>
+          <TableCell className="text-sm">{addon.quantity}</TableCell>
+          <TableCell className="text-right text-sm">₹ {addon.totalPrice.toFixed(2)}</TableCell>
+        </TableRow>
+      ))}
+    </React.Fragment>
   )
 
-  if (isDesktop) {
-    return (
-      <Dialog
-        open={isOpen}
-        onOpenChange={(flag) => {
-          if (!flag) {
-            onClose()
-          }
-        }}
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>
-              Order Details for &quot;{restaurant?.name}&quot;
-            </DialogTitle>
-          </DialogHeader>
+  const content =
+    isOrderLoading || isRestaurantLoading ? (
+      <Loading />
+    ) : order ? (
+      <>
+        <div className="mb-6 space-y-2 rounded-lg bg-gray-100 p-4 shadow-sm">
+          <p className="text-sm font-medium">
+            Table Number: <span className="font-bold">{order.tableNo}</span>
+          </p>
+          <p className="text-sm font-medium">
+            Order Status: <span className="font-bold">{order.status}</span>
+          </p>
+          <p className="text-sm font-medium">
+            Order Time:{" "}
+            <span className="font-bold">{new Date(order.createdAt).toLocaleString()}</span>
+          </p>
+        </div>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Item</TableHead>
+              <TableHead>Portion</TableHead>
+              <TableHead>Quantity</TableHead>
+              <TableHead className="text-right">Price</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>{order.orderItems.map(renderOrderItem)}</TableBody>
+          <TableFooter>
+            <TableRow>
+              <TableCell colSpan={3}>Subtotal</TableCell>
+              <TableCell className="text-right">₹ {order.itemsTotal.toFixed(2)}</TableCell>
+            </TableRow>
+            {Number(order.discount) > 0 && (
+              <TableRow>
+                <TableCell colSpan={3}>Discount</TableCell>
+                <TableCell className="text-right">₹ {Number(order.discount).toFixed(2)}</TableCell>
+              </TableRow>
+            )}
+            <TableRow>
+              <TableCell colSpan={3} className="font-bold">
+                Total
+              </TableCell>
+              <TableCell className="text-right font-bold">
+                ₹ {Number(order.total).toFixed(2)}
+              </TableCell>
+            </TableRow>
+          </TableFooter>
+        </Table>
+        <div className="mt-6 flex justify-center">
+          <Button className="w-full max-w-[200px]" onClick={handlePrint} disabled={!isConnected}>
+            {isConnected ? "Print Order" : "Printer not connected"}
+          </Button>
+        </div>
+      </>
+    ) : (
+      <p className="text-center text-gray-600">No order details found</p>
+    )
+
+  const DialogComponent = isDesktop ? Dialog : Drawer
+  const DialogContentComponent = isDesktop ? DialogContent : DrawerContent
+
+  return (
+    <DialogComponent open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContentComponent className={isDesktop ? "max-w-3xl" : ""} hideHandle>
+        <DialogHeader>
+          <DialogTitle
+            className={`${
+              isDesktop ? "text-2xl" : "text-xl"
+            } border-b px-4 py-2 text-left font-bold`}
+          >
+            Order Details for &quot;{restaurant?.name}&quot;
+          </DialogTitle>
+        </DialogHeader>
+        <ScrollArea
+          className={`${
+            isDesktop ? "max-h-[80vh] pr-4" : "max-h-[80vh] w-full overflow-y-auto p-4"
+          }`}
+        >
           {content}
-        </DialogContent>
-      </Dialog>
-    )
-  } else {
-    return (
-      <Drawer
-        open={isOpen}
-        onOpenChange={(flag) => {
-          if (!flag) {
-            onClose()
-          }
-        }}
-      >
-        <DrawerContent>
-          <DrawerHeader>
-            <DrawerTitle>
-              Order Details for &quot;{restaurant?.name}&quot;
-            </DrawerTitle>
-          </DrawerHeader>
-          <ScrollArea className="max-h-[90vh] w-full overflow-y-auto p-4">
-            {content}
-          </ScrollArea>
-        </DrawerContent>
-      </Drawer>
-    )
-  }
+        </ScrollArea>
+      </DialogContentComponent>
+    </DialogComponent>
+  )
 }
 
 export default OrderDetails

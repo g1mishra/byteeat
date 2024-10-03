@@ -1,16 +1,22 @@
-import { FullAdress, fetchRestaurant } from "@/services/restaurantService"
-import { PlusIcon } from "lucide-react"
-import { getServerSession } from "next-auth"
 import dynamic from "next/dynamic"
-import Link from "next/link"
+import { fetchRestaurant } from "@/services/restaurantService"
+import {
+  EditIcon,
+  LucideSortDesc,
+  MenuIcon,
+  PlusCircleIcon,
+  PlusIcon,
+  SortAsc,
+} from "lucide-react"
+import { getServerSession } from "next-auth"
 
-import { authOptions } from "@/app/api/auth/authOption"
-import LogoOrAvatar from "@/components/logo-or-avatar"
-import { buttonVariants } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import UnAuthorized from "@/components/UnAuthorized"
-import { formatAddress } from "@/lib/string"
-import { cn } from "@/lib/utils"
+import EditRestaurant from "@/components/manage/EditRestaurant"
+import MenuPositions from "@/components/manage/MenuPositions"
+import RestaurantAddons from "@/components/manage/RestaurantAddons"
+import { authOptions } from "@/app/api/auth/authOption"
 
 import MenuCardList from "../MenuCardList"
 
@@ -27,40 +33,71 @@ const RestaurantDetails = async ({ params }: any) => {
   let response = await fetchRestaurant(restroId, session?.user?.id, {
     includeMenuItems: true,
     includePrice: true,
+    includeSocialLinks: true,
   })
 
   if (!response) return <UnAuthorized />
 
   return (
     <div className="flex w-full flex-col gap-y-6 dark:text-white">
-      <div className="flex justify-between gap-4 max-sm:flex-col">
-        <div className="flex flex-col items-start gap-y-0.5">
-          <LogoOrAvatar
-            name={response?.name}
-            src={response?.logoUrl || ""}
-            className="max-w-52"
-          />
-          <h1 className="mt-2 text-4xl font-bold">{response.name}</h1>
-          <p>{formatAddress(response as FullAdress)}</p>
-          <p>Table size: {response.tableSize}</p>
-        </div>
-        <Link
-          className={cn(buttonVariants({ variant: "default" }))}
-          href={`/manage/restaurant/${restroId}/manual-order`}
-        >
-          Manual Order
-        </Link>
+      <div className="w-full">
+        <h1 className="mb-2 text-2xl font-bold">
+          Manage Restaurant: {response.name}
+        </h1>
+        <p className="mb-4 text-gray-600">
+          Edit details, manage menu items, and configure settings for your
+          restaurant.
+        </p>
+        <Tabs defaultValue="menu" className="w-full">
+          <TabsList className="grid h-auto w-full grid-cols-4 gap-px rounded-lg bg-gray-200">
+            <TabsTrigger
+              value="menu"
+              className="flex items-center justify-center rounded-md px-4 py-2 data-[state=active]:bg-white data-[state=active]:shadow-sm"
+            >
+              <MenuIcon className="mr-2 size-5" /> Menu Items
+            </TabsTrigger>
+
+            <TabsTrigger
+              value="addons"
+              className="flex items-center justify-center rounded-md px-4 py-2 data-[state=active]:bg-white data-[state=active]:shadow-sm"
+            >
+              <PlusCircleIcon className="mr-2 size-5" /> Addons
+            </TabsTrigger>
+            <TabsTrigger
+              value="edit-restaurant"
+              className="flex items-center justify-center rounded-md px-4 py-2 data-[state=active]:bg-white data-[state=active]:shadow-sm"
+            >
+              <EditIcon className="mr-2 size-5" /> Edit Restaurant
+            </TabsTrigger>
+            <TabsTrigger
+              value="menu-positions"
+              className="flex items-center justify-center rounded-md px-4 py-2 data-[state=active]:bg-white data-[state=active]:shadow-sm"
+            >
+              <LucideSortDesc className="mr-2 size-5" /> Menu Positions
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="menu">
+            {response?.ItemCategory?.map((menu) => (
+              <MenuCardList key={menu.id} menu={menu} slug={response.slug} />
+            ))}
+            <WithCreateMenuDialog restaurantId={restroId} slug={response.slug}>
+              <Card className="mt-4 flex h-full items-center justify-center p-6 hover:cursor-pointer">
+                <PlusIcon size={24} />
+                <span className="ml-2">Add New Item</span>
+              </Card>
+            </WithCreateMenuDialog>
+          </TabsContent>
+          <TabsContent value="addons">
+            <RestaurantAddons restaurantId={restroId} />
+          </TabsContent>
+          <TabsContent value="edit-restaurant">
+            <EditRestaurant response={response} />
+          </TabsContent>
+          <TabsContent value="menu-positions">
+            <MenuPositions itemCategory={response?.ItemCategory} />
+          </TabsContent>
+        </Tabs>
       </div>
-      <div>
-        {response?.ItemCategory?.map((menu) => (
-          <MenuCardList key={menu.id} menu={menu} slug={response.slug} />
-        ))}
-      </div>
-      <WithCreateMenuDialog restaurantId={restroId} slug={response.slug}>
-        <Card className="mx-auto flex w-full max-w-24 items-center justify-center p-6 hover:cursor-pointer">
-          <PlusIcon size={24} />
-        </Card>
-      </WithCreateMenuDialog>
     </div>
   )
 }

@@ -1,16 +1,17 @@
 "use client"
 
+import { useEffect, useRef, useState } from "react"
+import { useParams, useRouter } from "next/navigation"
 import {
   deleteMenuItemHelper,
   updateMenuItemHelper,
 } from "@/services/helper.service"
-import { MenuItemI } from "@/services/menuService"
+import { MenuItemI, fetchRestaurantAddons } from "@/services/menuService"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { PlusIcon, Trash2 } from "lucide-react"
-import { useRouter } from "next/navigation"
-import { useRef } from "react"
 import { useForm } from "react-hook-form"
 
+import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
   Form,
@@ -22,8 +23,8 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { useToast } from "@/components/ui/use-toast"
-import { cn } from "@/lib/utils"
 
+import { MultiSelect } from "../ui/multi-select"
 import {
   Select,
   SelectContent,
@@ -48,8 +49,13 @@ export default function MenuUpdateForm({
   restaurantSlug,
 }: MenuUpdateFormProps) {
   const router = useRouter()
+  const params = useParams()
   const { toast } = useToast()
   const imagesRef = useRef<(File | string)[]>([])
+  const [availableAddons, setAvailableAddons] = useState<
+    { label: string; value: string }[]
+  >([])
+
   const form = useForm<MenuFormValues>({
     resolver: zodResolver(menuFormSchema),
     mode: "onChange",
@@ -57,6 +63,19 @@ export default function MenuUpdateForm({
       ...(itemData || {}),
     },
   })
+
+  useEffect(() => {
+    const fetchAddons = async () => {
+      const addons = await fetchRestaurantAddons(params.restaurantId as string)
+      setAvailableAddons(
+        addons.map((addon: { name: string; price: number; id: string }) => ({
+          label: `${addon.name} - ₹${addon.price}`,
+          value: addon.id,
+        }))
+      )
+    }
+    fetchAddons()
+  }, [params.restaurantId])
 
   const errors = form.formState.errors
 
@@ -410,6 +429,28 @@ export default function MenuUpdateForm({
             </div>
           </div>
         ))}
+
+        <FormField
+          control={form.control}
+          name="addons"
+          render={({ field }) => (
+            <FormItem className="sm:col-span-2">
+              <FormLabel>Addons</FormLabel>
+              <FormControl>
+                <MultiSelect
+                  options={availableAddons}
+                  onValueChange={(selectedOptions) => {
+                    field.onChange(
+                      selectedOptions.map((addon) => ({ id: addon }))
+                    )
+                  }}
+                  value={field?.value?.map((addon) => addon.id) ?? []}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
         <UploadItemImage
           imagesRef={imagesRef}

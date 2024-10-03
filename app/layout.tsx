@@ -1,10 +1,11 @@
 import "@/styles/globals.css"
+import React from "react"
 
-import { ThemeProvider } from "@/components/theme-provider"
-import { Toaster } from "@/components/ui/toaster"
 import { siteMetadata } from "@/config/site"
 import { fontSans } from "@/lib/fonts"
 import { cn } from "@/lib/utils"
+import { Toaster } from "@/components/ui/toaster"
+import { ThemeProvider } from "@/components/theme-provider"
 
 import QueryProvider from "../components/QueryProvider"
 import AuthContext from "./AuthContext"

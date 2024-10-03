@@ -14,6 +14,7 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { toast } from "@/components/ui/use-toast"
+import { addonsArraysEqual } from "@/components/slug-view/util"
 
 import AddedDish from "./AddedDish"
 import ConfirmOrderModal from "./ConfirmOrderModal"
@@ -23,7 +24,7 @@ const restaurantInclude = Prisma.validator<Prisma.RestaurantInclude>()({
   ItemCategory: {
     select: {
       id: true,
-      Item: { include: { PriceItemMap: true } },
+      Item: { include: { PriceItemMap: true, addons: true } },
       categoryName: true,
     },
   },
@@ -51,10 +52,7 @@ export default function QuickOrder({ restaurant }: QuickOrderProps) {
   const { handleRequestDevice, isConnected, printOrder } = useBluetoothPrinter()
 
   const subtotal = useMemo(() => {
-    return addedDishes.reduce(
-      (total, dish) => total + dish.price * dish.quantity,
-      0
-    )
+    return addedDishes.reduce((total, dish) => total + dish.price * dish.quantity, 0)
   }, [addedDishes])
 
   const totalPrice = useMemo(() => {
@@ -65,11 +63,16 @@ export default function QuickOrder({ restaurant }: QuickOrderProps) {
     setAddedDishes((prev) => {
       const temp = [...prev]
       const existingDish = temp.find(
-        (d) => d.id === dish.id && d.portion === dish.portion
+        (d) =>
+          d.id === dish.id &&
+          d.portion === dish.portion &&
+          addonsArraysEqual(d.addons?.map((a) => a.id) || [], dish.addons?.map((a) => a.id) || [])
       )
       if (existingDish) {
         return temp.map((d) =>
-          d.id === dish.id && d.portion === dish.portion
+          d.id === dish.id &&
+          d.portion === dish.portion &&
+          addonsArraysEqual(d.addons?.map((a) => a.id) || [], dish.addons?.map((a) => a.id) || [])
             ? { ...d, quantity: d.quantity + (action === "INC" ? 1 : -1) }
             : d
         )
@@ -126,6 +129,12 @@ export default function QuickOrder({ restaurant }: QuickOrderProps) {
             quantity: dish.quantity,
             name: dish.name,
             price: dish.price,
+            addons:
+              dish.addons?.map((addon) => ({
+                id: addon.id,
+                name: addon.name || "",
+                price: addon.price || 0,
+              })) || [],
           })),
           subtotal.toFixed(2),
           totalPrice.toFixed(2),
@@ -225,10 +234,7 @@ export default function QuickOrder({ restaurant }: QuickOrderProps) {
               <Leaf className="mr-2 size-4" />
               Veg
             </ToggleGroupItem>
-            <ToggleGroupItem
-              value="non-veg"
-              aria-label="Show non-vegetarian dishes"
-            >
+            <ToggleGroupItem value="non-veg" aria-label="Show non-vegetarian dishes">
               <Drumstick className="mr-2 size-4" />
               Non-Veg
             </ToggleGroupItem>
@@ -270,20 +276,11 @@ export default function QuickOrder({ restaurant }: QuickOrderProps) {
           </div>
           <ScrollArea className="max-h-[60vh] overflow-y-auto md:max-h-[calc(100vh-10rem)]">
             {filteredCategories
-              .filter(
-                (category) =>
-                  activeCategory === null || category.id === activeCategory
-              )
+              .filter((category) => activeCategory === null || category.id === activeCategory)
               .map((category) => (
                 <div key={category.id} className="mb-6">
-                  <h3 className="mb-2 text-xl font-semibold">
-                    {category.categoryName}
-                  </h3>
-                  <DishList
-                    menu={category}
-                    onSelect={handleAddOrUpdate}
-                    addedDishes={addedDishes}
-                  />
+                  <h3 className="mb-2 text-xl font-semibold">{category.categoryName}</h3>
+                  <DishList menu={category} onSelect={handleAddOrUpdate} />
                 </div>
               ))}
           </ScrollArea>

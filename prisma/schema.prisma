@@ -31,6 +31,7 @@ model Restaurant {
   createdAt      DateTime       @default(now()) @db.Timestamptz()
   updatedAt      DateTime       @default(now()) @updatedAt @db.Timestamptz()
   isActive       Boolean        @default(true)
+  addons         Addon[]
 
   @@index([slug])
 }
@@ -74,6 +75,7 @@ model Item {
   PriceItemMap PriceItemMap[]
   position     Int            @default(autoincrement())
   isActive     Boolean        @default(true)
+  addons       Addon[]
 
   @@index([dish])
 }
@@ -163,6 +165,18 @@ model OrderItem {
   quantity Int
   order    Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
   orderId  String
+  addons   OrderItemAddon[]
+}
+
+model OrderItemAddon {
+  id          String    @id @default(uuid())
+  orderItem   OrderItem @relation(fields: [orderItemId], references: [id], onDelete: Cascade)
+  orderItemId String
+  addon       Addon     @relation(fields: [addonId], references: [id])
+  addonId     String
+  quantity    Int       @default(1)
+
+  @@unique([orderItemId, addonId])
 }
 
 enum OrderStatus {
@@ -244,4 +258,16 @@ model JoiningKey {
   expiresAt    DateTime?
   restaurantId String   @unique
   restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+}
+
+model Addon {
+  id            String   @id @default(cuid())
+  name          String
+  price         Float
+  restaurant    Restaurant @relation(fields: [restaurantId], references: [id])
+  restaurantId  String
+  items         Item[]
+  orderItems    OrderItemAddon[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
