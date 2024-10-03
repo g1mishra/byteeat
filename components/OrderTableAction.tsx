@@ -21,9 +21,7 @@ import {
 
 import { useToast } from "./ui/use-toast"
 
-const STATUSES = Object.values(OrderStatus).filter(
-  (status) => status !== OrderStatus.DELIVERED
-)
+const STATUSES = Object.values(OrderStatus).filter((status) => status !== OrderStatus.DELIVERED)
 
 const OrderTableAction = React.memo(
   ({
@@ -59,7 +57,7 @@ const OrderTableAction = React.memo(
         const restaurantName = await getRestaurantSlug(rowOrder.restaurantId, {
           name: true,
         })
-        const order = await getOrderWithItemsById(orderId, true)
+        const order = await getOrderWithItemsById(orderId)
 
         if (!order) {
           console.error("Order not found.")
@@ -68,10 +66,23 @@ const OrderTableAction = React.memo(
 
         const receiptData = generateReceipt(
           restaurantName?.name,
-          order?.orderItems,
+          order?.orderItems.map((item) => ({
+            id: item.id,
+            name: item.name,
+            itemId: item.itemId,
+            portion: item.portion,
+            price: item.price,
+            quantity: item.quantity,
+            orderId: item.orderId,
+            addons: item.addons.map((addon) => ({
+              id: addon.addon.id,
+              name: addon.addon.name,
+              price: addon.addon.price,
+            })),
+          })),
           order?.subtotal?.toString(),
           order?.total?.toString(),
-          parseInt(order?.discount?.toString()),
+          order?.discount ? parseInt(order.discount.toString()) : 0,
           order?.tableNo
         )
 
@@ -92,16 +103,11 @@ const OrderTableAction = React.memo(
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Change status</DropdownMenuLabel>
-          {STATUSES.filter((status) => status !== rowOrder.status).map(
-            (status) => (
-              <DropdownMenuItem
-                key={status}
-                onClick={() => handleStatusChange(status)}
-              >
-                {status}
-              </DropdownMenuItem>
-            )
-          )}
+          {STATUSES.filter((status) => status !== rowOrder.status).map((status) => (
+            <DropdownMenuItem key={status} onClick={() => handleStatusChange(status)}>
+              {status}
+            </DropdownMenuItem>
+          ))}
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={onOpenOrderDetails}>
             View Details

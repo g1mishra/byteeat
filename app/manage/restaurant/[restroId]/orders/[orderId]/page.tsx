@@ -16,7 +16,7 @@ async function OrderTable({
 }: {
   params: { restroId: string; orderId: string }
 }) {
-  const order = await getOrderWithItemsById(params.orderId, true)
+  const order = await getOrderWithItemsById(params.orderId)
   const restauntName = await getRestaurantSlug(params.restroId)
 
   return (
