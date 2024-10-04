@@ -301,59 +301,32 @@ export type FetchRestaurantReturnType = Awaited<
 >
 
 const addRestaurant = async (
-  restaurantData: Partial<Restaurant>,
+  restaurant: RestaurantI & { logoUrl?: string },
   userId: string
-) => {
+): Promise<Restaurant> => {
   try {
-    let baseSlug = Slugify(`${restaurantData.name} ${restaurantData.city}`)
-    let slug = baseSlug
-
-    let existingRestaurant = await prisma.restaurant.findUnique({
-      where: { slug },
-    })
-    let suffix = 1
-
-    // If slug exists, increment suffix until a unique slug is found
-    while (existingRestaurant) {
-      slug = `${baseSlug}-${suffix}`
-      existingRestaurant = await prisma.restaurant.findUnique({
-        where: { slug },
-      })
-      suffix++
+    if (!userId) {
+      throw new Error("User ID is required")
     }
-
-    restaurantData = {
-      ...restaurantData,
-      slug,
-      address_string: restaurantData?.address_string?.trim() || "",
-    }
-
-    return await prisma.$transaction(async (prisma) => {
-      // Create the restaurant
-      const newRestaurant = await prisma.restaurant.create({
-        data: {
-          ...(restaurantData as Restaurant),
-          userRestaurants: { create: { user: { connect: { id: userId } } } },
+    await checkAuth("You are not authorized to create a restaurant")
+    const newRestaurant = await prisma.restaurant.create({
+      data: {
+        name: restaurant.name,
+        tableSize: restaurant.tableSize,
+        address_string: restaurant.address_string,
+        city: restaurant.city,
+        state: restaurant.state ?? '',
+        country: restaurant.country ?? '',
+        slug: restaurant.slug ?? '',
+        logoUrl: restaurant.logoUrl ?? '',
+        userRestaurants: {
+          create: {
+            userId: userId,
+          },
         },
-      })
-
-      const now = new Date()
-      const freeTrialEndDate = new Date(now.getTime() + 30 * 24 * 3600 * 1000)
-
-      // Create the subscription
-      await prisma.subscription.create({
-        data: {
-          restaurantId: newRestaurant.id,
-          planType: PlanType.STARTER,
-          startDate: now,
-          freeTrialEndDate: freeTrialEndDate,
-          status: SubscriptionStatus.ACTIVE,
-          // endDate is not set initially
-        },
-      })
-
-      return newRestaurant
+      },
     })
+    return newRestaurant
   } catch (error) {
     throw error
   }
