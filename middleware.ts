@@ -19,7 +19,6 @@ export async function middleware(request: NextRequest) {
   )
 
   if (isSubdomain && isAllowedDomain && subdomain) {
-    url.hostname = url.hostname.replace(`${subdomain}.`, "")
     url.pathname = `/restaurant/${subdomain}${pathname}`
 
     console.log(
