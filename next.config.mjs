@@ -18,7 +18,7 @@ const nextConfig = {
             value: `(?<slug>.*).${process.env.NEXT_PUBLIC_BASE_DOMAIN}`,
           },
         ],
-        destination: "/restaurant/:slug/:path*",
+        destination: "/:slug/:path*",
       },
     ]
   },
