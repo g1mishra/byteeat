@@ -14,11 +14,16 @@ export async function middleware(request: NextRequest) {
   const isAllowedDomain = allowedDomains.some((domain) => host.includes(domain))
 
   console.log(
+    "before",
     JSON.stringify({ url, isSubdomain, subdomain, host, pathname, isAllowedDomain }, null, 2)
   )
 
   if (isSubdomain && isAllowedDomain) {
     url.pathname = `/restaurant/${subdomain}${pathname}`
+    console.log(
+      "after",
+      JSON.stringify({ url, isSubdomain, subdomain, host, pathname, isAllowedDomain }, null, 2)
+    )
     return NextResponse.rewrite(url)
   }
 
