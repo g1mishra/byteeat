@@ -1,68 +1,43 @@
+import { redirect } from "next/dist/server/api-utils"
 import { NextRequest, NextResponse } from "next/server"
 
-import { getBasePath } from "./lib/utils"
+import { BaseDomain, getBasePath } from "./lib/utils"
 
 export async function middleware(request: NextRequest) {
   const url = request.nextUrl.clone()
-  const { hostname, pathname } = url
-  const host = request.headers.get("host") || hostname
-
+  const host = request.headers.get("host")
   const subdomain = host?.split(".")[0]
-  const isSubdomain = host?.includes(".") && subdomain !== "www"
+  const pathname = url.pathname
 
-  const allowedDomains = ["byteeat.in", "localhost"]
-  const isAllowedDomain = allowedDomains.some((domain) => host.includes(domain))
+  const potentialSlug = subdomain?.replace(`${BaseDomain}`, "")
 
-  console.log(
-    "before",
-    JSON.stringify({ url, isSubdomain, subdomain, host, pathname, isAllowedDomain }, null, 2)
-  )
-
-  if (isSubdomain && isAllowedDomain && subdomain) {
-    url.pathname = `/restaurant/${subdomain}${pathname}`
-
-    console.log(
-      "after",
-      JSON.stringify({ url, isSubdomain, subdomain, host, pathname, isAllowedDomain }, null, 2)
-    )
-    return NextResponse.rewrite(url)
+  if (!potentialSlug || host === BaseDomain) {
+    return NextResponse.next()
   }
 
-  const segments = pathname.split("/").filter(Boolean)
+  try {
+    const basePath = getBasePath()
+    const response = await fetch(`${basePath}/api/validate-slug`, {
+      method: "POST",
+      body: JSON.stringify({ slug: potentialSlug }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
 
-  if (segments[0] === "restaurant" && segments.length > 1 && isAllowedDomain) {
-    const potentialSlug = segments[1]
+    const restaurant = await response.json()
 
-    if (!potentialSlug) {
-      return NextResponse.redirect(new URL("/", request.url))
+    if (!restaurant?.isValid) {
+      return NextResponse.redirect(new URL(getBasePath(), request.url))
     }
 
-    try {
-      const basePath = getBasePath()
-      const response = await fetch(`${basePath}/api/validate-slug`, {
-        method: "POST",
-        body: JSON.stringify({ slug: potentialSlug }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      })
-
-      const data = await response.json()
-
-      if (data?.isValid) {
-        if (!data?.isActive) {
-          return NextResponse.redirect(`${getBasePath(potentialSlug)}/subscription-expired`)
-        }
-
-        const newPath = pathname.replace(`/${segments[0]}/${segments[1]}`, "")
-
-        return NextResponse.redirect(`${getBasePath(potentialSlug)}${newPath}${url.search}`)
-      }
-    } catch (error) {
-      console.error("Error validating slug:", error)
+    if (!restaurant?.isActive && !pathname.includes("subscription-expired")) {
+      return NextResponse.redirect(`${getBasePath(potentialSlug)}/subscription-expired`)
     }
 
-    return NextResponse.redirect(new URL("/", request.url))
+    return NextResponse.rewrite(new URL(`${potentialSlug}${pathname}${url.search}`, request.url))
+  } catch (error) {
+    console.error("Error validating slug:", error)
   }
 
   return NextResponse.next()

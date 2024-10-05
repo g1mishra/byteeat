@@ -4,24 +4,24 @@ const nextConfig = {
   images: {
     domains: ["byte-eat-staticfiles.s3.amazonaws.com", "lh3.googleusercontent.com"],
   },
-  async rewrites() {
-    return [
-      {
-        source: "/api/:path*",
-        destination: "/api/:path*",
-      },
-      {
-        source: "/restaurant/:path*",
-        has: [
-          {
-            type: "host",
-            value: `(?<slug>.*).${process.env.NEXT_PUBLIC_BASE_DOMAIN}`,
-          },
-        ],
-        destination: "/:slug/:path*",
-      },
-    ]
-  },
+  // async rewrites() {
+  //   return [
+  //     {
+  //       source: "/api/:path*",
+  //       destination: "/api/:path*",
+  //     },
+  //     {
+  //       source: "/restaurant/:path*",
+  //       has: [
+  //         {
+  //           type: "host",
+  //           value: `(?<slug>.*).${process.env.NEXT_PUBLIC_BASE_DOMAIN}`,
+  //         },
+  //       ],
+  //       destination: "/restaurant/:slug/:path*",
+  //     },
+  //   ]
+  // },
   async redirects() {
     return [
       {

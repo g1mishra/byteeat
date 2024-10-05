@@ -16,8 +16,7 @@ import { Separator } from "@/components/ui/separator"
 import { useToast } from "@/components/ui/use-toast"
 import QuantityActionButton from "@/components/QuantityActionBtn"
 import { QuantityControlAction } from "@/components/slug-view/util"
-
-import { useCart } from "../../../store/CartProvider"
+import { useCart } from "@/app/store/CartProvider"
 
 const CheckoutDialog = dynamic(() => import("@/components/CheckoutModal"), {
   ssr: false,

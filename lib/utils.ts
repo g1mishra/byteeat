@@ -20,14 +20,14 @@ export function debounce<T extends (...args: any) => any>(func: T, waitFor: numb
   }
 }
 
+export const BaseDomain = process.env.NEXT_PUBLIC_BASE_DOMAIN
 export function getBasePath(slug = "") {
-  const baseDomain = process.env.NEXT_PUBLIC_BASE_DOMAIN
   if (!slug) {
-    return baseDomain?.includes("localhost") ? `http://${baseDomain}` : `https://${baseDomain}`
+    return BaseDomain?.includes("localhost") ? `http://${BaseDomain}` : `https://${BaseDomain}`
   }
-  return baseDomain?.includes("localhost")
-    ? `http://${slug}.${baseDomain}`
-    : `https://${slug}.${baseDomain}`
+  return BaseDomain?.includes("localhost")
+    ? `http://${slug}.${BaseDomain}`
+    : `https://${slug}.${BaseDomain}`
 }
 
 export const getPathWithQuery = (href: string): string => {
