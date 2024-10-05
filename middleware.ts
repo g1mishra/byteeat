@@ -18,8 +18,10 @@ export async function middleware(request: NextRequest) {
     JSON.stringify({ url, isSubdomain, subdomain, host, pathname, isAllowedDomain }, null, 2)
   )
 
-  if (isSubdomain && isAllowedDomain) {
+  if (isSubdomain && isAllowedDomain && subdomain) {
+    url.hostname = url.hostname.replace(`${subdomain}.`, "")
     url.pathname = `/restaurant/${subdomain}${pathname}`
+
     console.log(
       "after",
       JSON.stringify({ url, isSubdomain, subdomain, host, pathname, isAllowedDomain }, null, 2)
