@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next"
 
 import prisma from "@/lib/prisma"
+import { getBasePath } from "@/lib/utils"
 
 const BASE_URL = "https://www.byteeat.in"
 
@@ -26,7 +27,7 @@ export default async function sitemap({ id }: { id: number }): Promise<MetadataR
 
   // Create the sitemap entries
   const dynamicEntries = restaurants.map((restaurant) => ({
-    url: `https://${restaurant.slug}.byteeat.in`,
+    url: getBasePath(restaurant.slug),
     lastModified: restaurant.updatedAt,
     changeFrequency: "monthly" as const,
     priority: 0.6,

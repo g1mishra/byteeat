@@ -5,9 +5,8 @@ import { getRestaurantSlug } from "@/services/restaurantService"
 import { Role } from "@prisma/client"
 import { getServerSession } from "next-auth"
 
-import RestroSidebar, {
-  SidebarItemType,
-} from "@/components/manage/RestroSidebar"
+import { getBasePath } from "@/lib/utils"
+import RestroSidebar, { SidebarItemType } from "@/components/manage/RestroSidebar"
 import { authOptions } from "@/app/api/auth/authOption"
 
 const RestroLayout = async ({
@@ -71,12 +70,14 @@ const RestroLayout = async ({
     })
   }
 
-  sidebarItems.push({
-    href: `/restaurant/${response?.slug}`,
-    icon: "GlobeIcon",
-    label: "Live Menu",
-    target: "_blank",
-  })
+  if (response?.slug) {
+    sidebarItems.push({
+      href: getBasePath(response.slug),
+      icon: "GlobeIcon",
+      label: "Live Menu",
+      target: "_blank",
+    })
+  }
 
   return (
     <RestroSidebar sidebarItems={sidebarItems} showLast={false}>
