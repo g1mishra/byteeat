@@ -72,7 +72,7 @@ const RestroLayout = async ({
   }
 
   sidebarItems.push({
-    href: `/${response?.slug}`,
+    href: `/restaurant/${response?.slug}`,
     icon: "GlobeIcon",
     label: "Live Menu",
     target: "_blank",

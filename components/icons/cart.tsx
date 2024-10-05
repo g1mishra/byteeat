@@ -1,16 +1,18 @@
 import Link from "next/link"
-import { useParams } from "next/navigation"
+import { useParams, useSearchParams } from "next/navigation"
 import { ShoppingCart } from "lucide-react"
 
-import { getPathWithQuery } from "@/lib/utils"
+import { getBasePath } from "@/lib/utils"
 import { useCart } from "@/app/store/CartProvider"
 
 export default function CartIcon() {
   const { slug } = useParams()
+  const searchParams = useSearchParams()
+  const tableNumber = searchParams.get("tableNumber")
   const { total } = useCart()((state) => state)
   return (
     <Link
-      href={getPathWithQuery(`/${slug}/view-cart`)}
+      href={`/view-cart${tableNumber ? `?tableNumber=${tableNumber}` : ""}`}
       className="relative py-2 text-white"
     >
       <div className="absolute -right-0.5 top-0">

@@ -1,12 +1,6 @@
 import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
-import {
-  CheckIcon,
-  ChevronDown,
-  SparklesIcon,
-  XCircle,
-  XIcon,
-} from "lucide-react"
+import { CheckIcon, ChevronDown, SparklesIcon, XCircle, XIcon } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { Badge } from "@/components/ui/badge"
@@ -20,11 +14,7 @@ import {
   CommandList,
   CommandSeparator,
 } from "@/components/ui/command"
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Separator } from "@/components/ui/separator"
 
 /**
@@ -36,8 +26,7 @@ const multiSelectVariants = cva(
   {
     variants: {
       variant: {
-        default:
-          "border-foreground/10 text-foreground bg-card hover:bg-card/80",
+        default: "border-foreground/10 text-foreground bg-card hover:bg-card/80",
         secondary:
           "border-foreground/10 bg-secondary text-secondary-foreground hover:bg-secondary/80",
         destructive:
@@ -123,10 +112,7 @@ interface MultiSelectProps
   className?: string
 }
 
-export const MultiSelect = React.forwardRef<
-  HTMLButtonElement,
-  MultiSelectProps
->(
+export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>(
   (
     {
       options,
@@ -144,11 +130,9 @@ export const MultiSelect = React.forwardRef<
     },
     ref
   ) => {
-    const [selectedValues, setSelectedValues] =
-      React.useState<string[]>(defaultValue)
+    const [selectedValues, setSelectedValues] = React.useState<string[]>(defaultValue)
     const [isPopoverOpen, setIsPopoverOpen] = React.useState(false)
     const [isAnimating, setIsAnimating] = React.useState(false)
-    console.log(selectedValues)
 
     React.useEffect(() => {
       if (value) {
@@ -168,9 +152,7 @@ export const MultiSelect = React.forwardRef<
       [onValueChange]
     )
 
-    const handleInputKeyDown = (
-      event: React.KeyboardEvent<HTMLInputElement>
-    ) => {
+    const handleInputKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
       if (event.key === "Enter") {
         setIsPopoverOpen(true)
       } else if (event.key === "Backspace" && !event.currentTarget.value) {
@@ -215,11 +197,7 @@ export const MultiSelect = React.forwardRef<
     }
 
     return (
-      <Popover
-        open={isPopoverOpen}
-        onOpenChange={setIsPopoverOpen}
-        modal={modalPopover}
-      >
+      <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen} modal={modalPopover}>
         <PopoverTrigger asChild>
           <Button
             ref={ref}
@@ -245,9 +223,7 @@ export const MultiSelect = React.forwardRef<
                         )}
                         style={{ animationDuration: `${animation}s` }}
                       >
-                        {IconComponent && (
-                          <IconComponent className="mr-2 size-4" />
-                        )}
+                        {IconComponent && <IconComponent className="mr-2 size-4" />}
                         {option?.label}
                         <XCircle
                           className="ml-2 size-4 cursor-pointer"
@@ -287,18 +263,13 @@ export const MultiSelect = React.forwardRef<
                       handleClear()
                     }}
                   />
-                  <Separator
-                    orientation="vertical"
-                    className="flex h-full min-h-6"
-                  />
+                  <Separator orientation="vertical" className="flex h-full min-h-6" />
                   <ChevronDown className="text-muted-foreground mx-2 h-4 cursor-pointer" />
                 </div>
               </div>
             ) : (
               <div className="mx-auto flex w-full items-center justify-between">
-                <span className="text-muted-foreground mx-3 text-sm">
-                  {placeholder}
-                </span>
+                <span className="text-muted-foreground mx-3 text-sm">{placeholder}</span>
                 <ChevronDown className="text-muted-foreground mx-2 h-4 cursor-pointer" />
               </div>
             )}
@@ -310,18 +281,11 @@ export const MultiSelect = React.forwardRef<
           onEscapeKeyDown={() => setIsPopoverOpen(false)}
         >
           <Command>
-            <CommandInput
-              placeholder="Search..."
-              onKeyDown={handleInputKeyDown}
-            />
+            <CommandInput placeholder="Search..." onKeyDown={handleInputKeyDown} />
             <CommandList>
               <CommandEmpty>No results found.</CommandEmpty>
               <CommandGroup>
-                <CommandItem
-                  key="all"
-                  onSelect={toggleAll}
-                  className="cursor-pointer"
-                >
+                <CommandItem key="all" onSelect={toggleAll} className="cursor-pointer">
                   <div
                     className={cn(
                       "border-primary mr-2 flex size-4 items-center justify-center rounded-sm border",
@@ -352,9 +316,7 @@ export const MultiSelect = React.forwardRef<
                       >
                         <CheckIcon className="size-4" />
                       </div>
-                      {option.icon && (
-                        <option.icon className="text-muted-foreground mr-2 size-4" />
-                      )}
+                      {option.icon && <option.icon className="text-muted-foreground mr-2 size-4" />}
                       <span>{option.label}</span>
                     </CommandItem>
                   )
@@ -371,10 +333,7 @@ export const MultiSelect = React.forwardRef<
                       >
                         Clear
                       </CommandItem>
-                      <Separator
-                        orientation="vertical"
-                        className="flex h-full min-h-6"
-                      />
+                      <Separator orientation="vertical" className="flex h-full min-h-6" />
                     </>
                   )}
                   <CommandItem

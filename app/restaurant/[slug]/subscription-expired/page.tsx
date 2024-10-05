@@ -1,8 +1,8 @@
-import Link from "next/link"
-import { notFound, redirect } from "next/navigation"
 import { fetchRestaurantSubscriptionStatus } from "@/services/restaurantService"
 import { ExclamationTriangleIcon } from "@radix-ui/react-icons"
 import { HomeIcon } from "lucide-react"
+import Link from "next/link"
+import { notFound, redirect } from "next/navigation"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -13,6 +13,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import { getBasePath, getPathWithQuery } from "@/lib/utils"
 
 const SubscriptionExpiredPage = async ({ params: { slug } }: any) => {
   let subscriptionStatus = { isActive: false }
@@ -26,7 +27,7 @@ const SubscriptionExpiredPage = async ({ params: { slug } }: any) => {
   }
 
   if (subscriptionStatus.isActive) {
-    return redirect(`/${slug}`)
+    return redirect(getBasePath(slug))
   }
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-100">
@@ -37,19 +38,17 @@ const SubscriptionExpiredPage = async ({ params: { slug } }: any) => {
             Subscription Expired
           </CardTitle>
           <CardDescription>
-            The restaurant you&apos;re trying to access is currently
-            unavailable.
+            The restaurant you&apos;re trying to access is currently unavailable.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <p className="mb-4 text-sm text-gray-600">
-            We apologize for the inconvenience. The restaurant&apos;s
-            subscription has expired, and they are unable to display their menu
-            at this time.
+            We apologize for the inconvenience. The restaurant&apos;s subscription has expired, and
+            they are unable to display their menu at this time.
           </p>
           <p className="text-sm text-gray-600">
-            If you&apos;re the restaurant owner, please renew your subscription
-            to restore access to your digital menu.
+            If you&apos;re the restaurant owner, please renew your subscription to restore access to
+            your digital menu.
           </p>
         </CardContent>
         <CardFooter className="flex justify-center">

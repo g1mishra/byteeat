@@ -1,9 +1,8 @@
 "use server"
 
-import { PlanType, Restaurant, SubscriptionStatus } from "@prisma/client"
+import { Restaurant, SubscriptionStatus } from "@prisma/client"
 
 import prisma from "@/lib/prisma"
-import { Slugify } from "@/lib/string"
 
 import { checkAuth } from "./utils.service"
 
@@ -115,14 +114,9 @@ export type SubscriptionStatusResult = {
 
 async function fetchRestaurantSubscriptionStatus(
   slug: string
-): Promise<SubscriptionStatusResult> {
+): Promise<{ isValid: boolean; isActive: boolean; status: SubscriptionStatus | null }> {
   if (!slug) {
-    return {
-      isActive: false,
-      status: null,
-      message: "Restaurant slug is required.",
-      expirationDate: null,
-    }
+    return { isValid: false, isActive: false, status: null }
   }
 
   try {
@@ -142,19 +136,15 @@ async function fetchRestaurantSubscriptionStatus(
     })
 
     if (!restaurant) {
-      throw new Error("Restaurant not found")
+      return { isValid: false, isActive: false, status: null }
     }
 
     const subscription = restaurant.subscription
 
     if (!subscription) {
-      return {
-        isActive: false,
-        status: null,
-        message: "No subscription found for this restaurant.",
-        expirationDate: null,
-      }
+      return { isValid: true, isActive: false, status: null }
     }
+
     const now = new Date()
     let expirationDate: Date | null = null
 
@@ -169,36 +159,18 @@ async function fetchRestaurantSubscriptionStatus(
       }
     }
 
-    if (subscription.status !== SubscriptionStatus.ACTIVE) {
-      return {
-        isActive: false,
-        status: subscription.status,
-        message: `Subscription is ${subscription.status.toLowerCase()}.`,
-        expirationDate,
-      }
-    }
-
-    if (expirationDate && now > expirationDate) {
-      return {
-        isActive: false,
-        status: subscription.status,
-        message: "Subscription has expired.",
-        expirationDate,
-      }
-    }
+    const isActive =
+      subscription.status === SubscriptionStatus.ACTIVE &&
+      (!expirationDate || now <= expirationDate)
 
     return {
-      isActive: true,
+      isValid: true,
+      isActive,
       status: subscription.status,
-      message: "Subscription is active.",
-      expirationDate,
     }
   } catch (error) {
     console.error("Error fetching subscription status:", error)
-    if (error instanceof Error && error.message === "Restaurant not found") {
-      throw new Error("NOT_FOUND")
-    }
-    throw error
+    return { isValid: false, isActive: false, status: null }
   }
 }
 
@@ -296,65 +268,45 @@ const getRestaurantSlug = async (
   }
 }
 
-export type FetchRestaurantReturnType = Awaited<
-  ReturnType<typeof fetchRestaurant>
->
+export type FetchRestaurantReturnType = Awaited<ReturnType<typeof fetchRestaurant>>
 
 const addRestaurant = async (
-  restaurantData: Partial<Restaurant>,
+  restaurant: RestaurantI & { logoUrl?: string; subscription: "STARTER" | "PRO" },
   userId: string
-) => {
+): Promise<Restaurant> => {
   try {
-    let baseSlug = Slugify(`${restaurantData.name} ${restaurantData.city}`)
-    let slug = baseSlug
-
-    let existingRestaurant = await prisma.restaurant.findUnique({
-      where: { slug },
-    })
-    let suffix = 1
-
-    // If slug exists, increment suffix until a unique slug is found
-    while (existingRestaurant) {
-      slug = `${baseSlug}-${suffix}`
-      existingRestaurant = await prisma.restaurant.findUnique({
-        where: { slug },
-      })
-      suffix++
+    if (!userId) {
+      throw new Error("User ID is required")
     }
-
-    restaurantData = {
-      ...restaurantData,
-      slug,
-      address_string: restaurantData?.address_string?.trim() || "",
-    }
-
-    return await prisma.$transaction(async (prisma) => {
-      // Create the restaurant
-      const newRestaurant = await prisma.restaurant.create({
-        data: {
-          ...(restaurantData as Restaurant),
-          userRestaurants: { create: { user: { connect: { id: userId } } } },
+    await checkAuth("You are not authorized to create a restaurant")
+    const newRestaurant = await prisma.restaurant.create({
+      data: {
+        name: restaurant.name,
+        tableSize: restaurant.tableSize,
+        address_string: restaurant.address_string,
+        city: restaurant.city,
+        state: restaurant.state ?? "",
+        country: restaurant.country ?? "",
+        slug: restaurant.slug ?? "",
+        logoUrl: restaurant.logoUrl ?? "",
+        userRestaurants: {
+          create: {
+            userId: userId,
+          },
         },
-      })
-
-      const now = new Date()
-      const freeTrialEndDate = new Date(now.getTime() + 30 * 24 * 3600 * 1000)
-
-      // Create the subscription
-      await prisma.subscription.create({
-        data: {
-          restaurantId: newRestaurant.id,
-          planType: PlanType.STARTER,
-          startDate: now,
-          freeTrialEndDate: freeTrialEndDate,
-          status: SubscriptionStatus.ACTIVE,
-          // endDate is not set initially
+        subscription: {
+          create: {
+            planType: restaurant.subscription,
+            status: "ACTIVE",
+            startDate: new Date(),
+            freeTrialEndDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
+          },
         },
-      })
-
-      return newRestaurant
+      },
     })
+    return newRestaurant
   } catch (error) {
+    console.error("Error adding restaurant:", error)
     throw error
   }
 }
@@ -396,10 +348,7 @@ const deleteRestaurant = async (restaurantId: string): Promise<void> => {
   }
 }
 
-const addOrUpdateSocialLinks = async (
-  restaurantId: string,
-  socialLinks: any
-) => {
+const addOrUpdateSocialLinks = async (restaurantId: string, socialLinks: any) => {
   if (!restaurantId) {
     throw new Error("Restaurant ID is required")
   }
@@ -421,16 +370,11 @@ const addOrUpdateSocialLinks = async (
     })
   } catch (error) {
     console.error("Failed to add or update social links:", error)
-    throw new Error(
-      "An error occurred while updating social links. Please try again."
-    )
+    throw new Error("An error occurred while updating social links. Please try again.")
   }
 }
 
-const checkUserRestaurantPermission = async (
-  userId: string,
-  restaurantId: string
-) => {
+const checkUserRestaurantPermission = async (userId: string, restaurantId: string) => {
   if (!userId || !restaurantId) {
     throw new Error("User ID and restaurant ID are required")
   }
@@ -441,9 +385,7 @@ const checkUserRestaurantPermission = async (
       include: { userRestaurants: true },
     })
 
-    return userWithRestaurants?.userRestaurants.some(
-      (ur) => ur.restaurantId === restaurantId
-    )
+    return userWithRestaurants?.userRestaurants.some((ur) => ur.restaurantId === restaurantId)
   } catch (error) {
     throw error
   }
@@ -452,6 +394,8 @@ const checkUserRestaurantPermission = async (
 export {
   addOrUpdateSocialLinks,
   addRestaurant,
+  // checks
+  checkUserRestaurantPermission,
   deleteRestaurant,
   fetchRestaurant,
   fetchRestaurantBySlug,
@@ -460,7 +404,4 @@ export {
   getRestaurantIdBySlug,
   getRestaurantSlug,
   updateRestaurant,
-
-  // checks
-  checkUserRestaurantPermission,
 }

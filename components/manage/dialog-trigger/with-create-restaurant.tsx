@@ -3,19 +3,8 @@
 import React, { useState } from "react"
 import useMediaQuery from "@/hook/useMediaQuery"
 
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "../../ui/dialog"
-import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
-} from "../../ui/drawer"
-import { ScrollArea } from "../../ui/scroll-area"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../ui/dialog"
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "../../ui/drawer"
 import RestaurantCreateForm from "../create-restaurants"
 
 export default function WithCreateRestaurantDialog({
@@ -38,10 +27,7 @@ export default function WithCreateRestaurantDialog({
       {cloneChildren}{" "}
       {isDesktop ? (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
-          <DialogContent
-            data-radix-scroll-area-viewport=""
-            className="max-h-[90vh] w-[90%] overflow-y-auto sm:max-w-screen-lg"
-          >
+          <DialogContent className="flex h-auto max-h-[95vh] w-full max-w-[95vw]  flex-col justify-center overflow-hidden border-none">
             <DialogHeader>
               <DialogTitle>Create Restaurant</DialogTitle>
             </DialogHeader>
@@ -50,13 +36,13 @@ export default function WithCreateRestaurantDialog({
         </Dialog>
       ) : (
         <Drawer open={isOpen} onOpenChange={setIsOpen}>
-          <DrawerContent>
-            <DrawerHeader>
+          <DrawerContent className="flex h-[80vh] flex-col" hideHandle showCloseIcon>
+            <DrawerHeader className="border-b text-left text-xl font-bold">
               <DrawerTitle>Create Restaurant</DrawerTitle>
             </DrawerHeader>
-            <ScrollArea className="max-h-[90vh] w-full overflow-y-auto p-4">
+            <div className="grow overflow-y-auto p-4">
               <RestaurantCreateForm closeModal={onCloseModal} />
-            </ScrollArea>
+            </div>
           </DrawerContent>
         </Drawer>
       )}

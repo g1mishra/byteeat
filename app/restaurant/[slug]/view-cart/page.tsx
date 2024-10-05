@@ -3,21 +3,21 @@
 import { useState } from "react"
 import dynamic from "next/dynamic"
 import Link from "next/link"
-import { useParams, useRouter } from "next/navigation"
+import { useParams, useRouter, useSearchParams } from "next/navigation"
 import { addOrderItems, createOrder } from "@/services/order.services"
 import { getRestaurantIdBySlug } from "@/services/restaurantService"
 import { OrderType } from "@prisma/client"
 import { ArrowLeft } from "lucide-react"
 
 import { Cart } from "@/lib/types"
-import { getPathWithQuery } from "@/lib/utils"
+import { getBasePath, getPathWithQuery } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { useToast } from "@/components/ui/use-toast"
 import QuantityActionButton from "@/components/QuantityActionBtn"
 import { QuantityControlAction } from "@/components/slug-view/util"
 
-import { useCart } from "../../store/CartProvider"
+import { useCart } from "../../../store/CartProvider"
 
 const CheckoutDialog = dynamic(() => import("@/components/CheckoutModal"), {
   ssr: false,
@@ -28,6 +28,8 @@ export default function ViewCart() {
   const [showCheckoutDialog, setShowCheckoutDialog] = useState(false)
   const router = useRouter()
   const params = useParams()
+  const searchParams = useSearchParams()
+  const tableNumber = searchParams.get("tableNumber")
 
   const { toast } = useToast()
 
@@ -90,7 +92,7 @@ export default function ViewCart() {
         success: true,
         callBack() {
           setShowCheckoutDialog(false)
-          router.push(`/${params?.slug}/orders?orderId=${resp.id}`)
+          router.push(`/orders?orderId=${resp.id}`)
           setTimeout(() => {
             clearCart()
           }, 1000)
@@ -114,7 +116,13 @@ export default function ViewCart() {
         <Button
           className="bg-primary z-10 shrink-0"
           size="sm"
-          onClick={() => router.push(getPathWithQuery(`/${params?.slug}`))}
+          onClick={() =>
+            router.push(
+              `${getBasePath(params?.slug as string)}${
+                tableNumber ? `?tableNumber=${tableNumber}` : ""
+              }`
+            )
+          }
         >
           <ArrowLeft size={24} />
         </Button>
@@ -184,7 +192,11 @@ export default function ViewCart() {
       )}
       {Object.values(cart).length === 0 && (
         <div className="flex w-full justify-center">
-          <Link href={getPathWithQuery(`/${params?.slug}`)}>
+          <Link
+            href={`${getBasePath(params?.slug as string)}${
+              tableNumber ? `?tableNumber=${tableNumber}` : ""
+            }`}
+          >
             <Button size="lg">Continue Shopping</Button>
           </Link>
         </div>
