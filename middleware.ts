@@ -11,7 +11,7 @@ export async function middleware(request: NextRequest) {
 
   const potentialSlug = subdomain?.replace(`${BaseDomain}`, "")
 
-  if (!potentialSlug || host === BaseDomain) {
+  if (!potentialSlug) {
     return NextResponse.next()
   }
 
@@ -28,7 +28,7 @@ export async function middleware(request: NextRequest) {
     const restaurant = await response.json()
 
     if (!restaurant?.isValid) {
-      return NextResponse.redirect(new URL(getBasePath(), request.url))
+      return NextResponse.next()
     }
 
     if (!restaurant?.isActive && !pathname.includes("subscription-expired")) {
