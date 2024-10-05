@@ -11,7 +11,7 @@ const nextConfig = {
         destination: "/api/:path*",
       },
       {
-        source: "/:path*",
+        source: "/restaurant/:path*",
         has: [
           {
             type: "host",

@@ -10,14 +10,21 @@ export async function middleware(request: NextRequest) {
   const subdomain = host?.split(".")[0]
   const isSubdomain = host?.includes(".") && subdomain !== "www"
 
-  if (isSubdomain) {
+  const allowedDomains = ["byteeat.in", "localhost"]
+  const isAllowedDomain = allowedDomains.some((domain) => host.includes(domain))
+
+  console.log(
+    JSON.stringify({ url, isSubdomain, subdomain, host, pathname, isAllowedDomain }, null, 2)
+  )
+
+  if (isSubdomain && isAllowedDomain) {
     url.pathname = `/restaurant/${subdomain}${pathname}`
     return NextResponse.rewrite(url)
   }
 
   const segments = pathname.split("/").filter(Boolean)
 
-  if (segments[0] === "restaurant" && segments.length > 1) {
+  if (segments[0] === "restaurant" && segments.length > 1 && isAllowedDomain) {
     const potentialSlug = segments[1]
 
     if (!potentialSlug) {
@@ -56,5 +63,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico|robots.txt).*)"],
+  matcher: ["/((?!api|_next/static|_next/image|favicon.ico|logo*|robots.txt|service-worker.js).*)"],
 }
