@@ -5,7 +5,7 @@ import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { addRestaurant, getRestaurantIdBySlug } from "@/services/restaurantService"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Pencil } from "lucide-react"
+import { InfoIcon, Pencil } from "lucide-react"
 import { useSession } from "next-auth/react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
@@ -26,6 +26,7 @@ import { useToast } from "@/components/ui/use-toast"
 import CenterLoading from "../center-loading"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select"
 import { Textarea } from "../ui/textarea"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip"
 import state2city from "./utils/cities"
 import uploadImage from "./utils/uploadImage"
 
@@ -45,6 +46,9 @@ const restaurantFormSchema = z.object({
     .regex(/^[a-z0-9-]+$/, {
       message: "Slug can only contain lowercase letters, numbers, and hyphens.",
     }),
+  subscription: z.enum(["STARTER", "PRO"], {
+    required_error: "Please select a subscription plan.",
+  }),
 })
 
 type RestaurantFormValues = z.infer<typeof restaurantFormSchema>
@@ -138,12 +142,7 @@ export default function RestaurantCreateForm({ closeModal }: RestaurantCreateFor
     <React.Fragment>
       {isSaving && <CenterLoading />}
       <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onSubmit, (errors) => {
-            console.log("Error while submitting form", errors)
-          })}
-          className="flex h-full flex-col"
-        >
+        <form onSubmit={form.handleSubmit(onSubmit)} className="flex h-full flex-col">
           <div className="grid max-h-max grow gap-6 overflow-y-auto pb-4 sm:grid-cols-2">
             <div className="sm:col-span-2">
               <div className="flex items-center gap-4">
@@ -247,6 +246,39 @@ export default function RestaurantCreateForm({ closeModal }: RestaurantCreateFor
                   <FormControl>
                     <Input type="number" {...field} placeholder="Enter max table size" />
                   </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="subscription"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="flex items-center gap-2">
+                    Subscription Plan
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger>
+                          <InfoIcon size={16} className="text-gray-400" />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Choose a subscription plan for your restaurant</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a subscription plan" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="STARTER">Starter - Digital menu only</SelectItem>
+                      <SelectItem value="PRO">Pro - All features included</SelectItem>
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}

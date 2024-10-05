@@ -1,4 +1,4 @@
-import CartProvider from "../store/CartProvider"
+import CartProvider from "../../store/CartProvider"
 
 const SlugLayout = ({ children }: { children: React.ReactNode }) => {
   return (

@@ -10,11 +10,7 @@ export async function generateSitemaps() {
   return Array.from({ length: sitemapsNeeded }, (_, i) => ({ id: i }))
 }
 
-export default async function sitemap({
-  id,
-}: {
-  id: number
-}): Promise<MetadataRoute.Sitemap> {
+export default async function sitemap({ id }: { id: number }): Promise<MetadataRoute.Sitemap> {
   const start = id * 50000
   const end = start + 50000
 
@@ -30,7 +26,7 @@ export default async function sitemap({
 
   // Create the sitemap entries
   const dynamicEntries = restaurants.map((restaurant) => ({
-    url: `${BASE_URL}/${restaurant.slug}`,
+    url: `https://${restaurant.slug}.byteeat.in`,
     lastModified: restaurant.updatedAt,
     changeFrequency: "monthly" as const,
     priority: 0.6,

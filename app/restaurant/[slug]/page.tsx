@@ -8,6 +8,7 @@ import {
 } from "@/services/restaurantService"
 
 import { formatAddress } from "@/lib/string"
+import { getBasePath } from "@/lib/utils"
 import LogoOrAvatar from "@/components/logo-or-avatar"
 import { Sidebar } from "@/components/sidebar"
 import MenuView from "@/components/slug-view/MenuView"
@@ -23,7 +24,9 @@ const Welcome = async ({
   params: { slug: string }
   searchParams: { tableNumber: string }
 }) => {
-  const restaurant = await fetchRestaurantBySlug(params.slug, {
+  const { slug } = params
+
+  const restaurant = await fetchRestaurantBySlug(slug, {
     includeMenuItems: true,
     includePrice: true,
   })
@@ -32,47 +35,27 @@ const Welcome = async ({
     return notFound()
   }
 
-  const subscriptionStatus = await fetchRestaurantSubscriptionStatus(
-    params.slug
-  )
-
-  if (!subscriptionStatus?.isActive) {
-    return redirect(`/${params.slug}/subscription-expired`)
-  }
-
   const tableNumber = Number(searchParams?.tableNumber)
   if (tableNumber < 1 || tableNumber > restaurant.tableSize) {
-    return redirect(`/${params.slug}`)
+    return redirect(getBasePath(slug))
   }
 
   const address = formatAddress(restaurant as FullAdress)
 
   return (
     <>
-      <Sidebar
-        name={restaurant.name}
-        socials={restaurant.SocialLinks}
-        address={address}
-      />
+      <Sidebar name={restaurant.name} socials={restaurant.SocialLinks} address={address} />
       <div className="px-6 py-4">
         <div className="flex flex-col items-center space-y-4">
           <div className="flex items-center justify-center">
-            <LogoOrAvatar
-              src={restaurant.logoUrl}
-              name={restaurant.name}
-              className="max-w-52"
-            />
+            <LogoOrAvatar src={restaurant.logoUrl} name={restaurant.name} className="max-w-52" />
           </div>
           <div className="flex flex-col items-center">
-            <h1 className="text-2xl font-bold text-gray-800">
-              {restaurant.name}
-            </h1>
+            <h1 className="text-2xl font-bold text-gray-800">{restaurant.name}</h1>
             <p className="text-sm font-light text-gray-500">{address}</p>
           </div>
         </div>
-        {restaurant.ItemCategory ? (
-          <MenuView data={restaurant.ItemCategory} />
-        ) : null}
+        {restaurant.ItemCategory ? <MenuView data={restaurant.ItemCategory} /> : null}
       </div>
     </>
   )
@@ -81,17 +64,15 @@ const Welcome = async ({
 export default Welcome
 
 export async function generateMetadata(
-  { params }: any,
+  { params }: { params: { slug: string } },
   parent: ResolvingMetadata
 ): Promise<Metadata> {
-  const slug = params.slug
-
+  const { slug } = params
   const response = await fetchRestaurantBySlug(slug)
 
   const previousImages = (await parent).openGraph?.images || []
 
-  const { name, logoUrl, address_string, city, state, country, tableSize } =
-    response || {}
+  const { name, logoUrl, address_string, city, state, country, tableSize } = response || {}
 
   return {
     title: `${name || slug} - Restaurant in ${city}, ${state}`,
@@ -101,7 +82,7 @@ export async function generateMetadata(
       title: `${name} - Restaurant`,
       description: `Visit ${name} in ${city} for a memorable dining experience. Located at ${address_string}, we provide a cozy ambiance and great food. Discover our menu and make a reservation today!`,
       images: [logoUrl || "", ...previousImages],
-      url: `https://www.byteeat.in/${slug}`,
+      url: getBasePath(slug),
       type: "website",
       siteName: "ByteEat",
     },

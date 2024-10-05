@@ -1,32 +1,60 @@
 import { NextRequest, NextResponse } from "next/server"
 
-import { parseSlug } from "./lib/utils"
+import { getBasePath } from "./lib/utils"
 
 export async function middleware(request: NextRequest) {
   const url = request.nextUrl.clone()
+  const { hostname, pathname } = url
+  const host = request.headers.get("host") || hostname
 
-  // Handle specific redirects
-  if (url.pathname === "/manage/orders") {
-    url.pathname = "/manage/orders/current"
-    return NextResponse.redirect(url)
+  const subdomain = host?.split(".")[0]
+  const isSubdomain = host?.includes(".") && subdomain !== "www"
+
+  if (isSubdomain) {
+    url.pathname = `/restaurant/${subdomain}${pathname}`
+    return NextResponse.rewrite(url)
   }
 
-  // Skip middleware for these paths
-  if (
-    url.pathname === "/" ||
-    url.pathname.startsWith("/manage") ||
-    url.pathname.startsWith("/about") ||
-    url.pathname.startsWith("/privacy") ||
-    url.pathname.endsWith("/subscription-expired")
-  ) {
-    return NextResponse.next()
+  const segments = pathname.split("/").filter(Boolean)
+
+  if (segments[0] === "restaurant" && segments.length > 1) {
+    const potentialSlug = segments[1]
+
+    if (!potentialSlug) {
+      return NextResponse.redirect(new URL("/", request.url))
+    }
+
+    try {
+      const basePath = getBasePath()
+      const response = await fetch(`${basePath}/api/validate-slug`, {
+        method: "POST",
+        body: JSON.stringify({ slug: potentialSlug }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+
+      const data = await response.json()
+
+      if (data?.isValid) {
+        if (!data?.isActive) {
+          return NextResponse.redirect(`${getBasePath(potentialSlug)}/subscription-expired`)
+        }
+
+        const newPath = pathname.replace(`/${segments[0]}/${segments[1]}`, "")
+
+        return NextResponse.redirect(`${getBasePath(potentialSlug)}${newPath}${url.search}`)
+      }
+    } catch (error) {
+      console.error("Error validating slug:", error)
+    }
+
+    return NextResponse.redirect(new URL("/", request.url))
   }
 
   return NextResponse.next()
 }
 
 export const config = {
-  matcher: [
-    "/((?!api|_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|manifest.json|service-worker.js|worker-sentry.js).*)",
-  ],
+  matcher: ["/((?!api|_next/static|_next/image|favicon.ico|robots.txt).*)"],
 }

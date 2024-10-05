@@ -3,21 +3,13 @@
 import { useState } from "react"
 import { useQRCode } from "next-qrcode"
 
-function QRMenu({
-  totalTables = 0,
-  slug,
-}: {
-  totalTables?: number
-  slug: string
-}) {
+import { getBasePath } from "@/lib/utils"
+
+function QRMenu({ totalTables = 0, slug }: { totalTables?: number; slug: string }) {
   const { Canvas } = useQRCode()
   const [tableNo, setTableNo] = useState(1)
-  const root_url =
-    typeof window !== "undefined" ? window.location.origin : "localhost:3000"
 
-  const url_to_render = `${root_url}/${slug}${
-    tableNo > 0 ? `?tableNumber=${tableNo}` : ""
-  }`
+  const url_to_render = `${getBasePath(slug)}?tableNumber=${tableNo}`
 
   return (
     <div className="flex w-full flex-col items-center justify-center">

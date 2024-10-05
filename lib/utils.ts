@@ -20,6 +20,16 @@ export function debounce<T extends (...args: any) => any>(func: T, waitFor: numb
   }
 }
 
+export function getBasePath(slug = "") {
+  const baseDomain = process.env.NEXT_PUBLIC_BASE_DOMAIN
+  if (!slug) {
+    return baseDomain?.includes("localhost") ? `http://${baseDomain}` : `https://${baseDomain}`
+  }
+  return baseDomain?.includes("localhost")
+    ? `http://${slug}.${baseDomain}`
+    : `https://${slug}.${baseDomain}`
+}
+
 export const getPathWithQuery = (href: string): string => {
   if (typeof window === "undefined") return href
   const searchParams = new URLSearchParams(window.location.search)
