@@ -1,12 +1,6 @@
-import { Addon, Order, OrderItem } from "@prisma/client"
+import { Order, OrderItem } from "@prisma/client"
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
-
-const SLUG_PATTERNS = [
-  /^\/([^\/]+)\/?$/, // Matches '/slug' or '/slug/'
-  /^\/([^\/]+)\/view-cart\/?$/, // Matches '/slug/view-cart' or '/slug/view-cart/'
-  /^\/([^\/]+)\/[^\/]+\/?$/, // Matches '/slug/anything' or '/slug/anything/'
-]
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -48,16 +42,24 @@ export const getPathWithQuery = (href: string): string => {
   return url.pathname + url.search
 }
 
-export function parseSlug(pathname: string): string | null {
-  if (!pathname) return null
-  for (const pattern of SLUG_PATTERNS) {
-    const match = pathname.match(pattern)
-    if (match && match[1]) {
-      return match[1]
-    }
-  }
-  return null
-}
+export const RESERVED_SLUGS = [
+  "admin",
+  "api",
+  "login",
+  "logout",
+  "register",
+  "settings",
+  "pricing",
+  "manage",
+  "docs",
+  "blog",
+  "contact",
+  "privacy",
+  "terms",
+  "404",
+  "500",
+  "demo",
+]
 
 export const generateWaiterKey = () => {
   const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"

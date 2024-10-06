@@ -5,12 +5,13 @@ import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { addRestaurant, getRestaurantIdBySlug } from "@/services/restaurantService"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { InfoIcon, Pencil } from "lucide-react"
+import { InfoIcon, Loader2Icon, Pencil } from "lucide-react"
 import { useSession } from "next-auth/react"
 import { useForm } from "react-hook-form"
+import slugify from "slugify"
 import { z } from "zod"
 
-import { debounce } from "@/lib/utils"
+import { RESERVED_SLUGS, debounce } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
   Form,
@@ -30,6 +31,25 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/
 import state2city from "./utils/cities"
 import uploadImage from "./utils/uploadImage"
 
+const MAX_SLUG_LENGTH = 50
+
+const slugSchema = z
+  .string()
+  .min(1, { message: "Slug is required." })
+  .max(MAX_SLUG_LENGTH, { message: `Slug must be ${MAX_SLUG_LENGTH} characters or less.` })
+  .refine((slug) => /^[a-z]/.test(slug), {
+    message: "Slug must start with a lowercase letter.",
+  })
+  .refine((slug) => /[a-z0-9]$/.test(slug), {
+    message: "Slug must end with a lowercase letter or number.",
+  })
+  .refine((slug) => /^[a-z0-9-]+$/.test(slug), {
+    message: "Slug can only contain lowercase letters, numbers, and hyphens.",
+  })
+  .refine((slug) => !RESERVED_SLUGS.includes(slug), {
+    message: "This slug is reserved and cannot be used.",
+  })
+
 const restaurantFormSchema = z.object({
   name: z.string().min(1, { message: "Name is required." }),
   tableSize: z.preprocess(
@@ -40,12 +60,7 @@ const restaurantFormSchema = z.object({
   city: z.string().min(1, { message: "City is required." }),
   state: z.string(),
   country: z.string().default("India"),
-  slug: z
-    .string()
-    .min(1, { message: "Slug is required." })
-    .regex(/^[a-z0-9-]+$/, {
-      message: "Slug can only contain lowercase letters, numbers, and hyphens.",
-    }),
+  slug: slugSchema,
   subscription: z.enum(["STARTER", "PRO"], {
     required_error: "Please select a subscription plan.",
   }),
@@ -76,10 +91,25 @@ export default function RestaurantCreateForm({ closeModal }: RestaurantCreateFor
   form.watch("state")
 
   const generateSlug = (name: string) => {
-    return name
-      .toLowerCase()
-      .replace(/\s+/g, "-")
-      .replace(/[^a-z0-9-]/g, "")
+    let slug = slugify(name, {
+      replacement: "-",
+      remove: /[*+~.()'"!:@]/g,
+      lower: true,
+      strict: true,
+      locale: "en",
+      trim: true,
+    })
+
+    // Ensure the slug starts with a letter
+    slug = slug.replace(/^[0-9-]+/, "")
+
+    // Limit the slug length
+    slug = slug.slice(0, MAX_SLUG_LENGTH)
+
+    // Ensure the slug doesn't end with a hyphen
+    slug = slug.replace(/-+$/, "")
+
+    return slug || "restaurant" // Fallback if the slug is empty after processing
   }
 
   const checkSlugAvailability = async (slug: string) => {
@@ -97,7 +127,13 @@ export default function RestaurantCreateForm({ closeModal }: RestaurantCreateFor
   }
 
   const debouncedCheck = debounce((value: string) => {
-    checkSlugAvailability(value)
+    const result = slugSchema.safeParse(value)
+    if (result.success) {
+      checkSlugAvailability(value)
+    } else {
+      setSlugAvailable(null)
+      setIsCheckingSlug(false)
+    }
   }, 500)
 
   const onSubmit = async (data: RestaurantFormValues) => {
@@ -221,11 +257,12 @@ export default function RestaurantCreateForm({ closeModal }: RestaurantCreateFor
                       />
                       {isCheckingSlug && (
                         <div className="absolute right-2 top-1/2 -translate-y-1/2">
-                          <span className="loading loading-spinner loading-xs text-primary"></span>
+                          <Loader2Icon className="animate-spin" />
                         </div>
                       )}
                     </div>
                   </FormControl>
+
                   {slugAvailable === false && (
                     <p className="text-xs text-red-500">This URL is already taken.</p>
                   )}
@@ -255,7 +292,7 @@ export default function RestaurantCreateForm({ closeModal }: RestaurantCreateFor
               name="subscription"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="flex items-center gap-2">
+                  <FormLabel className="inline-flex items-center gap-2">
                     Subscription Plan
                     <TooltipProvider>
                       <Tooltip>
