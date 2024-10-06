@@ -4,13 +4,17 @@ import { BaseDomain, getBasePath } from "./lib/utils"
 
 export async function middleware(request: NextRequest) {
   const url = request.nextUrl.clone()
-  const host = request.headers.get("host")
-  const subdomain = host?.split(".")[0]
+  const host = request.headers.get("host") || ""
   const pathname = url.pathname
 
+  if (host.includes(".vercel.app") || pathname.endsWith("/not-found")) {
+    return NextResponse.next()
+  }
+
+  const subdomain = host.split(".")[0]
   const potentialSlug = subdomain?.replace(`${BaseDomain}`, "")
 
-  if (!potentialSlug) {
+  if (!potentialSlug || potentialSlug === "www") {
     console.log("No potential slug", { host, subdomain, pathname, potentialSlug })
     return NextResponse.next()
   }
@@ -29,7 +33,7 @@ export async function middleware(request: NextRequest) {
 
     if (!restaurant?.isValid) {
       console.log("Invalid slug", { host, subdomain, pathname, potentialSlug })
-      return NextResponse.next()
+      return NextResponse.redirect(new URL(`${basePath}/not-found`, request.url), 302)
     }
 
     if (!restaurant?.isActive && !pathname.includes("subscription-expired")) {

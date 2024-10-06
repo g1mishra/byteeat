@@ -211,6 +211,7 @@ model Order {
 enum PlanType {
   STARTER
   PRO
+  ENTERPRISE
 }
 
 model Plan {
