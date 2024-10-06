@@ -1,4 +1,3 @@
-import { redirect } from "next/dist/server/api-utils"
 import { NextRequest, NextResponse } from "next/server"
 
 import { BaseDomain, getBasePath } from "./lib/utils"
@@ -12,6 +11,7 @@ export async function middleware(request: NextRequest) {
   const potentialSlug = subdomain?.replace(`${BaseDomain}`, "")
 
   if (!potentialSlug) {
+    console.log("No potential slug", { host, subdomain, pathname, potentialSlug })
     return NextResponse.next()
   }
 
@@ -28,6 +28,7 @@ export async function middleware(request: NextRequest) {
     const restaurant = await response.json()
 
     if (!restaurant?.isValid) {
+      console.log("Invalid slug", { host, subdomain, pathname, potentialSlug })
       return NextResponse.next()
     }
 
