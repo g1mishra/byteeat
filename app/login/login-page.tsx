@@ -22,27 +22,48 @@ export default function AuthPage() {
   }
 
   return (
-    <div className="bg-background flex min-h-screen items-center justify-center">
-      <Card className="w-[400px] shadow-lg">
-        <CardHeader className="bg-primary text-white">
-          <CardTitle className="text-2xl">Welcome Back</CardTitle>
+    <div className="bg-background flex min-h-screen items-center justify-center p-4">
+      <Card className="w-full max-w-md shadow-lg">
+        <CardHeader className="bg-primary space-y-1 pb-6 text-white">
+          <CardTitle className="text-2xl font-bold">Welcome Back</CardTitle>
           <CardDescription className="text-gray-100">Sign in to your account</CardDescription>
         </CardHeader>
-        <CardContent className="pt-6">
-          <Button variant="outline" className="w-full" onClick={handleGoogleSignIn}>
-            <svg className="mr-2 size-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+        <CardContent className="px-6 pb-6 pt-8">
+          <Button
+            variant="outline"
+            className="flex w-full items-center justify-center"
+            onClick={handleGoogleSignIn}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="mr-2 inline-block h-full"
+              viewBox="0 0 16 16"
+              fill="none"
+            >
               <path
-                fill="currentColor"
-                d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z"
+                fill="#4285F4"
+                d="M14.9 8.161c0-.476-.039-.954-.121-1.422h-6.64v2.695h3.802a3.24 3.24 0 0 1-1.407 2.127v1.75h2.269c1.332-1.22 2.097-3.02 2.097-5.15"
+              />
+              <path
+                fill="#34A853"
+                d="M8.14 15c1.898 0 3.499-.62 4.665-1.69l-2.268-1.749c-.631.427-1.446.669-2.395.669-1.836 0-3.393-1.232-3.952-2.888H1.85v1.803A7.04 7.04 0 0 0 8.14 15"
+              />
+              <path
+                fill="#FBBC04"
+                d="M4.187 9.342a4.17 4.17 0 0 1 0-2.68V4.859H1.849a6.97 6.97 0 0 0 0 6.286z"
+              />
+              <path
+                fill="#EA4335"
+                d="M8.14 3.77a3.84 3.84 0 0 1 2.7 1.05l2.01-1.999a6.8 6.8 0 0 0-4.71-1.82 7.04 7.04 0 0 0-6.29 3.858L4.186 6.66c.556-1.658 2.116-2.89 3.952-2.89z"
               />
             </svg>
             Continue with Google
           </Button>
         </CardContent>
-        <CardFooter className="flex justify-center">
-          <p className="text-sm text-gray-600">
+        <CardFooter className="flex justify-center px-6 pb-6">
+          <p className="text-center text-sm text-gray-600">
             By continuing, you agree to our{" "}
-            <a href="/terms" className="text-primary hover:underline">
+            <a href="/terms" className="text-primary font-medium hover:underline">
               Terms of Service
             </a>
           </p>
