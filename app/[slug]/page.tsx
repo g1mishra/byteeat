@@ -1,11 +1,7 @@
 import { Metadata, ResolvingMetadata } from "next"
 import { notFound, redirect } from "next/navigation"
 import { MenuItemI } from "@/services/menuService"
-import {
-  FullAdress,
-  fetchRestaurantBySlug,
-  fetchRestaurantSubscriptionStatus,
-} from "@/services/restaurantService"
+import { FullAdress, fetchRestaurantBySlug } from "@/services/restaurantService"
 
 import { formatAddress } from "@/lib/string"
 import { getBasePath } from "@/lib/utils"
@@ -55,7 +51,9 @@ const Welcome = async ({
             <p className="text-sm font-light text-gray-500">{address}</p>
           </div>
         </div>
-        {restaurant.ItemCategory ? <MenuView data={restaurant.ItemCategory} /> : null}
+        {restaurant.ItemCategory ? (
+          <MenuView data={restaurant.ItemCategory} selfOrdering={restaurant?.selfOrdering || false} />
+        ) : null}
       </div>
     </>
   )

@@ -27,108 +27,112 @@ interface MenuItemProps {
   quantity: number
   image?: string
   className?: string
+  selfOrdering?: boolean
 }
 
-const MenuItem = memo(({ item, quantity, image, className = "" }: MenuItemProps) => {
-  const params = useParams()
-  const setCart = useCart()((state) => state.setCart)
-  const [isOrderCustomizationModalOpen, setIsOrderCustomizationModalOpen] = useState(false)
-  const [variant, setVariant] = useState<OrderCustomizationModalVariant>("compact")
-  const [editMeta, setEditMeta] = useState<OrderCustomizationModalEditMeta | undefined>(undefined)
-  const [isRepeatModalOpen, setIsRepeatModalOpen] = useState(false)
-  const [repeatVariant, setRepeatVariant] = useState<QuantityControlAction>(
-    QuantityControlAction.INCREMENT
-  )
+const MenuItem = memo(
+  ({ item, quantity, image, className = "", selfOrdering = false }: MenuItemProps) => {
+    const params = useParams()
+    const setCart = useCart()((state) => state.setCart)
+    const [isOrderCustomizationModalOpen, setIsOrderCustomizationModalOpen] = useState(false)
+    const [variant, setVariant] = useState<OrderCustomizationModalVariant>("compact")
+    const [editMeta, setEditMeta] = useState<OrderCustomizationModalEditMeta | undefined>(undefined)
+    const [isRepeatModalOpen, setIsRepeatModalOpen] = useState(false)
+    const [repeatVariant, setRepeatVariant] = useState<QuantityControlAction>(
+      QuantityControlAction.INCREMENT
+    )
 
-  const openOrderCustomizationModal = useCallback(
-    (variant: OrderCustomizationModalVariant = "compact") => {
-      setVariant(variant)
-      setIsOrderCustomizationModalOpen(true)
-    },
-    [setVariant, setIsOrderCustomizationModalOpen]
-  )
+    const openOrderCustomizationModal = useCallback(
+      (variant: OrderCustomizationModalVariant = "compact") => {
+        setVariant(variant)
+        setIsOrderCustomizationModalOpen(true)
+      },
+      [setVariant, setIsOrderCustomizationModalOpen]
+    )
 
-  const handleEditCustomization = useCallback(
-    (editMeta: OrderCustomizationModalEditMeta) => {
-      setEditMeta(editMeta)
+    const handleEditCustomization = useCallback(
+      (editMeta: OrderCustomizationModalEditMeta) => {
+        setEditMeta(editMeta)
+        setIsRepeatModalOpen(false)
+        openOrderCustomizationModal("compact")
+      },
+      [openOrderCustomizationModal]
+    )
+
+    const handleNewCustomization = useCallback(() => {
       setIsRepeatModalOpen(false)
-      openOrderCustomizationModal("compact")
-    },
-    [openOrderCustomizationModal]
-  )
+      openOrderCustomizationModal("expanded")
+    }, [openOrderCustomizationModal])
 
-  const handleNewCustomization = useCallback(() => {
-    setIsRepeatModalOpen(false)
-    openOrderCustomizationModal("expanded")
-  }, [openOrderCustomizationModal])
-
-  const handleQuantityChange = useCallback(
-    (action: QuantityControlAction) => {
-      if ((item.PriceItemMap && item.PriceItemMap.length > 1) || item.addons?.length) {
-        if (action === QuantityControlAction.INCREMENT && !quantity) {
-          openOrderCustomizationModal("compact")
+    const handleQuantityChange = useCallback(
+      (action: QuantityControlAction) => {
+        if ((item.PriceItemMap && item.PriceItemMap.length > 1) || item.addons?.length) {
+          if (action === QuantityControlAction.INCREMENT && !quantity) {
+            openOrderCustomizationModal("compact")
+          } else {
+            setIsRepeatModalOpen(true)
+            setRepeatVariant(action)
+          }
         } else {
-          setIsRepeatModalOpen(true)
-          setRepeatVariant(action)
+          changeItemQuantity(
+            {
+              id: item.id,
+              name: item.dish,
+              price: item.PriceItemMap?.[0].price || 0,
+              portion: item.PriceItemMap?.[0].portion || "",
+            },
+            setCart
+          )(
+            action === QuantityControlAction.INCREMENT
+              ? QuantityControlAction.INCREMENT
+              : QuantityControlAction.DECREMENT
+          )
         }
-      } else {
-        changeItemQuantity(
-          {
-            id: item.id,
-            name: item.dish,
-            price: item.PriceItemMap?.[0].price || 0,
-            portion: item.PriceItemMap?.[0].portion || "",
-          },
-          setCart
-        )(
-          action === QuantityControlAction.INCREMENT
-            ? QuantityControlAction.INCREMENT
-            : QuantityControlAction.DECREMENT
-        )
-      }
-    },
-    [item, openOrderCustomizationModal, setCart, quantity]
-  )
+      },
+      [item, openOrderCustomizationModal, setCart, quantity]
+    )
 
-  const Content = image ? ItemCard : ItemRow
+    const Content = image ? ItemCard : ItemRow
 
-  return (
-    <div className={cn("relative [&_.hr-line]:last:hidden [&_div]:last:mb-0", className)}>
-      <Content
-        item={item}
-        quantity={quantity}
-        image={image}
-        slug={params.slug as string}
-        onOpenModal={openOrderCustomizationModal}
-        onQuantityChange={handleQuantityChange}
-      />
-      {isOrderCustomizationModalOpen && (
-        <OrderCustomizationModal
-          variant={variant}
+    return (
+      <div className={cn("relative [&_.hr-line]:last:hidden [&_div]:last:mb-0", className)}>
+        <Content
           item={item}
-          open={isOrderCustomizationModalOpen}
-          setOpen={(flag) => {
-            setIsOrderCustomizationModalOpen(flag)
-            if (!flag) {
-              setEditMeta(undefined)
-            }
-          }}
-          editMeta={editMeta}
+          quantity={quantity}
+          image={image}
+          slug={params.slug as string}
+          onOpenModal={openOrderCustomizationModal}
+          onQuantityChange={handleQuantityChange}
+          selfOrdering={selfOrdering}
         />
-      )}
-      {isRepeatModalOpen && (
-        <OrderCustomizationRepeat
-          item={item}
-          variant={repeatVariant}
-          isOpen={isRepeatModalOpen}
-          setOpen={setIsRepeatModalOpen}
-          onEditCustomization={handleEditCustomization}
-          onAddNewCustomization={handleNewCustomization}
-        />
-      )}
-    </div>
-  )
-})
+        {isOrderCustomizationModalOpen && !selfOrdering && (
+          <OrderCustomizationModal
+            variant={variant}
+            item={item}
+            open={isOrderCustomizationModalOpen}
+            setOpen={(flag) => {
+              setIsOrderCustomizationModalOpen(flag)
+              if (!flag) {
+                setEditMeta(undefined)
+              }
+            }}
+            editMeta={editMeta}
+          />
+        )}
+        {isRepeatModalOpen && !selfOrdering && (
+          <OrderCustomizationRepeat
+            item={item}
+            variant={repeatVariant}
+            isOpen={isRepeatModalOpen}
+            setOpen={setIsRepeatModalOpen}
+            onEditCustomization={handleEditCustomization}
+            onAddNewCustomization={handleNewCustomization}
+          />
+        )}
+      </div>
+    )
+  }
+)
 
 MenuItem.displayName = "MenuItem"
 export default MenuItem
@@ -141,6 +145,7 @@ const ItemCard = memo(
     slug,
     onOpenModal,
     onQuantityChange,
+    selfOrdering = false,
   }: {
     item: MenuItemI
     quantity: number
@@ -148,6 +153,7 @@ const ItemCard = memo(
     slug: string
     onOpenModal: (variant?: OrderCustomizationModalVariant) => void
     onQuantityChange: (action: QuantityControlAction) => void
+    selfOrdering?: boolean
   }) => {
     if (!item?.id) return null
 
@@ -179,13 +185,17 @@ const ItemCard = memo(
             </div>
 
             <div className="flex min-w-28 shrink-0 flex-col items-end self-end text-right">
-              <p className="mb-1 text-sm font-medium">₹{item.PriceItemMap?.[0]?.price}</p>
-              <OrderItemQuantityAdjuster
-                quantity={quantity}
-                className="-mr-3"
-                addBtnClassName="pr-0"
-                onQuantityChange={onQuantityChange}
-              />
+              <p className={cn("text-sm font-medium", selfOrdering ? "mb-1" : "mb-0")}>
+                ₹{item.PriceItemMap?.[0]?.price}
+              </p>
+              {selfOrdering ? (
+                <OrderItemQuantityAdjuster
+                  quantity={quantity}
+                  className="-mr-3"
+                  addBtnClassName="pr-0"
+                  onQuantityChange={onQuantityChange}
+                />
+              ) : null}
             </div>
           </div>
         </div>
@@ -200,15 +210,16 @@ const ItemRow = memo(
   ({
     item,
     quantity,
-    slug,
     onOpenModal,
     onQuantityChange,
+    selfOrdering = false,
   }: {
     item: MenuItemI
     quantity: number
     slug: string
     onOpenModal: (variant?: OrderCustomizationModalVariant) => void
     onQuantityChange: (action: QuantityControlAction) => void
+    selfOrdering?: boolean
   }) => {
     if (!item?.id) return null
 
@@ -226,8 +237,12 @@ const ItemRow = memo(
             <p className="line-clamp-3 text-sm text-gray-600">{item.description}</p>
           </div>
           <div className="flex min-w-28 shrink-0 flex-col items-end self-end text-right">
-            <p className="mb-1 pr-4 text-sm font-medium">₹{item.PriceItemMap?.[0]?.price}</p>
-            <OrderItemQuantityAdjuster quantity={quantity} onQuantityChange={onQuantityChange} />
+            <p className={cn("pr-4 text-sm font-medium", selfOrdering ? "mb-1" : "mb-0")}>
+              ₹{item.PriceItemMap?.[0]?.price}
+            </p>
+            {selfOrdering ? (
+              <OrderItemQuantityAdjuster quantity={quantity} onQuantityChange={onQuantityChange} />
+            ) : null}
           </div>
         </div>
         <div

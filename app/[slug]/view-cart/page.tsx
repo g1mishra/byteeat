@@ -111,7 +111,7 @@ export default function ViewCart() {
 
   return (
     <div className="container mx-auto grid gap-6 p-0">
-      <div className="bg-primary flex h-14 items-center overflow-hidden">
+      <div className="bg-primary sticky top-0 z-10 flex h-14 items-center justify-between space-x-2 overflow-hidden px-4 text-white">
         <Button
           className="bg-primary z-10 shrink-0"
           size="sm"

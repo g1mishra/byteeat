@@ -97,7 +97,7 @@ export function Sidebar({
       </div>
       <div
         className={cn(
-          "bg-primary flex h-14 items-center justify-between space-x-2 px-4 text-white",
+          "bg-primary sticky top-0 z-10 flex h-14 items-center justify-between space-x-2 px-4 text-white",
           className,
           {
             hidden: open,

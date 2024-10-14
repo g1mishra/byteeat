@@ -15,6 +15,10 @@ export const authOptions = {
   adapter: PrismaAdapter(prisma),
   secret: process.env.NEXT_AUTH_SECRET,
 
+  pages: {
+    signIn: "/login",
+  },
+
   callbacks: {
     async session({ session, user }: { session: Session; user: any }) {
       const tempUser = session?.user
