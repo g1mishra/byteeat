@@ -6,7 +6,7 @@ import AuthPage from "./login-page"
 
 export default async function SignIn({ params, searchParams }: any) {
   const session = await getServerSession(authOptions)
-  const callbackUrl = searchParams.get("callbackUrl") || "/manage"
+  const callbackUrl = searchParams?.callbackUrl || "/manage"
   if (session) return redirect(callbackUrl)
 
   return (
