@@ -232,6 +232,15 @@ const fetchRestaurant = async (
           },
         },
         SocialLinks: options?.includeSocialLinks ? true : false,
+        subscription: {
+          select: {
+            planType: true,
+            status: true,
+            endDate: true,
+            startDate: true,
+            freeTrialEndDate: true,
+          },
+        },
       },
     })
   } catch (error) {
@@ -302,6 +311,7 @@ const addRestaurant = async (
             freeTrialEndDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
           },
         },
+        selfOrdering: restaurant.subscription === "STARTER" ? false : true,
       },
     })
     return newRestaurant
@@ -318,11 +328,11 @@ const updateRestaurant = async (restaurantData: Partial<RestaurantI>) => {
     }
     await checkAuth("You are not authorized to update this restaurant")
 
+    const { id, ...updateData } = restaurantData
+
     return await prisma.restaurant.update({
-      where: {
-        id: restaurantData.id,
-      },
-      data: restaurantData,
+      where: { id },
+      data: updateData,
     })
   } catch (error) {
     throw error

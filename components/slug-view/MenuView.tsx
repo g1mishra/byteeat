@@ -22,9 +22,10 @@ const MenuPopover = dynamic(() => import("./MenuPopover"), { ssr: false })
 type MenuViewProps = {
   data: ItemsToRender[]
   restaurantId?: string
+  selfOrdering?: boolean
 }
 
-const MenuView: React.FC<MenuViewProps> = ({ data }) => {
+const MenuView: React.FC<MenuViewProps> = ({ data, selfOrdering = false }) => {
   const totalQty = useTotalQty()
   const [filters, setFilters] = useState({
     isFood: true,
@@ -100,6 +101,7 @@ const MenuView: React.FC<MenuViewProps> = ({ data }) => {
                       item={item}
                       quantity={totalQty[item.id] || 0}
                       image={item.imgPath?.trim().split(";")[0]}
+                      selfOrdering={selfOrdering}
                     />
                   ))}
                 </AccordionContent>
