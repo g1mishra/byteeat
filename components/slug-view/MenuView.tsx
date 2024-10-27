@@ -30,6 +30,7 @@ const MenuView: React.FC<MenuViewProps> = ({ data, selfOrdering = false }) => {
   const [filters, setFilters] = useState({
     isFood: true,
     searchValue: "",
+    isSearchActive: false,
   })
 
   const { foodItems, barItems } = useMemo(() => {
@@ -54,10 +55,14 @@ const MenuView: React.FC<MenuViewProps> = ({ data, selfOrdering = false }) => {
   const filterItems = useCallback((items: ItemsToRender[], query: string) => {
     if (!query) return items
 
-    return items.map((category) => ({
-      ...category,
-      Item: category.Item?.filter((item) => item.dish.toLowerCase().includes(query.toLowerCase())),
-    }))
+    return items
+      .map((category) => ({
+        ...category,
+        Item: category.Item?.filter((item) =>
+          item.dish.toLowerCase().includes(query.toLowerCase())
+        ),
+      }))
+      .filter((category) => category.Item && category.Item.length > 0)
   }, [])
 
   const itemsToRender = useMemo(() => {
@@ -69,6 +74,11 @@ const MenuView: React.FC<MenuViewProps> = ({ data, selfOrdering = false }) => {
     if (!foodItems.length && barItems.length) {
       setFilters((prev) => ({ ...prev, isFood: false }))
     }
+    // Update isSearchActive based on searchValue
+    setFilters((prev) => ({ 
+      ...prev, 
+      isSearchActive: prev.searchValue.trim().length > 0 
+    }))
   }, [foodItems.length, barItems.length])
 
   return (

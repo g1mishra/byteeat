@@ -1,5 +1,6 @@
 User-agent: *
 Disallow: /manage/
 Disallow: /api/
+Disallow: /v2/
 
 Sitemap: https://www.byteeat.in/sitemap-index.xml

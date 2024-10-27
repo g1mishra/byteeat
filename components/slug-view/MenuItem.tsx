@@ -14,9 +14,10 @@ import {
   OrderCustomizationModalEditMeta,
   OrderCustomizationModalVariant,
 } from "./OrderCustomizationModal"
-import OrderCustomizationRepeat from "./OrderCustomizationRepeat"
-import OrderItemQuantityAdjuster from "./OrderItemQuantityAdjuster"
 import { QuantityControlAction, changeItemQuantity } from "./util"
+
+const OrderCustomizationRepeat = dynamic(() => import("./OrderCustomizationRepeat"))
+const OrderItemQuantityAdjuster = dynamic(() => import("./OrderItemQuantityAdjuster"))
 
 const OrderCustomizationModal = dynamic(() => import("./OrderCustomizationModal"), {
   ssr: false,
@@ -105,30 +106,34 @@ const MenuItem = memo(
           onQuantityChange={handleQuantityChange}
           selfOrdering={selfOrdering}
         />
-        {isOrderCustomizationModalOpen && !selfOrdering && (
-          <OrderCustomizationModal
-            variant={variant}
-            item={item}
-            open={isOrderCustomizationModalOpen}
-            setOpen={(flag) => {
-              setIsOrderCustomizationModalOpen(flag)
-              if (!flag) {
-                setEditMeta(undefined)
-              }
-            }}
-            editMeta={editMeta}
-          />
-        )}
-        {isRepeatModalOpen && !selfOrdering && (
-          <OrderCustomizationRepeat
-            item={item}
-            variant={repeatVariant}
-            isOpen={isRepeatModalOpen}
-            setOpen={setIsRepeatModalOpen}
-            onEditCustomization={handleEditCustomization}
-            onAddNewCustomization={handleNewCustomization}
-          />
-        )}
+        {selfOrdering ? (
+          <>
+            {isOrderCustomizationModalOpen && (
+              <OrderCustomizationModal
+                variant={variant}
+                item={item}
+                open={isOrderCustomizationModalOpen}
+                setOpen={(flag) => {
+                  setIsOrderCustomizationModalOpen(flag)
+                  if (!flag) {
+                    setEditMeta(undefined)
+                  }
+                }}
+                editMeta={editMeta}
+              />
+            )}
+            {isRepeatModalOpen && (
+              <OrderCustomizationRepeat
+                item={item}
+                variant={repeatVariant}
+                isOpen={isRepeatModalOpen}
+                setOpen={setIsRepeatModalOpen}
+                onEditCustomization={handleEditCustomization}
+                onAddNewCustomization={handleNewCustomization}
+              />
+            )}
+          </>
+        ) : null}
       </div>
     )
   }
@@ -169,14 +174,14 @@ const ItemCard = memo(
               width={500}
               height={500}
               quality={100}
-              onClick={() => onOpenModal("expanded")}
+              onClick={() => (selfOrdering ? onOpenModal("expanded") : undefined)}
             />
           ) : null}
           <div className="flex w-1/2 flex-col gap-1 p-4 sm:w-2/3">
             <div className="w-full flex-1 self-start">
               <div
                 className="flex items-center justify-between"
-                onClick={() => onOpenModal("expanded")}
+                onClick={() => (selfOrdering ? onOpenModal("expanded") : undefined)}
               >
                 <h3 className="text-base font-medium">{item.dish}</h3>
                 {item.type === "FOOD" && <VegOrNonVeg isVeg={item.isVeg} />}
@@ -229,7 +234,7 @@ const ItemRow = memo(
           <div className="max-w-[95%] flex-1 self-start">
             <h3
               className="flex items-center gap-1 text-base font-medium"
-              onClick={() => onOpenModal("expanded")}
+              onClick={() => (selfOrdering ? onOpenModal("expanded") : undefined)}
             >
               {item.type === "FOOD" && <VegOrNonVeg isVeg={item.isVeg} />}
               {item.dish}

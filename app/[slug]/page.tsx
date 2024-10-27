@@ -40,7 +40,12 @@ const Welcome = async ({
 
   return (
     <>
-      <Sidebar name={restaurant.name} socials={restaurant.SocialLinks} address={address} />
+      <Sidebar
+        name={restaurant.name}
+        socials={restaurant.SocialLinks}
+        address={address}
+        selfOrdering={restaurant?.selfOrdering || false}
+      />
       <div className="px-6 py-4">
         <div className="flex flex-col items-center space-y-4">
           <div className="flex items-center justify-center">
@@ -52,7 +57,10 @@ const Welcome = async ({
           </div>
         </div>
         {restaurant.ItemCategory ? (
-          <MenuView data={restaurant.ItemCategory} selfOrdering={restaurant?.selfOrdering || false} />
+          <MenuView
+            data={restaurant.ItemCategory}
+            selfOrdering={restaurant?.selfOrdering || false}
+          />
         ) : null}
       </div>
     </>

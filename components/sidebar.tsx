@@ -30,6 +30,7 @@ interface SidebarProps extends React.HTMLAttributes<HTMLElement> {
   } | null
 
   addBackButton?: boolean
+  selfOrdering?: boolean
 }
 
 const Social_Map = ["facebook", "twitter", "instagram", "whatsapp"]
@@ -39,6 +40,7 @@ export function Sidebar({
   socials,
   name,
   addBackButton = false,
+  selfOrdering = false,
   ...props
 }: SidebarProps) {
   const [open, setOpen] = React.useState(false)
@@ -63,11 +65,7 @@ export function Sidebar({
         <div className="mt-6 flex h-[90svh] flex-col justify-between gap-y-6 pb-6">
           <div className="flex flex-col space-y-1">
             <div className="flex items-center justify-center">
-              <LogoOrAvatar
-                src={props?.logoUrl}
-                name={name}
-                className="max-w-52"
-              />
+              <LogoOrAvatar src={props?.logoUrl} name={name} className="max-w-52" />
             </div>
             <div className="flex flex-col items-center justify-center">
               <h1 className="text-2xl font-bold">{name}</h1>
@@ -105,12 +103,9 @@ export function Sidebar({
         )}
         {...props}
       >
-        <MenuIcon
-          onClick={() => setOpen(!open)}
-          className="size-7 cursor-pointer"
-        />
+        <MenuIcon onClick={() => setOpen(!open)} className="size-7 cursor-pointer" />
 
-        <CartIcon />
+        {selfOrdering ? <CartIcon /> : null}
       </div>
     </>
   )

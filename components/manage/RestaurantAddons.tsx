@@ -1,10 +1,6 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { Separator } from "@/components/ui/separator"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { useEffect, useState } from "react"
 import {
   addRestaurantAddon,
   deleteRestaurantAddon,
@@ -13,9 +9,28 @@ import {
 } from "@/services/menuService"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Edit, PlusCircle, Trash2 } from "lucide-react"
-import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
+
+import { Button } from "@/components/ui/button"
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
+import { Separator } from "@/components/ui/separator"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
 
 const addonSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -23,11 +38,7 @@ const addonSchema = z.object({
 })
 
 type AddonFormValues = z.infer<typeof addonSchema>
-export default function RestaurantAddons({
-  restaurantId,
-}: {
-  restaurantId: string
-}) {
+export default function RestaurantAddons({ restaurantId }: { restaurantId: string }) {
   const [addons, setAddons] = useState<any[]>([])
   const [editingAddonId, setEditingAddonId] = useState<string | null>(null)
 
@@ -53,7 +64,7 @@ export default function RestaurantAddons({
       ...data,
       price: Number(data.price), // Ensure price is a number
     }
-    
+
     if (editingAddonId) {
       await updateRestaurantAddon({ id: editingAddonId, ...submissionData })
     } else {
@@ -100,12 +111,7 @@ export default function RestaurantAddons({
                 <FormItem className="flex-1">
                   <FormLabel>Price</FormLabel>
                   <FormControl>
-                    <Input
-                      {...field}
-                      type="number"
-                      step="0.01"
-                      placeholder="Enter price"
-                    />
+                    <Input {...field} type="number" step="0.01" placeholder="Enter price" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -125,9 +131,9 @@ export default function RestaurantAddons({
           </Button>
         </form>
       </Form>
-      
+
       <Separator className="my-6" />
-      
+
       <h3 className="mb-4 text-xl font-semibold">Existing Addons</h3>
       <Table>
         <TableHeader>
@@ -143,11 +149,16 @@ export default function RestaurantAddons({
               <TableCell>{addon.name}</TableCell>
               <TableCell>₹{addon.price.toFixed(2)}</TableCell>
               <TableCell className="text-right">
-                <Button onClick={() => handleEdit(addon)} variant="outline" size="sm" className="mr-2">
-                  <Edit className="mr-2 size-4" /> Edit
+                <Button
+                  onClick={() => handleEdit(addon)}
+                  variant="outline"
+                  size="sm"
+                  className="mr-2"
+                >
+                  <Edit className="size-4" />
                 </Button>
                 <Button onClick={() => handleDelete(addon.id)} variant="destructive" size="sm">
-                  <Trash2 className="mr-2 size-4" /> Delete
+                  <Trash2 className="size-4" />
                 </Button>
               </TableCell>
             </TableRow>

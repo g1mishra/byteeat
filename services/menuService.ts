@@ -1,6 +1,6 @@
 "use server"
 
-import { Addon, Item, PriceItemMap } from "@prisma/client"
+import { Addon, Item, PriceItemMap, Prisma } from "@prisma/client"
 
 import prisma from "@/lib/prisma"
 
@@ -409,6 +409,67 @@ export async function addMultipleRestaurantAddons(
   } catch (error) {
     console.error("Error adding multiple restaurant addons:", error)
     throw new Error("Failed to add addons")
+  }
+}
+
+export async function updateMenuItems(items: Partial<MenuItemI & { categoryName: string }>[]) {
+  try {
+    const updatePromises = items.map(async (item) => {
+      const { id, PriceItemMap, addons, categoryId, categoryName, ...updateData } = item
+
+      if (!id) {
+        console.warn("Skipping item update due to missing ID:", item)
+        return
+      }
+
+      // First update the menu item
+      const updatedItem = await prisma.item.update({
+        where: { id },
+        data: {
+          ...updateData,
+          category: categoryId ? { connect: { id: categoryId } } : undefined,
+          addons: addons ? { set: addons.map((addon) => ({ id: addon.id })) } : undefined,
+        },
+        include: {
+          PriceItemMap: true,
+          addons: true,
+        },
+      })
+
+      // Then handle price updates if provided
+      if (PriceItemMap !== undefined) {
+        // Delete all existing prices
+        await prisma.priceItemMap.deleteMany({
+          where: { itemId: id },
+        })
+
+        // Create new prices if any exist
+        if (PriceItemMap && PriceItemMap.length > 0) {
+          await prisma.priceItemMap.createMany({
+            data: PriceItemMap.map((price) => ({
+              itemId: id,
+              portion: price.portion || "",
+              price: typeof price.price === "string" ? parseFloat(price.price) : price.price,
+            })),
+          })
+        }
+      }
+
+      // Fetch the final state with all relations
+      return prisma.item.findUnique({
+        where: { id },
+        include: {
+          PriceItemMap: true,
+          addons: true,
+        },
+      })
+    })
+
+    const updatedItems = await Promise.all(updatePromises.filter(Boolean))
+    return updatedItems.filter(Boolean)
+  } catch (error) {
+    console.error("Error updating menu items:", error)
+    throw error
   }
 }
 
