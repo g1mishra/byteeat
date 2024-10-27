@@ -185,8 +185,7 @@ export default function MenuItemForm({
     try {
       const uploadedPath = await uploadImage(
         image,
-        `${Date.now().toString()}-${restaurantSlug}/${dishName}/${image.name}`,
-        true
+        `${Date.now().toString()}-${restaurantSlug}/${dishName}/${image.name}`
       )
       toast({ title: `Image uploaded successfully.` })
       return uploadedPath

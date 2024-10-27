@@ -7,6 +7,7 @@ import { PlusIcon } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/components/ui/use-toast"
+import CenterLoading from "@/components/center-loading"
 import Loading from "@/components/loader"
 
 import WithCreateMenuDialog from "../dialog-trigger/with-create-item"
@@ -71,6 +72,7 @@ const RestaurantMenu: React.FC<RestaurantMenuProps> = ({
   const [categories, setCategories] = useState<Record<string, string>>({})
   const [editingRows, setEditingRows] = useState<EditingRowsType>({})
   const [editingRowId, setEditingRowId] = useState<string | null>(null)
+  const [isUpdating, setIsUpdating] = useState(false)
 
   const { toast } = useToast()
 
@@ -264,6 +266,7 @@ const RestaurantMenu: React.FC<RestaurantMenuProps> = ({
   const saveRowChanges = useCallback(
     async (rowId: string) => {
       try {
+        setIsUpdating(true)
         const editedRow = editingRows[rowId]
         if (!editedRow) {
           throw new Error("No changes found for this item")
@@ -319,6 +322,8 @@ const RestaurantMenu: React.FC<RestaurantMenuProps> = ({
             error instanceof Error ? error.message : "An error occurred while saving changes.",
           variant: "destructive",
         })
+      } finally {
+        setIsUpdating(false)
       }
     },
     [editingRows, menuItems, restaurantSlug, toast]
@@ -326,6 +331,7 @@ const RestaurantMenu: React.FC<RestaurantMenuProps> = ({
 
   const saveAllChanges = useCallback(async () => {
     try {
+      setIsUpdating(true)
       const changedItems = Object.values(editingRows).filter((editedItem) => {
         const originalItem = menuItems.find((item) => item.id === editedItem.id)
         return Object.keys(editedItem).some((key) => {
@@ -347,15 +353,13 @@ const RestaurantMenu: React.FC<RestaurantMenuProps> = ({
         return
       }
 
-      const preparedResults = await Promise.all(
-        changedItems.map((item) =>
-          prepareMenuItemForUpdate(
-            item,
-            menuItems.find((menuItem) => menuItem.id === item.id) as MenuItemI,
-            restaurantSlug
-          )
-        )
-      )
+      // Process items sequentially if they have images to prevent race conditions
+      const preparedResults = []
+      for (const item of changedItems) {
+        const originalItem = menuItems.find((menuItem) => menuItem.id === item.id) as MenuItemI
+        const result = await prepareMenuItemForUpdate(item, originalItem, restaurantSlug)
+        preparedResults.push(result)
+      }
 
       const itemsToUpdate = preparedResults
         .filter((result) => result.hasChanges)
@@ -382,11 +386,14 @@ const RestaurantMenu: React.FC<RestaurantMenuProps> = ({
         description: "An error occurred while saving the changes. Please try again.",
         variant: "destructive",
       })
+    } finally {
+      setIsUpdating(false)
     }
   }, [editingRows, menuItems, restaurantSlug, toast])
 
   return (
     <>
+      {isUpdating && <CenterLoading />}
       <div className="sticky top-0 z-10 flex w-full items-center justify-between gap-2 bg-white pb-4 max-sm:flex-col dark:bg-gray-900">
         <SearchBar
           searchTerm={searchTerm}

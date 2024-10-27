@@ -172,19 +172,34 @@ const TableView: React.FC<TableViewProps> = ({
         cell: ({ row }) => {
           const editing = editingRowId === row.original.id
           const imgPath = editingRows[row.original.id]?.imgPath ?? row.original.imgPath
-          const newImage = editingRows[row.original.id]?.newImage ?? null
+          const newImage = editingRows[row.original.id]?.newImage
 
-          const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+          const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
             const file = e.target.files?.[0]
             if (file) {
+              // Validate file type and size
+              if (!file.type.startsWith("image/")) {
+                alert("Please upload an image file")
+                return
+              }
+              if (file.size > 5 * 1024 * 1024) {
+                // 5MB limit
+                alert("Image size should be less than 5MB")
+                return
+              }
+
               updateField(row.id, "newImage", file)
+              // Create a temporary URL for preview
+              updateField(row.id, "imgPath", URL.createObjectURL(file))
             }
           }
 
           const imageToShow = newImage
             ? URL.createObjectURL(newImage)
             : imgPath
-            ? imgPath.split(";")[0]
+            ? imgPath.startsWith("blob:")
+              ? imgPath
+              : imgPath.split(";")[0]
             : null
 
           return (
@@ -196,6 +211,7 @@ const TableView: React.FC<TableViewProps> = ({
                     alt={row.original.dish}
                     fill
                     className="rounded-md object-cover"
+                    unoptimized={newImage !== null} // Skip optimization for blob URLs
                   />
                   {editing && (
                     <Label

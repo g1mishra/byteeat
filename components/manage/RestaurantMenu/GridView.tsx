@@ -1,12 +1,15 @@
-import { MenuItemI } from "@/services/menuService"
 import dynamic from "next/dynamic"
+import { MenuItemI } from "@/services/menuService"
 
 import {
+  Accordion,
+  AccordionContent,
   AccordionItem,
-  AccordionTrigger
+  AccordionTrigger,
 } from "@/components/ui/accordion"
 import { Button } from "@/components/ui/button"
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import Loading from "@/components/loader"
 import VegOrNonVeg from "@/components/veg-or-nonveg"
 
 const WithUpdateMenuDialog = dynamic(
@@ -58,7 +61,7 @@ const GridView: React.FC<GridViewProps> = ({ filteredMenuItems, restaurantSlug, 
                     itemData={{
                       ...item,
                       categoryId: item.categoryId,
-                      category: item.categoryName,
+                      category: categoryName,
                       description: item.description || "",
                       PriceItemMap: item.PriceItemMap || [],
                       addons: item.addons || [],

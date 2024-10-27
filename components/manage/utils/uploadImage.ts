@@ -1,15 +1,10 @@
-async function uploadImage(
-  file: File | undefined | null,
-  slug: string,
-  resize = false
-) {
+async function uploadImage(file: File | undefined | null, slug: string) {
   if (!file) {
     return null
   }
   const formData = new FormData()
   formData.append("file", file as Blob)
   formData.append("slug", slug)
-  formData.append("resize", resize.toString())
 
   try {
     const response = await fetch("/api/image-upload", {

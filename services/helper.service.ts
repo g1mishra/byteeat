@@ -1,6 +1,6 @@
 "use server"
 
-import { MenuFormValues } from "@/components/manage/create-menu-item"
+import { MenuFormValues } from "@/components/manage/MenuItemForm"
 
 import {
   MenuItemI,
@@ -16,10 +16,7 @@ import {
   updateMenuItem,
 } from "./menuService"
 
-const addMenuItemHelper = async (
-  data: MenuFormValues,
-  restaurantId: string
-): Promise<void> => {
+const addMenuItemHelper = async (data: MenuFormValues, restaurantId: string): Promise<void> => {
   try {
     const categoryResp = await addOrFetchCategory(data.category, restaurantId)
     const menuResp = await addMenuItem({
@@ -29,7 +26,7 @@ const addMenuItemHelper = async (
       PriceItemMap: [],
       type: data.type || "FOOD",
       imgPath: data.imgPath || "",
-      addons: data.addons
+      addons: data.addons,
     })
 
     const payload = data.PriceItemMap.map((price) => ({
@@ -104,10 +101,7 @@ const updateMenuItemHelper = async (
   }
 }
 
-const deleteMenuItemHelper = async (
-  itemId: any,
-  categoryId: any
-): Promise<void> => {
+const deleteMenuItemHelper = async (itemId: any, categoryId: any): Promise<void> => {
   try {
     await deletePriceItem(itemId)
     await deleteMenuItem(itemId, categoryId)
