@@ -13,53 +13,76 @@ interface Props {
   filters: {
     isFood: boolean
     searchValue: string
+    isSearchActive: boolean
   }
   setFilters?: Dispatch<
     SetStateAction<{
       isFood: boolean
       searchValue: string
+      isSearchActive: boolean
     }>
   >
 }
 
 const SearchAndFilter: React.FC<Props> = ({
-  filters: { isFood },
+  filters: { isFood, isSearchActive, searchValue: initialSearchValue },
   setFilters,
 }) => {
-  const [openSearch, setOpenSearch] = useState(false)
-  const [searchValue, setSearchValue] = useState("")
+  const [openSearch, setOpenSearch] = useState(isSearchActive)
+  const [searchValue, setSearchValue] = useState(initialSearchValue)
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchValue(e.target.value)
+    const value = e.target.value
+    setSearchValue(value)
 
     if (setFilters) {
       debounce(
         () =>
           setFilters((prev) => ({
             ...prev,
-            searchValue: e.target.value,
+            searchValue: value,
+            isSearchActive: value.trim().length > 0,
           })),
         300
       )()
     }
   }
 
+  const handleClear = () => {
+    setSearchValue("")
+    setFilters?.((prev) => ({
+      ...prev,
+      searchValue: "",
+      isSearchActive: false,
+    }))
+  }
+
   return (
     <div className="flex items-center justify-between">
-      {openSearch ? (
+      {openSearch || isSearchActive ? (
         <div className="w-full self-end">
           <div className="relative">
             <Search className="text-muted-foreground absolute left-2 top-2.5 size-4" />
             <Input
               autoFocus
               placeholder="Search"
-              className="w-full pl-8 outline-none focus:border-none focus:ring-0"
+              className="w-full pl-8 pr-8 outline-none focus:border-none focus:ring-0"
               value={searchValue}
               onChange={handleSearch}
               onBlur={() => {
-                setOpenSearch(false)
+                if (!searchValue.trim()) {
+                  setOpenSearch(false)
+                }
               }}
             />
+            {searchValue && (
+              <button
+                onClick={handleClear}
+                className="absolute right-2 top-2.5 text-muted-foreground hover:text-foreground"
+              >
+                ✕
+              </button>
+            )}
           </div>
         </div>
       ) : (

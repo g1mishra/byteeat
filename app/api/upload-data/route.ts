@@ -1,10 +1,10 @@
-import { NextResponse } from "next/server"
-
 // import { insertData } from "@/temp/data-upload"
+import { NextResponse } from "next/server"
 
 export async function GET(request: Request, context: any) {
   try {
-    // const data = await insertData()
+    // const restaurantId = new URL(request.url).searchParams.get("restaurantId")
+    // const data = await insertData(restaurantId || "")
     // return NextResponse.json({ data })
     return NextResponse.json({ data: "GET" })
   } catch (error) {

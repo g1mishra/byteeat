@@ -19,6 +19,10 @@ module.exports = {
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
+        main: {
+          DEFAULT: "#4F46E5", // Adjust to your brand color
+          dark: "#4338CA",
+        },
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",

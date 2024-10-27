@@ -1,98 +1,63 @@
 import { useEffect, useState } from "react"
 import Image from "next/image"
 
-import { Label } from "@/components/ui/label"
-
-const MAX_IMAGES = 3
-
 export default function UploadItemImage({
   uploadItemImage,
-  imagesRef,
+  imageRef,
 }: {
   uploadItemImage: string
-  imagesRef?: React.MutableRefObject<(File | string)[]>
+  imageRef: React.MutableRefObject<File | string | null>
 }) {
-  const [images, setImages] = useState<(File | string)[]>([])
+  const [image, setImage] = useState<File | string | null>(null)
 
   useEffect(() => {
-    if (!uploadItemImage) return
-    const splitedImages = uploadItemImage.split(";")
-    if (splitedImages.length > 0) {
-      setImages(splitedImages)
-      if (imagesRef) {
-        imagesRef.current = splitedImages
-      }
+    if (uploadItemImage) {
+      setImage(uploadItemImage)
+      imageRef.current = uploadItemImage
     }
-  }, [imagesRef, uploadItemImage])
+  }, [imageRef, uploadItemImage])
 
-  const handleRemoveImage = (index: number) => {
-    setImages((prev) => {
-      const newImages = [...prev]
-      newImages.splice(index, 1)
-      if (imagesRef) {
-        imagesRef.current = newImages
-      }
-      return newImages
-    })
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      setImage(file)
+      imageRef.current = file
+    }
+  }
+
+  const handleRemoveImage = () => {
+    setImage(null)
+    imageRef.current = null
   }
 
   return (
-    <div className="grid gap-2">
-      <Label>Images</Label>
-      <div className="grid grid-cols-3 gap-2">
-        {images.length < MAX_IMAGES && (
+    <div className="flex items-center gap-4">
+      <div className="relative size-24 overflow-hidden rounded-lg shadow-md">
+        {image ? (
           <>
-            <button
-              type="button"
-              className="bg-muted relative flex aspect-square items-center justify-center rounded-md border border-dashed"
-            >
-              <PlusIcon className="text-muted-foreground size-6" />
-              <input
-                type="file"
-                accept="image/*"
-                className="absolute inset-0 cursor-pointer opacity-0"
-                onChange={(e) => {
-                  const files = e.target.files
-                  if (files) {
-                    const newImages = Array.from(files).slice(0, MAX_IMAGES)
-                    setImages((prev) => {
-                      const updatedImages = [...prev, ...newImages]
-                      if (imagesRef) {
-                        imagesRef.current = updatedImages
-                      }
-                      return updatedImages
-                    })
-                  }
-                }}
-              />
-            </button>
-          </>
-        )}
-
-        {images.map((image, index) => (
-          <div
-            key={index}
-            className="relative aspect-square overflow-hidden rounded-md"
-          >
             <Image
-              src={
-                typeof image === "string" ? image : URL.createObjectURL(image)
-              }
-              alt="Image 1"
+              src={typeof image === "string" ? image : URL.createObjectURL(image)}
+              alt="Menu item"
               fill
-              className="object-cover"
+              className="object-contain transition-transform hover:scale-105"
             />
             <button
               type="button"
-              className="bg-background/80 hover:bg-background absolute right-2 top-2 rounded-full p-1"
+              className="absolute -right-1 -top-1 rounded-full bg-white/90 p-1.5 shadow-sm transition-colors hover:bg-white"
+              onClick={handleRemoveImage}
             >
-              <XIcon
-                className="text-destructive size-4"
-                onClick={() => handleRemoveImage(index)}
-              />
+              <XIcon className="size-4 text-red-500" />
             </button>
+          </>
+        ) : (
+          <div className="flex size-full items-center justify-center bg-gray-100 transition-colors hover:bg-gray-200">
+            <label className="cursor-pointer text-center">
+              <PlusIcon className="mx-auto mb-1 size-8 text-gray-400" />
+              <span className="text-sm text-gray-500">Add Image</span>
+              <input type="file" accept="image/*" className="hidden" onChange={handleImageChange} />
+            </label>
           </div>
-        ))}
+        )}
       </div>
     </div>
   )

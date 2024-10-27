@@ -1,5 +1,4 @@
 import React from "react"
-import { Minus, Plus } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 

@@ -408,7 +408,7 @@ export default function EditRestaurant({ response }: { response: FetchRestaurant
           />
         </form>
       </Form>
-      <div className="fixed inset-x-0 bottom-0 flex items-center justify-center border-t bg-white p-4">
+      <div className="flex items-center justify-center">
         <Button
           type="submit"
           className="mx-auto w-full max-w-52"

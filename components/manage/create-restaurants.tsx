@@ -143,11 +143,7 @@ export default function RestaurantCreateForm({ closeModal }: RestaurantCreateFor
 
       let logoUrl = ""
       if (file) {
-        logoUrl = await uploadImage(
-          file,
-          `${Date.now().toString()}-${data.slug}/logo/${file.name}`,
-          true
-        )
+        logoUrl = await uploadImage(file, `${Date.now().toString()}-${data.slug}/logo/${file.name}`)
       }
 
       await addRestaurant(
@@ -206,8 +202,11 @@ export default function RestaurantCreateForm({ closeModal }: RestaurantCreateFor
                   </div>
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold">Restaurant Logo</h3>
-                  <p className="text-sm text-gray-500">Upload your restaurant logo</p>
+                  <h3 className="text-lg font-semibold">
+                    Restaurant Logo{" "}
+                    <span className="text-muted-foreground text-sm font-normal">(Optional)</span>
+                  </h3>
+                  <p className="text-sm text-gray-500">Upload your restaurant logo image</p>
                 </div>
               </div>
             </div>
@@ -217,7 +216,7 @@ export default function RestaurantCreateForm({ closeModal }: RestaurantCreateFor
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Name</FormLabel>
+                  <FormLabel>Restaurant Name</FormLabel>
                   <FormControl>
                     <Input
                       {...field}
@@ -242,7 +241,23 @@ export default function RestaurantCreateForm({ closeModal }: RestaurantCreateFor
               name="slug"
               render={({ field }) => (
                 <FormItem className="relative">
-                  <FormLabel>Slug</FormLabel>
+                  <FormLabel className="inline-flex items-center gap-2">
+                    Restaurant URL
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger type="button">
+                          <InfoIcon size={16} className="text-gray-400" />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>
+                            This will be your restaurant&apos;s unique web address.
+                            <br />
+                            Example: your-restaurant-name
+                          </p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </FormLabel>
                   <FormControl>
                     <div className="relative">
                       <Input
@@ -279,9 +294,21 @@ export default function RestaurantCreateForm({ closeModal }: RestaurantCreateFor
               name="tableSize"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Table Size</FormLabel>
+                  <FormLabel className="inline-flex items-center gap-2">
+                    Number of Tables
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger type="button">
+                          <InfoIcon size={16} className="text-gray-400" />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Total number of tables in your restaurant</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </FormLabel>
                   <FormControl>
-                    <Input type="number" {...field} placeholder="Enter max table size" />
+                    <Input type="number" {...field} placeholder="Enter number of tables" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -296,7 +323,7 @@ export default function RestaurantCreateForm({ closeModal }: RestaurantCreateFor
                     Subscription Plan
                     <TooltipProvider>
                       <Tooltip>
-                        <TooltipTrigger>
+                        <TooltipTrigger type="button">
                           <InfoIcon size={16} className="text-gray-400" />
                         </TooltipTrigger>
                         <TooltipContent>
@@ -326,11 +353,11 @@ export default function RestaurantCreateForm({ closeModal }: RestaurantCreateFor
               name="state"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>State</FormLabel>
+                  <FormLabel>State/Province</FormLabel>
                   <Select onValueChange={(value) => field.onChange(value)}>
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Find your state" />
+                        <SelectValue placeholder="Select your state" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -383,9 +410,21 @@ export default function RestaurantCreateForm({ closeModal }: RestaurantCreateFor
               name="address_string"
               render={({ field }) => (
                 <FormItem className="sm:col-span-2">
-                  <FormLabel>Address</FormLabel>
+                  <FormLabel className="inline-flex items-center gap-2">
+                    Street Address <span className="text-muted-foreground text-sm">(Optional)</span>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger type="button">
+                          <InfoIcon size={16} className="text-gray-400" />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Detailed street address of your restaurant</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </FormLabel>
                   <FormControl>
-                    <Textarea {...field} placeholder="Enter restaurant address" />
+                    <Textarea {...field} placeholder="Enter detailed street address" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

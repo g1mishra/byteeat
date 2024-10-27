@@ -10,9 +10,8 @@ import UnAuthorized from "@/components/UnAuthorized"
 import EditRestaurant from "@/components/manage/EditRestaurant"
 import MenuPositions from "@/components/manage/MenuPositions"
 import RestaurantAddons from "@/components/manage/RestaurantAddons"
+import RestaurantMenu from "@/components/manage/RestaurantMenu/index"
 import { authOptions } from "@/app/api/auth/authOption"
-
-import MenuCardList from "../MenuCardList"
 
 const WithCreateMenuDialog = dynamic(
   () => import("@/components/manage/dialog-trigger/with-create-item"),
@@ -70,15 +69,16 @@ const RestaurantDetails = async ({ params }: any) => {
             <ScrollBar orientation="horizontal" />
           </ScrollArea>
           <TabsContent value="menu">
-            {response?.ItemCategory?.map((menu) => (
-              <MenuCardList key={menu.id} menu={menu} slug={response.slug} />
-            ))}
-            <WithCreateMenuDialog restaurantId={restroId} slug={response.slug}>
-              <Card className="mt-4 flex h-full items-center justify-center p-6 hover:cursor-pointer">
-                <PlusIcon size={24} />
-                <span className="ml-2">Add New Item</span>
-              </Card>
-            </WithCreateMenuDialog>
+            <div
+              className="h-[calc(100vh-11rem)] w-full max-w-full overflow-y-auto"
+              data-radix-scroll-area-viewport="true"
+            >
+              <RestaurantMenu
+                response={response}
+                restaurantId={restroId}
+                restaurantSlug={response.slug}
+              />
+            </div>
           </TabsContent>
           <TabsContent value="addons">
             <RestaurantAddons restaurantId={restroId} />
