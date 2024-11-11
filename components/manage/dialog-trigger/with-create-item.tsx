@@ -32,15 +32,17 @@ export default function WithCreateMenuDialog({
       <>
         {cloneChildren}
         <Dialog open={isOpen} onOpenChange={setIsOpen} modal>
-          <DialogContent className="flex h-auto max-h-[95vh] w-full max-w-[95vw]  flex-col justify-center overflow-hidden border-none">
+          <DialogContent className="flex h-auto max-h-[95vh] w-full max-w-[95vw]  flex-col justify-center overflow-y-auto border-none">
             <DialogHeader>
               <DialogTitle>Create Item</DialogTitle>
             </DialogHeader>
-            <MenuCreateForm
-              restaurantId={restaurantId}
-              restaurantSlug={restaurantSlug}
-              closeModal={onCloseModal}
-            />
+            <ScrollArea className="h-[90vh]">
+              <MenuCreateForm
+                restaurantId={restaurantId}
+                restaurantSlug={restaurantSlug}
+                closeModal={onCloseModal}
+              />
+            </ScrollArea>
           </DialogContent>
         </Dialog>
       </>

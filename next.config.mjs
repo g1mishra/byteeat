@@ -2,26 +2,13 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    domains: ["byte-eat-staticfiles.s3.amazonaws.com", "lh3.googleusercontent.com"],
+    domains: [
+      "byteeat.s3.ap-south-1.amazonaws.com",
+      "byte-eat-staticfiles.s3.amazonaws.com",
+      "lh3.googleusercontent.com",
+    ],
   },
-  // async rewrites() {
-  //   return [
-  //     {
-  //       source: "/api/:path*",
-  //       destination: "/api/:path*",
-  //     },
-  //     {
-  //       source: "/restaurant/:path*",
-  //       has: [
-  //         {
-  //           type: "host",
-  //           value: `(?<slug>.*).${process.env.NEXT_PUBLIC_BASE_DOMAIN}`,
-  //         },
-  //       ],
-  //       destination: "/restaurant/:slug/:path*",
-  //     },
-  //   ]
-  // },
+
   async redirects() {
     return [
       {

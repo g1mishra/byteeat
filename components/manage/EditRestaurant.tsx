@@ -135,7 +135,7 @@ export default function EditRestaurant({ response }: { response: FetchRestaurant
         const updateData: Partial<EditRestaurantFormValues> = { ...newInfo, id: response?.id }
 
         if (file) {
-          const uploadedUrl = await uploadImage(file, `${response?.slug}/logo.png`)
+          const uploadedUrl = await uploadImage(file, `${response?.slug}/logo`)
           if (uploadedUrl) {
             updateData.logoUrl = uploadedUrl
           }

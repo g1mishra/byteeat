@@ -34,7 +34,7 @@ export async function POST(request: Request) {
 
   try {
     const params = {
-      Bucket: "byte-eat-staticfiles",
+      Bucket: "byteeat",
       Key: `${slug}/${file.name}`,
       Body: resized || filebuffer,
     }

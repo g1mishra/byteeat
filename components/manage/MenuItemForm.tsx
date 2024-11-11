@@ -183,10 +183,7 @@ export default function MenuItemForm({
     if (typeof image === "string") return image
 
     try {
-      const uploadedPath = await uploadImage(
-        image,
-        `${Date.now().toString()}-${restaurantSlug}/${dishName}/${image.name}`
-      )
+      const uploadedPath = await uploadImage(image, `${restaurantSlug}/items/${dishName}`)
       toast({ title: `Image uploaded successfully.` })
       return uploadedPath
     } catch (error) {

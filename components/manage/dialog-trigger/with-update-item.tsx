@@ -35,16 +35,18 @@ export default function WithUpdateMenuDialog({
       <>
         {cloneChildren}
         <Dialog open={isOpen} onOpenChange={setIsOpen} modal>
-          <DialogContent className="flex h-auto max-h-[95vh] w-full max-w-[95vw]  flex-col justify-center overflow-hidden border-none">
+          <DialogContent className="flex h-auto max-h-[95vh] w-full max-w-[95vw]  flex-col justify-center border-none">
             <DialogHeader>
               <DialogTitle>Update Item</DialogTitle>
             </DialogHeader>
-            <MenuUpdateForm
-              itemData={itemData}
-              closeModal={onCloseModal}
-              restaurantSlug={restaurantSlug}
-              restaurantId={restaurantId}
-            />
+            <ScrollArea className="h-[80vh]">
+              <MenuUpdateForm
+                itemData={itemData}
+                closeModal={onCloseModal}
+                restaurantSlug={restaurantSlug}
+                restaurantId={restaurantId}
+              />
+            </ScrollArea>
           </DialogContent>
         </Dialog>
       </>

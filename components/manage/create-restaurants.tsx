@@ -143,7 +143,7 @@ export default function RestaurantCreateForm({ closeModal }: RestaurantCreateFor
 
       let logoUrl = ""
       if (file) {
-        logoUrl = await uploadImage(file, `${Date.now().toString()}-${data.slug}/logo/${file.name}`)
+        logoUrl = await uploadImage(file, `${data.slug}/logo`)
       }
 
       await addRestaurant(

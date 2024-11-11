@@ -27,7 +27,10 @@ export const prepareMenuItemForUpdate = async (
 
   if (editedItem.newImage) {
     try {
-      preparedData.imgPath = await uploadImage(editedItem.newImage, restaurantSlug)
+      preparedData.imgPath = await uploadImage(
+        editedItem.newImage,
+        `${restaurantSlug}/items/${editedItem.dish}`
+      )
       hasChanges = true
     } catch (error) {
       console.error("Error uploading image:", error)

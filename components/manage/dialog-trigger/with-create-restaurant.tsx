@@ -3,6 +3,8 @@
 import React, { useState } from "react"
 import useMediaQuery from "@/hook/useMediaQuery"
 
+import { ScrollArea } from "@/components/ui/scroll-area"
+
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../ui/dialog"
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "../../ui/drawer"
 import RestaurantCreateForm from "../create-restaurants"
@@ -27,11 +29,13 @@ export default function WithCreateRestaurantDialog({
       {cloneChildren}{" "}
       {isDesktop ? (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
-          <DialogContent className="flex h-auto max-h-[95vh] w-full max-w-[95vw]  flex-col justify-center overflow-hidden border-none">
+          <DialogContent className="flex h-auto max-h-[95vh] w-full max-w-[95vw] flex-col justify-center border-none">
             <DialogHeader>
               <DialogTitle>Create Restaurant</DialogTitle>
             </DialogHeader>
-            <RestaurantCreateForm closeModal={onCloseModal} />
+            <ScrollArea className="h-[90vh]">
+              <RestaurantCreateForm closeModal={onCloseModal} />
+            </ScrollArea>
           </DialogContent>
         </Dialog>
       ) : (
