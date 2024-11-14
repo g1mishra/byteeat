@@ -82,6 +82,10 @@
     font-feature-settings: "rlig"1, "calt"1;
   }
 
+  html {
+    scroll-behavior: smooth;
+  }
+
   .subtitle-2 {
     font-size: .875rem;
     font-weight: 600;
@@ -116,10 +120,20 @@
   }
 
   @media screen and (max-width: 640px) {
+
     /* to fix iphone zoom issue */
     form input,
     form textarea {
-      @apply text-base;
+      @apply text-[16px];
+    }
+
+    form input:focus,
+    form textarea:focus {
+      @apply text-[16px];
     }
   }
+}
+
+@layer components {
+
 }

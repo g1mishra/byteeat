@@ -1,0 +1,59 @@
+.gradientText {
+    background: linear-gradient(to right, #4F46E5, #EC4899);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.heroGradient {
+    background: linear-gradient(to right, #4F46E5, #EC4899);
+}
+
+.sectionGradient {
+    background: linear-gradient(135deg, #F3F4FF 0%, #FDF2F8 100%);
+}
+
+.cardGradient {
+    background: linear-gradient(135deg, rgba(79, 70, 229, 0.1) 0%, rgba(236, 72, 153, 0.1) 100%);
+}
+
+.iconGradient {
+    background: linear-gradient(to right, #4F46E5, #EC4899);
+    padding: 8px;
+    border-radius: 8px;
+    color: white;
+}
+
+.statsCard {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(79, 70, 229, 0.1);
+}
+
+.testimonialCard {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(79, 70, 229, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.testimonialCard:hover {
+    transform: translateY(-5px);
+}
+
+.primaryButton {
+    background: linear-gradient(to right, #4F46E5, #EC4899);
+    @apply text-white px-6 py-2 inline-flex items-center justify-center rounded-full hover:opacity-90 transition-opacity font-semibold;
+}
+
+.secondaryButton {
+    @apply border-2 px-6 py-2 rounded-full transition-colors font-semibold inline-flex items-center gap-2;
+    border-color: #4F46E5;
+    color: #4F46E5;
+}
+
+.sectionTitle {
+    @apply text-3xl font-bold mb-4;
+    background: linear-gradient(to right, #4F46E5, #EC4899);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
