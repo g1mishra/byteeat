@@ -16,11 +16,12 @@ export default function Navbar() {
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center">
             <Image
+            
               src="/logo.png"
               width={80}
               height={80}
               className="object-contain"
-              alt="ByteEat"
+              alt="ByteEat | Digital Menu Creator & Restaurant Management System"
               priority
             />
           </div>
