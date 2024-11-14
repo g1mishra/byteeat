@@ -4,10 +4,10 @@ import styles from "@/styles/home.module.css"
 
 export default function Stats({ id }: { id: string }) {
   const stats = [
-    { number: "1000+", label: "Restaurants Served" },
-    { number: "50K+", label: "Digital Menus Created" },
-    { number: "1M+", label: "Orders Processed" },
-    { number: "98%", label: "Customer Satisfaction" },
+    { number: "10+", label: "Restaurants Served" },
+    { number: "50+", label: "Digital Menus Created" },
+    { number: "1000+", label: "Orders Processed" },
+    { number: "99%", label: "Customer Satisfaction" },
   ]
 
   return (

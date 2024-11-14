@@ -18,9 +18,9 @@ export default function Hero({ id }: { id: string }) {
               Transform Your Restaurant with
               <span className={styles.gradientText}> Smart Digital Menu</span> Solutions
             </h1>
+            {/* <h2>Digital Menu Creator & Restaurant Management System</h2> */}
             <p className="mb-8 max-w-2xl text-xl text-gray-600">
-              Streamline operations, enhance customer experience, and boost revenue with our digital
-              menu platform.
+            Create custom QR code menus, streamline operations, and boost revenue with our all-in-one restaurant management solution.
             </p>
             <div className="flex flex-col items-center justify-start gap-4 sm:flex-row md:justify-start">
               <Link href="/manage" className={cn(styles.primaryButton, "h-11 w-44")}>
@@ -37,7 +37,7 @@ export default function Hero({ id }: { id: string }) {
           <div className="md:w-1/2">
             <Image
               src="/Background1.png"
-              alt="Digital menu demonstration"
+              alt="Digital menu"
               className="max-w-full rounded-xl"
               width={1000}
               height={1000}

@@ -5,22 +5,22 @@ import styles from '@/styles/home.module.css';
 export default function Solutions({ id }: { id: string }) {
   const solutions = [
     {
-      icon: <Settings className="text-accent size-8" />,
-      title: 'Smart Digital Menu System',
+      icon: <QrCode className="text-accent size-8" />,
+      title: 'Digital Menu Creation System',
       description: 'Create, update, and manage your menu in real-time',
-      features: ['Real-time updates', 'Multi-language support', 'Rich media integration', 'Category management'],
+      features: ['Custom QR code menu generator','Real-time updates', 'Mobile-responsive design', 'Rich media integration', 'Category management'],
     },
     {
-      icon: <QrCode className="text-accent size-8" />,
-      title: 'Contactless QR Ordering',
+      icon: <Settings className="text-accent size-8" />,
+      title: 'Advanced Operations Solutions',
       description: 'Enable seamless ordering through customized QR codes',
-      features: ['Custom QR generation', 'Table-specific menus', 'Direct ordering system', 'Order tracking'],
+      features: ['Contactless ordering', 'Customer feedback system','Custom QR generation', 'Order management','Table-specific menus', 'Direct ordering system', 'Order tracking'],
     },
     {
       icon: <CreditCard className="text-accent size-8" />,
       title: 'Secure Payment Solutions',
       description: 'Offer multiple payment options for customer convenience',
-      features: ['Multiple payment methods', 'Secure transactions', 'Split bill feature', 'Digital receipts'],
+      features: ['Multiple payment methods', 'Secure transactions','Digital receipts','Direct Bill Printing'],
     },
   ];
 

@@ -28,7 +28,7 @@ const featureCategories = [
     title: "Business Operations",
     icon: <BarChart2 className="size-6" />,
     description: "Streamline operations with powerful management and analytics tools.",
-    features: ["Order management", "Analytics dashboard", "Inventory tracking", "Staff management"],
+    features: ["Order management", "Analytics dashboard", "All Order Tracking", "Staff management"],
     gradient: "from-purple-600 to-pink-600",
   },
   {
@@ -39,7 +39,6 @@ const featureCategories = [
       "Promotional offers",
       "Customer feedback",
       "Social media integration",
-      "Email marketing",
     ],
     gradient: "from-pink-600 to-rose-600",
   },

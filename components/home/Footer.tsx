@@ -37,8 +37,7 @@ export default function Footer() {
             </div>
 
             <p className="max-w-md text-left text-gray-600">
-              Transforming restaurants with smart digital menu solutions. Join thousands of
-              restaurants already using ByteEat.
+            Digital Menu Creator & Restaurant Management System
             </p>
           </div>
           {/* Quick Links */}
