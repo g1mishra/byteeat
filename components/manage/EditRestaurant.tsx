@@ -134,7 +134,6 @@ export default function EditRestaurant({ response }: { response: FetchRestaurant
       if (hasGeneralChanges) {
         const updateData: Partial<EditRestaurantFormValues> = {
           ...newInfo,
-          id: response?.id,
         }
 
         if (file) {
@@ -144,7 +143,9 @@ export default function EditRestaurant({ response }: { response: FetchRestaurant
           }
         }
 
-        updatePromises.push(updateRestaurant(updateData))
+        if (response?.id) {
+          updatePromises.push(updateRestaurant(response.id, updateData))
+        }
       }
 
       if (hasSocialChanges && response?.id) {

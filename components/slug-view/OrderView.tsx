@@ -5,7 +5,6 @@ import { fromatDate } from "@/lib/dateUtils"
 import { getOrderToken } from "@/lib/utils"
 import { OrderWithItems } from "@/services/order.services"
 import { OrderItem } from "@prisma/client"
-import { Decimal } from "@prisma/client/runtime/library"
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"
 
@@ -170,11 +169,10 @@ function OrderItems({ items }: { items: OrderItem[] | undefined }) {
   )
 }
 
-function OrderTotals({ total }: { total: Decimal }) {
-  const totalValue = Number(total)
+function OrderTotals({ total }: { total: number }) {
   return (
     <div className="mt-4">
-      <OrderTotal label="Total" value={`${totalValue.toFixed(2)}`} bold />
+      <OrderTotal label="Total" value={`${total.toFixed(2)}`} bold />
     </div>
   )
 }

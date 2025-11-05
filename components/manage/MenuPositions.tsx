@@ -2,7 +2,6 @@
 
 import { ItemCategory } from "@prisma/client"
 
-import "react-phone-input-2/lib/style.css"
 
 import { Table, TableBody, TableCell, TableHeader, TableRow } from "@/components/ui/table"
 
