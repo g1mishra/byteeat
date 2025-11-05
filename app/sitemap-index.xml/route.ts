@@ -2,7 +2,7 @@
 import { buildSitemapIndex, generateSitemaps } from "@/lib/sitemapUtils"
 import { NextResponse } from "next/server"
 
-const BASE_URL = "https://www.byteeat.in"
+const BASE_URL = "https://byteeat.vercel.app"
 
 export async function GET() {
   try {

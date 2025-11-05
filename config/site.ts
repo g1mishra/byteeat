@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 
 export const siteMetadata: Metadata = {
-  metadataBase: new URL(`https://www.byteeat.in`),
+  metadataBase: new URL(`https://byteeat.vercel.app`),
   alternates: {
     canonical: "./",
   },
@@ -35,14 +35,14 @@ export const siteMetadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_IN",
-    url: "https://www.byteeat.in",
+    url: "https://byteeat.vercel.app",
     siteName: "ByteEat",
     title: "ByteEat - Digital Menu Platform | Modern Restaurant Solutions",
     description:
       "Create stunning digital menus for your restaurant with ByteEat. Transform your traditional menu into an interactive digital experience with QR codes, instant updates, and seamless management.",
     images: [
       {
-        url: "https://www.byteeat.in/og-image.jpg",
+        url: "https://byteeat.vercel.app/og-image.png",
         width: 1200,
         height: 630,
         alt: "ByteEat - Digital Menu & Restaurant Management Platform",
@@ -56,7 +56,7 @@ export const siteMetadata: Metadata = {
     title: "ByteEat - Digital Menu Platform | Restaurant Menu Solutions",
     description:
       "Create and manage professional digital menus for your restaurant. ByteEat helps restaurants digitize their menus with QR codes, real-time updates, and interactive features.",
-    images: ["https://www.byteeat.in/og-image.jpg"],
+    images: ["https://byteeat.vercel.app/og-image.png"],
   },
   robots: {
     index: true,
@@ -72,7 +72,7 @@ export const siteMetadata: Metadata = {
   verification: {
     // google: "",
     other: {
-      me: ["https://www.byteeat.in"],
+      me: ["https://byteeat.vercel.app"],
     },
   },
   category: "Technology",

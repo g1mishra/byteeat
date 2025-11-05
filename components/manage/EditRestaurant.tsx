@@ -11,7 +11,6 @@ import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 
-import "react-phone-input-2/lib/style.css"
 
 import CenterLoading from "@/components/center-loading"
 import LogoOrAvatar from "@/components/logo-or-avatar"

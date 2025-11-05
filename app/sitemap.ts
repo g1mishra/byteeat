@@ -1,6 +1,6 @@
 import { MetadataRoute } from "next"
 
-const BASE_URL = "https://www.byteeat.in"
+const BASE_URL = "https://byteeat.vercel.app"
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
