@@ -1,20 +1,5 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
-import { useParams, useRouter } from "next/navigation"
-import {
-  addMenuItemHelper,
-  deleteMenuItemHelper,
-  updateMenuItemHelper,
-} from "@/services/helper.service"
-import { MenuItemI, fetchRestaurantAddons } from "@/services/menuService"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { ItemType } from "@prisma/client"
-import { PlusIcon, Trash2 } from "lucide-react"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
-
-import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
   Form,
@@ -35,6 +20,20 @@ import {
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/components/ui/use-toast"
+import { cn } from "@/lib/utils"
+import {
+  addMenuItemHelper,
+  deleteMenuItemHelper,
+  updateMenuItemHelper,
+} from "@/services/helper.service"
+import { MenuItemI, fetchRestaurantAddons } from "@/services/menuService"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { ItemType } from "@prisma/client"
+import { PlusIcon, Trash2 } from "lucide-react"
+import { useParams, useRouter } from "next/navigation"
+import { useEffect, useRef, useState } from "react"
+import { useForm } from "react-hook-form"
+import { z } from "zod"
 
 import CenterLoading from "../center-loading"
 import UploadItemImage from "./upload-item-image"
@@ -43,11 +42,14 @@ import uploadImage from "./utils/uploadImage"
 const PriceItemMap = z
   .array(
     z.object({
-      price: z.preprocess((x) => {
-        if (x === "" || x === undefined || x === null) return 0
-        const num = Number(x)
-        return isNaN(num) ? 0 : num
-      }, z.number().min(1, { message: "Price must be at least 1." })),
+      price: z.preprocess(
+        (x) => {
+          if (x === "" || x === undefined || x === null) return 0
+          const num = Number(x)
+          return isNaN(num) ? 0 : num
+        },
+        z.number().min(1, { message: "Price must be at least 1." })
+      ),
       portion: z.string().optional(),
       id: z.string().optional(),
       itemId: z.string().optional(),
@@ -163,7 +165,9 @@ export default function MenuItemForm({
         await addMenuItemHelper(data, restaurantId)
       }
 
-      toast({ title: `Item ${itemData ? "updated" : "created"} successfully.` })
+      toast({
+        title: `Item ${itemData ? "updated" : "created"} successfully.`,
+      })
       router.refresh()
       form.reset({})
       closeModal?.()
@@ -229,8 +233,8 @@ export default function MenuItemForm({
                     form.getValues().type === "FOOD"
                       ? "Main Course"
                       : form.getValues().type === "BEVERAGE"
-                      ? "Mocktail"
-                      : "Whiskey"
+                        ? "Mocktail"
+                        : "Whiskey"
                   })`}
                 />
               </FormControl>
@@ -334,8 +338,8 @@ export default function MenuItemForm({
                           form.getValues().type === "FOOD"
                             ? "Enter portion (ex. Half, Full)"
                             : form.getValues().type === "BEVERAGE"
-                            ? "Enter portion (10ml, 30ml, 60ml, etc.)"
-                            : "Enter portion (30ml, 60ml, 90ml, etc.)"
+                              ? "Enter portion (10ml, 30ml, 60ml, etc.)"
+                              : "Enter portion (30ml, 60ml, 90ml, etc.)"
                         }
                         value={item.portion || ""}
                         onChange={(e) => {

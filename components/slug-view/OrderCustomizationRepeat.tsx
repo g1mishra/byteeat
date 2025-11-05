@@ -1,11 +1,10 @@
-import React, { useCallback, useEffect } from "react"
-import { MenuItemI } from "@/services/menuService"
-import { ChevronRight, Plus } from "lucide-react"
-
-import { Cart } from "@/lib/types"
+import { useCart } from "@/app/store/CartProvider"
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer"
 import VegOrNonVeg from "@/components/veg-or-nonveg"
-import { useCart } from "@/app/store/CartProvider"
+import { Cart } from "@/lib/types"
+import { MenuItemI } from "@/services/menuService"
+import { ChevronRight, Plus } from "lucide-react"
+import React, { useCallback, useEffect } from "react"
 
 import QuantityActionButton from "../QuantityActionBtn"
 import { OrderCustomizationModalEditMeta } from "./OrderCustomizationModal"
@@ -18,6 +17,11 @@ interface OrderCustomizationRepeatProps {
   setOpen: (open: boolean) => void
   onEditCustomization: (editMeta: OrderCustomizationModalEditMeta) => void
   onAddNewCustomization: () => void
+  theme?: {
+    buttonStyle: "rounded" | "square" | "pill"
+    primaryColor: string
+    secondaryColor: string
+  }
 }
 
 const OrderCustomizationRepeat: React.FC<OrderCustomizationRepeatProps> = ({
@@ -27,6 +31,7 @@ const OrderCustomizationRepeat: React.FC<OrderCustomizationRepeatProps> = ({
   setOpen,
   onEditCustomization,
   onAddNewCustomization,
+  theme,
 }) => {
   const setCart = useCart()((state) => state.setCart)
   const cart = useCart()((state) => state.cart)
@@ -52,6 +57,13 @@ const OrderCustomizationRepeat: React.FC<OrderCustomizationRepeatProps> = ({
       setOpen(false)
     }
   }, [selectedItems, setOpen])
+
+  const buttonClasses =
+    theme?.buttonStyle === "pill"
+      ? "rounded-full"
+      : theme?.buttonStyle === "square"
+        ? "rounded-none"
+        : "rounded-md"
 
   return (
     <Drawer open={isOpen} onOpenChange={setOpen}>
@@ -112,7 +124,11 @@ const OrderCustomizationRepeat: React.FC<OrderCustomizationRepeatProps> = ({
           </div>
           {variant === "increment" && (
             <button
-              className="mt-4 flex w-full items-center justify-center rounded-md bg-green-50 py-2 text-center text-base font-medium capitalize text-green-700"
+              className={`mt-4 flex w-full items-center justify-center ${buttonClasses} py-2 text-center text-base font-medium capitalize`}
+              style={{
+                backgroundColor: theme?.primaryColor,
+                color: theme?.secondaryColor,
+              }}
               onClick={onAddNewCustomization}
             >
               <Plus size={16} className="mr-2" />

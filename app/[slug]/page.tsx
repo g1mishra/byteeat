@@ -1,16 +1,33 @@
-import { Metadata, ResolvingMetadata } from "next"
-import { notFound, redirect } from "next/navigation"
-import { MenuItemI } from "@/services/menuService"
-import { FullAdress, fetchRestaurantBySlug } from "@/services/restaurantService"
-
-import { formatAddress } from "@/lib/string"
-import { getBasePath } from "@/lib/utils"
 import LogoOrAvatar from "@/components/logo-or-avatar"
+import { ThemeFormValues } from "@/components/manage/RestaurantTheme"
 import { Sidebar } from "@/components/sidebar"
 import MenuView from "@/components/slug-view/MenuView"
+import { formatAddress } from "@/lib/string"
+import { getBasePath } from "@/lib/utils"
+import { MenuItemI } from "@/services/menuService"
+import { FullAdress, fetchRestaurantBySlug } from "@/services/restaurantService"
+import { Metadata, ResolvingMetadata } from "next"
+import { notFound, redirect } from "next/navigation"
 
 export interface OrganizedMenu {
   [category: string]: MenuItemI[]
+}
+
+// Helper function to get theme-based styles
+const getThemeStyles = (theme: ThemeFormValues) => {
+  if (!theme) return {}
+
+  return {
+    "--background-color": theme.backgroundColor || "#f5f5f5",
+    "--primary-color": theme.primaryColor || "#000000",
+    "--secondary-color": theme.secondaryColor || "#ffffff",
+    fontFamily:
+      theme.fontFamily === "inter"
+        ? "'Inter', sans-serif"
+        : theme.fontFamily === "poppins"
+          ? "'Poppins', sans-serif"
+          : "'Roboto', sans-serif",
+  } as React.CSSProperties
 }
 
 const Welcome = async ({
@@ -36,7 +53,10 @@ const Welcome = async ({
     return redirect(getBasePath(slug))
   }
 
+  const theme = restaurant.theme as ThemeFormValues
+
   const address = formatAddress(restaurant as FullAdress)
+  const themeStyles = getThemeStyles(theme)
 
   return (
     <>
@@ -52,7 +72,9 @@ const Welcome = async ({
             <LogoOrAvatar src={restaurant.logoUrl} name={restaurant.name} className="max-w-52" />
           </div>
           <div className="flex flex-col items-center">
-            <h1 className="text-2xl font-bold text-gray-800">{restaurant.name}</h1>
+            <h1 className="text-2xl font-bold" style={{ color: "var(--primary-color)" }}>
+              {restaurant.name}
+            </h1>
             <p className="text-sm font-light text-gray-500">{address}</p>
           </div>
         </div>
@@ -60,6 +82,13 @@ const Welcome = async ({
           <MenuView
             data={restaurant.ItemCategory}
             selfOrdering={restaurant?.selfOrdering || false}
+            theme={{
+              menuStyle: theme?.menuStyle || "grid",
+              buttonStyle: theme?.buttonStyle || "rounded",
+              primaryColor: theme?.primaryColor || "#000000",
+              secondaryColor: theme?.secondaryColor || "#ffffff",
+              fontFamily: theme?.fontFamily || "inter",
+            }}
           />
         ) : null}
       </div>

@@ -1,8 +1,7 @@
-import Link from "next/link"
-
-import { cn, getBasePath } from "@/lib/utils"
-import { buttonVariants } from "@/components/ui/button"
 import AnimatingEmoji from "@/components/rolling_emojis"
+import { buttonVariants } from "@/components/ui/button"
+import { cn, getBasePath } from "@/lib/utils"
+import Link from "next/link"
 
 export default function NotFound() {
   return (
@@ -11,7 +10,7 @@ export default function NotFound() {
         <div className="flex flex-1 flex-col items-center justify-center gap-4 text-center lg:gap-8">
           <div className="space-y-4">
             <h1 className="text-4xl font-bold lg:text-6xl">ByteEat {<AnimatingEmoji />}</h1>
-            <h2 className="text-muted-foreground text-lg font-light lg:text-3xl">
+            <h2 className="text-lg font-light text-muted-foreground lg:text-3xl">
               Our ByteEat couldn&apos;t find the page you are looking for.
             </h2>
           </div>

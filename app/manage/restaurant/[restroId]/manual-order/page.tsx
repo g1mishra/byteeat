@@ -1,16 +1,11 @@
+import { authOptions } from "@/app/api/auth/authOption"
+import UnAuthorized from "@/components/UnAuthorized"
 import { fetchRestaurant } from "@/services/restaurantService"
 import { getServerSession } from "next-auth"
 
-import UnAuthorized from "@/components/UnAuthorized"
-import { authOptions } from "@/app/api/auth/authOption"
-
 import QuickOrder from "./QuickOrder"
 
-export default async function OfflineOrdersPage({
-  params,
-}: {
-  params: { restroId: string }
-}) {
+export default async function OfflineOrdersPage({ params }: { params: { restroId: string } }) {
   const { restroId } = params
 
   const session = await getServerSession(authOptions)

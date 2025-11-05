@@ -1,7 +1,6 @@
 import { Order } from "@prisma/client"
 import { useCallback, useEffect } from "react"
 
-
 export function useNotifications() {
   useEffect(() => {
     const requestNotificationPermission = async () => {

@@ -1,17 +1,17 @@
-import AWS from "aws-sdk"
+import { v2 as cloudinary } from "cloudinary"
 
 if (
-  !process.env.AWS_S3_ACCESS_KEY_ID ||
-  !process.env.AWS_S3_SECRET_ACCESS_KEY ||
-  !process.env.AWS_S3_REGION
+  !process.env.CLOUDINARY_CLOUD_NAME ||
+  !process.env.CLOUDINARY_API_KEY ||
+  !process.env.CLOUDINARY_API_SECRET
 ) {
-  throw new Error("AWS S3 configuration environment variables are not set")
+  throw new Error("Cloudinary configuration environment variables are not set")
 }
 
-const s3 = new AWS.S3({
-  accessKeyId: process.env.AWS_S3_ACCESS_KEY_ID,
-  secretAccessKey: process.env.AWS_S3_SECRET_ACCESS_KEY,
-  region: process.env.AWS_S3_REGION,
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
 })
 
-export default s3
+export default cloudinary

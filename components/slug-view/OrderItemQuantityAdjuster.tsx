@@ -1,21 +1,35 @@
-import React from "react"
-
 import { cn } from "@/lib/utils"
+import React from "react"
 
 import QuantityActionButton from "../QuantityActionBtn"
 import { QuantityControlAction } from "./util"
+
+interface OrderItemQuantityAdjusterProps {
+  quantity: number
+  className?: string
+  addBtnClassName?: string
+  onQuantityChange: (action: QuantityControlAction) => void
+  theme?: {
+    buttonStyle: "rounded" | "square" | "pill"
+    primaryColor: string
+    secondaryColor: string
+  }
+}
 
 const OrderItemQuantityAdjuster = ({
   quantity,
   className = "",
   addBtnClassName = "",
   onQuantityChange,
-}: {
-  quantity: number
-  className?: string
-  addBtnClassName?: string
-  onQuantityChange: (action: QuantityControlAction) => void
-}) => {
+  theme,
+}: OrderItemQuantityAdjusterProps) => {
+  const buttonClasses =
+    theme?.buttonStyle === "pill"
+      ? "rounded-full"
+      : theme?.buttonStyle === "square"
+        ? "rounded-none"
+        : "rounded-md"
+
   return (
     <React.Fragment>
       {quantity > 0 ? (
@@ -26,7 +40,11 @@ const OrderItemQuantityAdjuster = ({
         />
       ) : (
         <button
-          className={cn("pr-4 text-xs font-semibold text-orange-300", addBtnClassName)}
+          className={cn("px-4 py-1 text-xs font-semibold", buttonClasses, addBtnClassName)}
+          style={{
+            backgroundColor: theme?.primaryColor,
+            color: theme?.secondaryColor,
+          }}
           onClick={() => onQuantityChange(QuantityControlAction.INCREMENT)}
         >
           ADD

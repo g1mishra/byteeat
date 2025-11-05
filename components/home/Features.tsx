@@ -1,109 +1,95 @@
+import { Badge } from "@/components/ui/badge"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { BarChart2, Check, Code2, LayoutGrid, Users } from "lucide-react"
 import React from "react"
-import { BarChart2, LayoutGrid, Megaphone, Users } from "lucide-react"
-
-import styles from "@/styles/home.module.css"
 
 const featureCategories = [
   {
     title: "Menu Management",
-    icon: <LayoutGrid className="size-6" />,
+    icon: LayoutGrid,
     description:
-      "Effortlessly manage your digital menu with real-time updates and rich media support.",
+      "Full CRUD operations for menu items with category organization and image uploads.",
     features: [
       "Digital menu creation",
       "Real-time updates",
       "Category organization",
-      "Special offers management",
+      "Cloudinary image integration",
     ],
-    gradient: "from-blue-500 to-indigo-600",
   },
   {
     title: "Customer Experience",
-    icon: <Users className="size-6" />,
-    description: "Enhance dining experience with intuitive navigation and personalized options.",
-    features: ["Easy navigation", "Multi-language support", "Dietary filters", "Image gallery"],
-    gradient: "from-indigo-600 to-purple-600",
+    icon: Users,
+    description: "QR code-based ordering system with intuitive UI and responsive design.",
+    features: ["QR code ordering", "Responsive design", "Shopping cart", "Order history"],
   },
   {
     title: "Business Operations",
-    icon: <BarChart2 className="size-6" />,
-    description: "Streamline operations with powerful management and analytics tools.",
-    features: ["Order management", "Analytics dashboard", "All Order Tracking", "Staff management"],
-    gradient: "from-purple-600 to-pink-600",
+    icon: BarChart2,
+    description: "Comprehensive dashboard with real-time order tracking and analytics.",
+    features: ["Order management", "Real-time updates", "Analytics dashboard", "Staff roles"],
   },
   {
-    title: "Marketing Tools",
-    icon: <Megaphone className="size-6" />,
-    description: "Grow your business with integrated marketing and promotion features.",
+    title: "Technical Stack",
+    icon: Code2,
+    description: "Built with modern technologies and best practices for scalability.",
     features: [
-      "Promotional offers",
-      "Customer feedback",
-      "Social media integration",
+      "Next.js 14 (App Router)",
+      "MongoDB + Prisma ORM",
+      "TypeScript",
+      "TailwindCSS + shadcn/ui",
     ],
-    gradient: "from-pink-600 to-rose-600",
   },
 ]
+
 export default function Features({ id }: { id: string }) {
   return (
-    <div className="bg-white py-24" id={id}>
+    <div className="bg-background py-24" id={id}>
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="mb-16 text-center">
-          <h2 className={styles.sectionTitle}>Features That Set Us Apart</h2>
-          <p className="mx-auto max-w-2xl text-lg text-gray-600">
-            Comprehensive tools and features designed to revolutionize your restaurant operations
+        <div className="mb-16 space-y-4 text-center">
+          <Badge variant="secondary" className="mb-4">
+            Features
+          </Badge>
+          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
+            Key Features & Technologies
+          </h2>
+          <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
+            A showcase of modern web development practices and full-stack capabilities
           </p>
         </div>
 
-        <div className="grid gap-8 md:grid-cols-2">
-          {featureCategories.map((category, index) => (
-            <div
-              key={index}
-              className="group relative overflow-hidden rounded-2xl border border-gray-100 bg-white transition-all duration-300 hover:border-gray-200 hover:shadow-xl"
-            >
-              {/* Gradient Background Overlay */}
-              <div
-                className={`absolute inset-0 bg-gradient-to-r ${category.gradient} opacity-0 transition-opacity duration-300 group-hover:opacity-5`}
-              />
-
-              <div className="p-8">
-                {/* Header */}
-                <div className="mb-6 flex items-center">
-                  <div
-                    className={`rounded-xl bg-gradient-to-r p-3 ${category.gradient} text-white`}
-                  >
-                    {category.icon}
-                  </div>
-                  <h3 className="ml-4 text-xl font-semibold text-gray-900">{category.title}</h3>
-                </div>
-
-                {/* Description */}
-                <p className="mb-6 text-gray-600">{category.description}</p>
-
-                {/* Features Grid */}
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  {category.features.map((feature, idx) => (
-                    <div key={idx} className="flex items-center space-x-2 text-gray-700">
-                      <svg
-                        className={`size-5 shrink-0 bg-gradient-to-r ${category.gradient} rounded-full p-1`}
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        strokeWidth={2}
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M5 13l4 4L19 7"
-                          className="text-white"
-                        />
-                      </svg>
-                      <span className="text-sm">{feature}</span>
+        <div className="grid gap-6 md:grid-cols-2 lg:gap-8">
+          {featureCategories.map((category, index) => {
+            const Icon = category.icon
+            return (
+              <Card
+                key={index}
+                className="group transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+              >
+                <CardHeader>
+                  <div className="mb-2 flex items-center gap-4">
+                    <div className="rounded-xl bg-primary p-3 text-primary-foreground transition-transform duration-300 group-hover:scale-110">
+                      <Icon className="size-6" />
                     </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          ))}
+                    <CardTitle className="text-xl">{category.title}</CardTitle>
+                  </div>
+                  <CardDescription className="text-base">{category.description}</CardDescription>
+                </CardHeader>
+
+                <CardContent>
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                    {category.features.map((feature, idx) => (
+                      <div key={idx} className="flex items-center gap-2 text-sm">
+                        <div className="flex size-5 items-center justify-center rounded-full bg-primary/10">
+                          <Check className="size-3 text-primary" strokeWidth={3} />
+                        </div>
+                        <span className="text-muted-foreground">{feature}</span>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )
+          })}
         </div>
       </div>
     </div>

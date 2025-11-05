@@ -1,9 +1,3 @@
-import { fetchRestaurantSubscriptionStatus } from "@/services/restaurantService"
-import { ExclamationTriangleIcon } from "@radix-ui/react-icons"
-import { HomeIcon } from "lucide-react"
-import Link from "next/link"
-import { notFound, redirect } from "next/navigation"
-
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -14,6 +8,11 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { getBasePath, getPathWithQuery } from "@/lib/utils"
+import { fetchRestaurantSubscriptionStatus } from "@/services/restaurantService"
+import { ExclamationTriangleIcon } from "@radix-ui/react-icons"
+import { HomeIcon } from "lucide-react"
+import Link from "next/link"
+import { notFound, redirect } from "next/navigation"
 
 const SubscriptionExpiredPage = async ({ params: { slug } }: any) => {
   let subscriptionStatus = { isActive: false }

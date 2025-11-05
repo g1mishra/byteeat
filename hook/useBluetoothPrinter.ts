@@ -1,15 +1,13 @@
-import { useEffect } from "react"
-
-import { useToast } from "@/components/ui/use-toast"
 import { bluetoothPrinterStore } from "@/app/store"
+import { useToast } from "@/components/ui/use-toast"
+import { useEffect } from "react"
 
 const PRINT_SERVICE_UUID = "000018f0-0000-1000-8000-00805f9b34fb"
 const PRINT_CHARACTERISTIC_UUID = "00002af1-0000-1000-8000-00805f9b34fb"
 
 export function useBluetoothPrinter() {
   const { toast } = useToast()
-  const { server, setServer, isConnected, setIsConnected } =
-    bluetoothPrinterStore()
+  const { server, setServer, isConnected, setIsConnected } = bluetoothPrinterStore()
 
   useEffect(() => {
     const checkConnection = async () => {
@@ -59,9 +57,7 @@ export function useBluetoothPrinter() {
       }
 
       const service = await server.getPrimaryService(PRINT_SERVICE_UUID)
-      const characteristic = await service.getCharacteristic(
-        PRINT_CHARACTERISTIC_UUID
-      )
+      const characteristic = await service.getCharacteristic(PRINT_CHARACTERISTIC_UUID)
       await characteristic.writeValue(new TextEncoder().encode(receiptData))
       console.log("Print command sent successfully.")
       toast({

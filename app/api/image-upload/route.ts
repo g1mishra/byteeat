@@ -1,7 +1,7 @@
+import cloudinary from "@/lib/aws-s3-client"
+import { UploadApiResponse } from "cloudinary"
 import { NextResponse } from "next/server"
 import sharp from "sharp"
-
-import s3 from "@/lib/aws-s3-client"
 
 export async function POST(request: Request) {
   const formData = await request.formData()
@@ -25,27 +25,25 @@ export async function POST(request: Request) {
       resized = await sharp(filebuffer).resize(500, 500).toBuffer()
     } catch (error) {
       console.error("Error resizing image: ", error)
-      return NextResponse.json(
-        { error: "Error resizing image" },
-        { status: 500 }
-      )
+      return NextResponse.json({ error: "Error resizing image" }, { status: 500 })
     }
   }
 
   try {
-    const params = {
-      Bucket: "byteeat",
-      Key: `${slug}/${file.name}`,
-      Body: resized || filebuffer,
-    }
-    const resp = await s3.upload(params).promise()
-    const url = resp.Location
+    // Convert buffer to base64 for Cloudinary upload
+    const base64Image = `data:${file.type};base64,${(resized || filebuffer).toString("base64")}`
+
+    // Upload to Cloudinary
+    const result: UploadApiResponse = await cloudinary.uploader.upload(base64Image, {
+      folder: `byteeat/${slug}`,
+      public_id: file.name.split(".")[0],
+      resource_type: "auto",
+    })
+
+    const url = result.secure_url
 
     if (!url) {
-      return NextResponse.json(
-        { error: "Error uploading file" },
-        { status: 500 }
-      )
+      return NextResponse.json({ error: "Error uploading file" }, { status: 500 })
     }
 
     return NextResponse.json({ url })

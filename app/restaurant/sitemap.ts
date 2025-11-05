@@ -1,7 +1,6 @@
-import type { MetadataRoute } from "next"
-
 import prisma from "@/lib/prisma"
 import { getBasePath } from "@/lib/utils"
+import type { MetadataRoute } from "next"
 
 const BASE_URL = "https://www.byteeat.in"
 

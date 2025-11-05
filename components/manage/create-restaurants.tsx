@@ -1,17 +1,5 @@
 "use client"
 
-import React, { useState } from "react"
-import Image from "next/image"
-import { useRouter } from "next/navigation"
-import { addRestaurant, getRestaurantIdBySlug } from "@/services/restaurantService"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { InfoIcon, Loader2Icon, Pencil } from "lucide-react"
-import { useSession } from "next-auth/react"
-import { useForm } from "react-hook-form"
-import slugify from "slugify"
-import { z } from "zod"
-
-import { RESERVED_SLUGS, debounce } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
   Form,
@@ -23,6 +11,17 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { useToast } from "@/components/ui/use-toast"
+import { RESERVED_SLUGS, debounce } from "@/lib/utils"
+import { addRestaurant, getRestaurantIdBySlug } from "@/services/restaurantService"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { InfoIcon, Loader2Icon, Pencil } from "lucide-react"
+import { useSession } from "next-auth/react"
+import Image from "next/image"
+import { useRouter } from "next/navigation"
+import React, { useState } from "react"
+import { useForm } from "react-hook-form"
+import slugify from "slugify"
+import { z } from "zod"
 
 import CenterLoading from "../center-loading"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select"
@@ -36,7 +35,9 @@ const MAX_SLUG_LENGTH = 50
 const slugSchema = z
   .string()
   .min(1, { message: "Slug is required." })
-  .max(MAX_SLUG_LENGTH, { message: `Slug must be ${MAX_SLUG_LENGTH} characters or less.` })
+  .max(MAX_SLUG_LENGTH, {
+    message: `Slug must be ${MAX_SLUG_LENGTH} characters or less.`,
+  })
   .refine((slug) => /^[a-z]/.test(slug), {
     message: "Slug must start with a lowercase letter.",
   })
@@ -204,7 +205,7 @@ export default function RestaurantCreateForm({ closeModal }: RestaurantCreateFor
                 <div>
                   <h3 className="text-lg font-semibold">
                     Restaurant Logo{" "}
-                    <span className="text-muted-foreground text-sm font-normal">(Optional)</span>
+                    <span className="text-sm font-normal text-muted-foreground">(Optional)</span>
                   </h3>
                   <p className="text-sm text-gray-500">Upload your restaurant logo image</p>
                 </div>
@@ -411,7 +412,7 @@ export default function RestaurantCreateForm({ closeModal }: RestaurantCreateFor
               render={({ field }) => (
                 <FormItem className="sm:col-span-2">
                   <FormLabel className="inline-flex items-center gap-2">
-                    Street Address <span className="text-muted-foreground text-sm">(Optional)</span>
+                    Street Address <span className="text-sm text-muted-foreground">(Optional)</span>
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger type="button">
@@ -432,7 +433,7 @@ export default function RestaurantCreateForm({ closeModal }: RestaurantCreateFor
             />
           </div>
 
-          <div className="bg-background sticky bottom-0 mt-6 flex justify-center gap-2 border-t px-4 pt-4 sm:justify-end">
+          <div className="sticky bottom-0 mt-6 flex justify-center gap-2 border-t bg-background px-4 pt-4 sm:justify-end">
             <Button className="min-w-[120px]" type="button" variant="outline" onClick={closeModal}>
               Cancel
             </Button>

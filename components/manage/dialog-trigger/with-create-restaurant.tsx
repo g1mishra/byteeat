@@ -1,9 +1,8 @@
 "use client"
 
-import React, { useState } from "react"
-import useMediaQuery from "@/hook/useMediaQuery"
-
 import { ScrollArea } from "@/components/ui/scroll-area"
+import useMediaQuery from "@/hook/useMediaQuery"
+import React, { useState } from "react"
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../ui/dialog"
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "../../ui/drawer"

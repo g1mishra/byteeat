@@ -72,7 +72,9 @@ export const generateWaiterKey = () => {
 
 export const generateReceipt = (
   slug: string | undefined,
-  orderItems: (OrderItem & { addons: { id: string; name: string; price: number }[] })[],
+  orderItems: (OrderItem & {
+    addons: { id: string; name: string; price: number }[]
+  })[],
   subtotal: string,
   total: string,
   discount: number,

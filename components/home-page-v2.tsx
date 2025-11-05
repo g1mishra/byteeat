@@ -1,6 +1,3 @@
-import { JSX, SVGProps } from "react"
-import Image from "next/image"
-import Link from "next/link"
 import {
   BarChartIcon,
   CheckIcon,
@@ -13,6 +10,9 @@ import {
   UsersIcon,
   ZapIcon,
 } from "lucide-react"
+import Image from "next/image"
+import Link from "next/link"
+import { JSX, SVGProps } from "react"
 
 import { Button } from "./ui/button"
 import { Container } from "./ui/container"
@@ -37,26 +37,26 @@ export default function HomePageV2() {
             <nav className="hidden items-center space-x-8 md:flex">
               <Link
                 href="#features"
-                className="hover:text-main text-sm font-medium text-gray-700 transition-colors"
+                className="text-sm font-medium text-gray-700 transition-colors hover:text-main"
                 prefetch={false}
               >
                 Features
               </Link>
               <Link
                 href="#benefits"
-                className="hover:text-main text-sm font-medium text-gray-700 transition-colors"
+                className="text-sm font-medium text-gray-700 transition-colors hover:text-main"
                 prefetch={false}
               >
                 Benefits
               </Link>
               <Link
                 href="#pricing"
-                className="hover:text-main text-sm font-medium text-gray-700 transition-colors"
+                className="text-sm font-medium text-gray-700 transition-colors hover:text-main"
                 prefetch={false}
               >
                 Pricing
               </Link>
-              <Button size="sm" variant="default" className="shadow-main/25 shadow-lg" asChild>
+              <Button size="sm" variant="default" className="shadow-lg shadow-main/25" asChild>
                 <Link href="/manage" prefetch={false}>
                   Get Started
                 </Link>
@@ -73,13 +73,13 @@ export default function HomePageV2() {
         {/* Hero Section with 3D Elements */}
         <section className="relative overflow-hidden bg-zinc-900 py-24 md:py-32">
           <div className="absolute inset-0 z-0">
-            <div className="from-main/20 absolute inset-0 bg-gradient-to-r to-purple-500/20 mix-blend-multiply" />
+            <div className="absolute inset-0 bg-gradient-to-r from-main/20 to-purple-500/20 mix-blend-multiply" />
             <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-30" />
           </div>
           <Container className="relative z-10">
             <div className="mx-auto max-w-screen-lg text-center">
               <div className="mb-6 inline-flex rounded-full bg-white/10 px-6 py-2 backdrop-blur-xl">
-                <span className="to-main bg-gradient-to-r from-yellow-300 bg-clip-text text-sm font-medium text-transparent">
+                <span className="bg-gradient-to-r from-yellow-300 to-main bg-clip-text text-sm font-medium text-transparent">
                   Trusted by 1000+ Restaurants Worldwide
                 </span>
               </div>
@@ -98,8 +98,8 @@ export default function HomePageV2() {
                   size="lg"
                   className="group relative h-14 overflow-hidden rounded-xl bg-white px-8 shadow-2xl shadow-white/25"
                 >
-                  <div className="from-main absolute inset-0 bg-gradient-to-r to-purple-600 opacity-0 transition-opacity group-hover:opacity-100" />
-                  <span className="from-main relative z-10 bg-gradient-to-r to-purple-600 bg-clip-text text-lg font-semibold text-transparent group-hover:text-white">
+                  <div className="absolute inset-0 bg-gradient-to-r from-main to-purple-600 opacity-0 transition-opacity group-hover:opacity-100" />
+                  <span className="relative z-10 bg-gradient-to-r from-main to-purple-600 bg-clip-text text-lg font-semibold text-transparent group-hover:text-white">
                     Create Your Digital Menu
                   </span>
                 </Button>
@@ -139,7 +139,7 @@ export default function HomePageV2() {
         <section className="border-y border-gray-200 bg-white py-16">
           <Container>
             <div className="text-center">
-              <span className="text-main mb-2 block text-sm font-semibold uppercase tracking-wider">
+              <span className="mb-2 block text-sm font-semibold uppercase tracking-wider text-main">
                 Trusted by Leading Restaurants
               </span>
               <div className="mt-8 flex flex-wrap items-center justify-center gap-x-12 gap-y-8">
@@ -158,7 +158,7 @@ export default function HomePageV2() {
           <div className="absolute inset-0 bg-gradient-to-b from-zinc-50/50 to-white/95" />
           <Container className="relative z-10">
             <div className="mb-16 text-center">
-              <span className="bg-main/10 text-main mb-4 inline-block rounded-full px-4 py-1.5 text-sm font-semibold">
+              <span className="mb-4 inline-block rounded-full bg-main/10 px-4 py-1.5 text-sm font-semibold text-main">
                 Powerful Features
               </span>
               <h2 className="mb-4 text-3xl font-bold md:text-4xl lg:text-5xl">
@@ -216,7 +216,7 @@ export default function HomePageV2() {
           <Container>
             <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
               <div className="relative">
-                <div className="bg-main/30 absolute -left-4 -top-4 size-72 rounded-full blur-3xl" />
+                <div className="absolute -left-4 -top-4 size-72 rounded-full bg-main/30 blur-3xl" />
                 <div className="absolute -bottom-8 -right-8 size-72 rounded-full bg-purple-500/30 blur-3xl" />
                 <div className="relative rounded-2xl bg-white/10 p-2 backdrop-blur-xl">
                   <Image
@@ -229,7 +229,7 @@ export default function HomePageV2() {
                 </div>
               </div>
               <div className="relative">
-                <span className="bg-main/20 text-main mb-4 inline-block rounded-full px-4 py-1.5 text-sm font-semibold">
+                <span className="mb-4 inline-block rounded-full bg-main/20 px-4 py-1.5 text-sm font-semibold text-main">
                   Why Choose ByteEat
                 </span>
                 <h2 className="mb-6 text-3xl font-bold text-white md:text-4xl">
@@ -262,7 +262,7 @@ export default function HomePageV2() {
         <section className="py-24 lg:py-32">
           <Container>
             <div className="mb-16 text-center">
-              <span className="bg-main/10 text-main mb-4 inline-block rounded-full px-4 py-1.5 text-sm font-semibold">
+              <span className="mb-4 inline-block rounded-full bg-main/10 px-4 py-1.5 text-sm font-semibold text-main">
                 Success Stories
               </span>
               <h2 className="mb-4 text-3xl font-bold md:text-4xl">
@@ -301,7 +301,7 @@ export default function HomePageV2() {
           <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
           <Container className="relative">
             <div className="mb-16 text-center">
-              <span className="bg-main/20 text-main mb-4 inline-block rounded-full px-4 py-1.5 text-sm font-semibold">
+              <span className="mb-4 inline-block rounded-full bg-main/20 px-4 py-1.5 text-sm font-semibold text-main">
                 Simple Pricing
               </span>
               <h2 className="mb-4 text-3xl font-bold text-white md:text-4xl">
@@ -361,7 +361,7 @@ export default function HomePageV2() {
         <section className="py-24">
           <Container>
             <div className="text-center">
-              <span className="bg-main/10 text-main mb-4 inline-block rounded-full px-4 py-1.5 text-sm font-semibold">
+              <span className="mb-4 inline-block rounded-full bg-main/10 px-4 py-1.5 text-sm font-semibold text-main">
                 Seamless Integration
               </span>
               <h2 className="mb-4 text-3xl font-bold md:text-4xl">
@@ -386,9 +386,9 @@ export default function HomePageV2() {
         </section>
 
         {/* CTA Section */}
-        <section className="bg-main relative overflow-hidden py-24 lg:py-32">
+        <section className="relative overflow-hidden bg-main py-24 lg:py-32">
           <div className="absolute inset-0">
-            <div className="from-main absolute inset-0 bg-gradient-to-r to-purple-600 opacity-90" />
+            <div className="absolute inset-0 bg-gradient-to-r from-main to-purple-600 opacity-90" />
             <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-20" />
           </div>
           <Container className="relative">
@@ -406,7 +406,7 @@ export default function HomePageV2() {
                   className="group relative h-14 w-full overflow-hidden rounded-xl bg-white px-8 sm:w-auto"
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-yellow-400 to-orange-500 opacity-0 transition-opacity group-hover:opacity-100" />
-                  <span className="text-main relative z-10 text-lg font-semibold group-hover:text-white">
+                  <span className="relative z-10 text-lg font-semibold text-main group-hover:text-white">
                     Start Free Trial
                   </span>
                 </Button>
@@ -519,8 +519,8 @@ function FeatureCard({
 function BenefitItem({ title, description }: { title: string; description: string }) {
   return (
     <div className="flex items-start space-x-4">
-      <div className="bg-main/20 rounded-full p-2">
-        <CheckIcon className="text-main size-6" />
+      <div className="rounded-full bg-main/20 p-2">
+        <CheckIcon className="size-6 text-main" />
       </div>
       <div>
         <h3 className="mb-2 text-lg font-semibold text-white">{title}</h3>
@@ -585,7 +585,7 @@ function PricingCard({
       } p-8 transition-transform hover:-translate-y-1`}
     >
       {featured && (
-        <div className="bg-main absolute -top-4 left-1/2 -translate-x-1/2 rounded-full px-4 py-1 text-sm font-semibold text-white">
+        <div className="absolute -top-4 left-1/2 -translate-x-1/2 rounded-full bg-main px-4 py-1 text-sm font-semibold text-white">
           Most Popular
         </div>
       )}
@@ -610,7 +610,7 @@ function PricingCard({
       <Button
         className={`w-full ${
           featured
-            ? "from-main hover:from-main/90 bg-gradient-to-r to-purple-600 text-white hover:to-purple-600/90"
+            ? "bg-gradient-to-r from-main to-purple-600 text-white hover:from-main/90 hover:to-purple-600/90"
             : "bg-white/10 text-white hover:bg-white/20"
         }`}
       >
@@ -635,7 +635,7 @@ function FooterLinks({
           <li key={link.label}>
             <Link
               href={link.href}
-              className="hover:text-main text-gray-600 transition-colors"
+              className="text-gray-600 transition-colors hover:text-main"
               prefetch={false}
             >
               {link.label}

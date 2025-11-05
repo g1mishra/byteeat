@@ -1,5 +1,5 @@
-import dynamic from "next/dynamic"
 import { Role, User } from "@prisma/client"
+import dynamic from "next/dynamic"
 
 import { Button } from "../ui/button"
 
@@ -13,13 +13,7 @@ const WithJoinRestaurantDialog = dynamic(
   { ssr: false }
 )
 
-const NoRestaurant = ({
-  className = "",
-  user,
-}: {
-  className?: string
-  user: User
-}) => {
+const NoRestaurant = ({ className = "", user }: { className?: string; user: User }) => {
   return (
     <>
       <div
@@ -27,13 +21,12 @@ const NoRestaurant = ({
       >
         <div className="flex flex-col items-center gap-4 py-5">
           <div className="flex flex-col items-center">
-            <p className="font-inter text-center text-2xl font-semibold leading-tight lg:text-3xl dark:text-white">
+            <p className="font-inter text-center text-2xl font-semibold leading-tight dark:text-white lg:text-3xl">
               You don&apos;t have any restaurant yet
             </p>
           </div>
           <span className="font-inter text-center text-base font-normal text-gray-400 lg:text-lg">
-            {user.role === Role.OWNER ? "Create" : "Join"} a restaurant to get
-            started
+            {user.role === Role.OWNER ? "Create" : "Join"} a restaurant to get started
           </span>
         </div>
 

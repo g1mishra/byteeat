@@ -1,10 +1,9 @@
 "use client"
 
+import { QuantityControlAction } from "@/components/slug-view/util"
+import { Cart } from "@/lib/types"
 import { createContext, useContext, useState } from "react"
 import { create } from "zustand"
-
-import { Cart } from "@/lib/types"
-import { QuantityControlAction } from "@/components/slug-view/util"
 
 type CartMap = {
   [key: string]: Cart

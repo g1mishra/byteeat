@@ -1,13 +1,7 @@
 import * as React from "react"
 
 const NonVegIcon = (props: any) => (
-  <svg
-    width={12}
-    height={12}
-    viewBox="0 0 12 12"
-    xmlns="http://www.w3.org/2000/svg"
-    {...props}
-  >
+  <svg width={12} height={12} viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg" {...props}>
     <path
       d="m.2 98.7.3 98.8h188l.3-98.8L189 0H0Zm182.6.5.2 92.8H6V6l88.3.2 88.2.3z"
       style={{

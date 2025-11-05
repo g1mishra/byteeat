@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from "next/server"
 import { fetchRestaurantSubscriptionStatus } from "@/services/restaurantService"
+import { NextRequest, NextResponse } from "next/server"
 
 export async function POST(request: NextRequest) {
   try {

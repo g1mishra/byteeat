@@ -4,7 +4,7 @@ import NonVegIcon from "./icons/nonveg"
 import VegIcon from "./icons/veg"
 
 type VegOrNonVegProps = {
-  isVeg?: boolean
+  isVeg: boolean
 } & React.ComponentPropsWithoutRef<"div">
 
 const VegOrNonVeg = ({ isVeg, ...rest }: VegOrNonVegProps) => {

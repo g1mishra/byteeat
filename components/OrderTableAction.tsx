@@ -1,14 +1,5 @@
 "use client"
 
-import React, { useCallback } from "react"
-import { useRouter } from "next/navigation"
-import { useBluetoothPrinter } from "@/hook/useBluetoothPrinter"
-import { getOrderWithItemsById, updateOrder } from "@/services/order.services"
-import { getRestaurantSlug } from "@/services/restaurantService"
-import { Order, OrderStatus } from "@prisma/client"
-import { EyeIcon, MoreHorizontal } from "lucide-react"
-
-import { generateReceipt } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -18,6 +9,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { useBluetoothPrinter } from "@/hook/useBluetoothPrinter"
+import { generateReceipt } from "@/lib/utils"
+import { getOrderWithItemsById, updateOrder } from "@/services/order.services"
+import { getRestaurantSlug } from "@/services/restaurantService"
+import { Order, OrderStatus } from "@prisma/client"
+import { EyeIcon, MoreHorizontal } from "lucide-react"
+import { useRouter } from "next/navigation"
+import React, { useCallback } from "react"
 
 import { useToast } from "./ui/use-toast"
 

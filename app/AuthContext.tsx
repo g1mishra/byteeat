@@ -1,9 +1,8 @@
 "use client"
 
-import React, { useEffect } from "react"
-import { SessionProvider } from "next-auth/react"
-
 import { registerServiceWorker } from "@/lib/serviceWorkerRegistration"
+import { SessionProvider } from "next-auth/react"
+import React, { useEffect } from "react"
 
 export interface AuthContextProps {
   children: React.ReactNode

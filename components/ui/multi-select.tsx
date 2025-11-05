@@ -1,8 +1,3 @@
-import * as React from "react"
-import { cva, type VariantProps } from "class-variance-authority"
-import { CheckIcon, ChevronDown, SparklesIcon, XCircle, XIcon } from "lucide-react"
-
-import { cn } from "@/lib/utils"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
@@ -16,6 +11,10 @@ import {
 } from "@/components/ui/command"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Separator } from "@/components/ui/separator"
+import { cn } from "@/lib/utils"
+import { cva, type VariantProps } from "class-variance-authority"
+import { CheckIcon, ChevronDown, SparklesIcon, XCircle, XIcon } from "lucide-react"
+import * as React from "react"
 
 /**
  * Variants for the multi-select component to handle different styles.
@@ -238,7 +237,7 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
                   {selectedValues.length > maxCount && (
                     <Badge
                       className={cn(
-                        "text-foreground border-foreground/1 bg-transparent hover:bg-transparent",
+                        "border-foreground/1 bg-transparent text-foreground hover:bg-transparent",
                         isAnimating ? "animate-bounce" : "",
                         multiSelectVariants({ variant })
                       )}
@@ -257,20 +256,20 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
                 </div>
                 <div className="flex items-center justify-between">
                   <XIcon
-                    className="text-muted-foreground mx-2 h-4 cursor-pointer"
+                    className="mx-2 h-4 cursor-pointer text-muted-foreground"
                     onClick={(event) => {
                       event.stopPropagation()
                       handleClear()
                     }}
                   />
                   <Separator orientation="vertical" className="flex h-full min-h-6" />
-                  <ChevronDown className="text-muted-foreground mx-2 h-4 cursor-pointer" />
+                  <ChevronDown className="mx-2 h-4 cursor-pointer text-muted-foreground" />
                 </div>
               </div>
             ) : (
               <div className="mx-auto flex w-full items-center justify-between">
-                <span className="text-muted-foreground mx-3 text-sm">{placeholder}</span>
-                <ChevronDown className="text-muted-foreground mx-2 h-4 cursor-pointer" />
+                <span className="mx-3 text-sm text-muted-foreground">{placeholder}</span>
+                <ChevronDown className="mx-2 h-4 cursor-pointer text-muted-foreground" />
               </div>
             )}
           </Button>
@@ -288,7 +287,7 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
                 <CommandItem key="all" onSelect={toggleAll} className="cursor-pointer">
                   <div
                     className={cn(
-                      "border-primary mr-2 flex size-4 items-center justify-center rounded-sm border",
+                      "mr-2 flex size-4 items-center justify-center rounded-sm border border-primary",
                       selectedValues.length === options.length
                         ? "bg-primary text-primary-foreground"
                         : "opacity-50 [&_svg]:invisible"
@@ -308,7 +307,7 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
                     >
                       <div
                         className={cn(
-                          "border-primary mr-2 flex size-4 items-center justify-center rounded-sm border",
+                          "mr-2 flex size-4 items-center justify-center rounded-sm border border-primary",
                           isSelected
                             ? "bg-primary text-primary-foreground"
                             : "opacity-50 [&_svg]:invisible"
@@ -316,7 +315,7 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
                       >
                         <CheckIcon className="size-4" />
                       </div>
-                      {option.icon && <option.icon className="text-muted-foreground mr-2 size-4" />}
+                      {option.icon && <option.icon className="mr-2 size-4 text-muted-foreground" />}
                       <span>{option.label}</span>
                     </CommandItem>
                   )
@@ -350,7 +349,7 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
         {animation > 0 && selectedValues.length > 0 && (
           <SparklesIcon
             className={cn(
-              "text-foreground bg-background my-2 size-3 cursor-pointer",
+              "my-2 size-3 cursor-pointer bg-background text-foreground",
               isAnimating ? "" : "text-muted-foreground"
             )}
             onClick={() => setIsAnimating(!isAnimating)}

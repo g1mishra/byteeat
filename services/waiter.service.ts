@@ -1,11 +1,10 @@
 "use server"
 
-import { revalidatePath } from "next/cache"
+import { authOptions } from "@/app/api/auth/authOption"
+import prisma from "@/lib/prisma"
 import { Role } from "@prisma/client"
 import { getServerSession } from "next-auth"
-
-import prisma from "@/lib/prisma"
-import { authOptions } from "@/app/api/auth/authOption"
+import { revalidatePath } from "next/cache"
 
 export async function getWaiters(restroId: string) {
   try {
@@ -44,9 +43,7 @@ export async function removeWaiter(userId: string, restroId: string | null) {
     if (error instanceof Error) {
       if (error.message.includes("Record to delete does not exist")) {
         // The association doesn't exist, so we can consider this a successful removal
-        console.log(
-          `No association found for user ${userId} and restaurant ${restroId}`
-        )
+        console.log(`No association found for user ${userId} and restaurant ${restroId}`)
       } else {
         throw new Error(`Failed to remove waiter: ${error.message}`)
       }
@@ -123,9 +120,7 @@ export async function validateJoiningKey(key: string) {
     const isValid = savedKey?.expiresAt && savedKey.expiresAt > new Date()
 
     if (!isValid) {
-      throw new Error(
-        "Joining key expired. Please ask your employer to generate a new key."
-      )
+      throw new Error("Joining key expired. Please ask your employer to generate a new key.")
     }
 
     const userRestaurant = await prisma.userRestaurant.create({

@@ -1,12 +1,11 @@
 "use client"
 
-import { useState } from "react"
-import { MenuItemI } from "@/services/menuService"
-import { ChevronDown } from "lucide-react"
-
-import { Cart } from "@/lib/types"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import VegOrNonVeg from "@/components/veg-or-nonveg"
+import { Cart } from "@/lib/types"
+import { MenuItemI } from "@/services/menuService"
+import { ChevronDown } from "lucide-react"
+import { useState } from "react"
 
 type DishListProps = {
   menu: {
@@ -19,7 +18,9 @@ type DishListProps = {
 
 const DishList = ({ menu, onSelect }: DishListProps) => {
   const [quantities, setQuantities] = useState<{ [key: string]: number }>({})
-  const [selectedAddons, setSelectedAddons] = useState<{ [key: string]: string[] }>({})
+  const [selectedAddons, setSelectedAddons] = useState<{
+    [key: string]: string[]
+  }>({})
 
   const handleQuantityChange = (itemId: string, newQuantity: number) => {
     setQuantities({ ...quantities, [itemId]: Math.max(0, newQuantity) })
@@ -30,7 +31,11 @@ const DishList = ({ menu, onSelect }: DishListProps) => {
     if (quantity > 0) {
       const addons = (item.addons || [])
         .filter((addon) => selectedAddons[item.id]?.includes(addon.id))
-        .map((addon) => ({ id: addon.id, name: addon.name, price: addon.price }))
+        .map((addon) => ({
+          id: addon.id,
+          name: addon.name,
+          price: addon.price,
+        }))
 
       const basePrice = item.PriceItemMap?.[0]?.price || 0
       const addonPrice = addons.reduce((total, addon) => total + (addon?.price || 0), 0)
@@ -96,7 +101,10 @@ const DishList = ({ menu, onSelect }: DishListProps) => {
                             const newAddons = e.target.checked
                               ? [...(selectedAddons[item.id] || []), addon.id]
                               : selectedAddons[item.id]?.filter((id) => id !== addon.id) || []
-                            setSelectedAddons({ ...selectedAddons, [item.id]: newAddons })
+                            setSelectedAddons({
+                              ...selectedAddons,
+                              [item.id]: newAddons,
+                            })
                           }}
                         />
                       </label>

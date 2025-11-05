@@ -1,8 +1,7 @@
 "use server"
 
-import { Addon, Item, PriceItemMap, Prisma } from "@prisma/client"
-
 import prisma from "@/lib/prisma"
+import { Addon, Item, PriceItemMap, Prisma } from "@prisma/client"
 
 import { checkAuth } from "./utils.service"
 
@@ -39,9 +38,20 @@ const fetchMenuItem = async (menuId: string) => {
 
 export type FetchMenuItemResponse = Awaited<ReturnType<typeof fetchMenuItem>>
 
-const addMenuItem = async (menuData: Omit<MenuItemI, "id" | "position" | "isActive">) => {
+const addMenuItem = async (
+  menuData: Omit<MenuItemI, "id" | "position" | "isActive" | "addonIds">
+) => {
   try {
     await checkAuth("You are not authorized to add a menu item")
+
+    // Get the maximum position for items in this category
+    const maxPositionItem = await prisma.item.findFirst({
+      where: { categoryId: menuData.categoryId },
+      orderBy: { position: "desc" },
+      select: { position: true },
+    })
+
+    const nextPosition = (maxPositionItem?.position ?? -1) + 1
 
     return await prisma.item.create({
       data: {
@@ -51,6 +61,7 @@ const addMenuItem = async (menuData: Omit<MenuItemI, "id" | "position" | "isActi
         imgPath: menuData.imgPath,
         isVeg: menuData.isVeg,
         type: menuData.type,
+        position: nextPosition,
         addons: menuData.addons
           ? {
               connect: menuData.addons.map((addon) => ({ id: addon.id })),
@@ -168,10 +179,20 @@ const addOrFetchCategory = async (categoryName: string, restaurantId: string) =>
 
     await checkAuth("You are not authorized to add a category")
 
+    // Get the maximum position for categories in this restaurant
+    const maxPositionCategory = await prisma.itemCategory.findFirst({
+      where: { restaurantId },
+      orderBy: { position: "desc" },
+      select: { position: true },
+    })
+
+    const nextPosition = (maxPositionCategory?.position ?? -1) + 1
+
     return await prisma.itemCategory.create({
       data: {
         categoryName,
         restaurantId,
+        position: nextPosition,
       },
     })
   } catch (error) {
@@ -276,7 +297,6 @@ const addItemPrice = async (priceData: PriceItemMapI[]) => {
   try {
     return await prisma.priceItemMap.createMany({
       data: priceData,
-      skipDuplicates: true,
     })
   } catch (error) {
     throw error
@@ -286,11 +306,12 @@ const addItemPrice = async (priceData: PriceItemMapI[]) => {
 const updateItemPrice = async (priceData: Partial<PriceItemMapI>[]) => {
   try {
     const operations = priceData.map((price) => {
+      const { id, itemId, ...updateData } = price
       return prisma.priceItemMap.update({
         where: {
-          id: price.id,
+          id: id,
         },
-        data: price,
+        data: updateData,
       })
     })
     return await prisma.$transaction(operations)
@@ -404,7 +425,6 @@ export async function addMultipleRestaurantAddons(
     await checkAuth("You are not authorized to add addons")
     return await prisma.addon.createMany({
       data: addons,
-      skipDuplicates: true,
     })
   } catch (error) {
     console.error("Error adding multiple restaurant addons:", error)
@@ -415,7 +435,7 @@ export async function addMultipleRestaurantAddons(
 export async function updateMenuItems(items: Partial<MenuItemI & { categoryName: string }>[]) {
   try {
     const updatePromises = items.map(async (item) => {
-      const { id, PriceItemMap, addons, categoryId, categoryName, ...updateData } = item
+      const { id, PriceItemMap, addons, categoryId, categoryName, addonIds, ...updateData } = item
 
       if (!id) {
         console.warn("Skipping item update due to missing ID:", item)

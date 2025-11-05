@@ -1,11 +1,10 @@
 "use client"
 
-import * as React from "react"
+import { cn } from "@/lib/utils"
 import * as ToastPrimitives from "@radix-ui/react-toast"
 import { cva, type VariantProps } from "class-variance-authority"
 import { X } from "lucide-react"
-
-import { cn } from "@/lib/utils"
+import * as React from "react"
 
 const ToastProvider = ToastPrimitives.Provider
 
@@ -29,8 +28,7 @@ const toastVariants = cva(
   {
     variants: {
       variant: {
-        default:
-          "border bg-white text-slate-950 dark:bg-slate-950 dark:text-slate-50",
+        default: "border bg-white text-slate-950 dark:bg-slate-950 dark:text-slate-50",
         destructive:
           "destructive group border-red-500 bg-red-500 text-slate-50 dark:border-red-900 dark:bg-red-900 dark:text-slate-50",
       },
@@ -43,8 +41,7 @@ const toastVariants = cva(
 
 const Toast = React.forwardRef<
   React.ElementRef<typeof ToastPrimitives.Root>,
-  React.ComponentPropsWithoutRef<typeof ToastPrimitives.Root> &
-    VariantProps<typeof toastVariants>
+  React.ComponentPropsWithoutRef<typeof ToastPrimitives.Root> & VariantProps<typeof toastVariants>
 >(({ className, variant, ...props }, ref) => {
   return (
     <ToastPrimitives.Root
@@ -93,11 +90,7 @@ const ToastTitle = React.forwardRef<
   React.ElementRef<typeof ToastPrimitives.Title>,
   React.ComponentPropsWithoutRef<typeof ToastPrimitives.Title>
 >(({ className, ...props }, ref) => (
-  <ToastPrimitives.Title
-    ref={ref}
-    className={cn("text-sm font-semibold", className)}
-    {...props}
-  />
+  <ToastPrimitives.Title ref={ref} className={cn("text-sm font-semibold", className)} {...props} />
 ))
 ToastTitle.displayName = ToastPrimitives.Title.displayName
 

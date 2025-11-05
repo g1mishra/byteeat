@@ -1,7 +1,5 @@
 "use client"
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
 import {
   FetchRestaurantReturnType,
   addOrUpdateSocialLinks,
@@ -9,13 +7,16 @@ import {
 } from "@/services/restaurantService"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Pencil } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { useState } from "react"
 import { useForm } from "react-hook-form"
 
 import "react-phone-input-2/lib/style.css"
-import { PlanType } from "@prisma/client"
-import { z } from "zod"
 
-import { isEqual } from "@/lib/utils"
+import CenterLoading from "@/components/center-loading"
+import LogoOrAvatar from "@/components/logo-or-avatar"
+import state2city from "@/components/manage/utils/cities"
+import uploadImage from "@/components/manage/utils/uploadImage"
 import { Button } from "@/components/ui/button"
 import {
   Form,
@@ -36,10 +37,9 @@ import {
 } from "@/components/ui/select"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { useToast } from "@/components/ui/use-toast"
-import CenterLoading from "@/components/center-loading"
-import LogoOrAvatar from "@/components/logo-or-avatar"
-import state2city from "@/components/manage/utils/cities"
-import uploadImage from "@/components/manage/utils/uploadImage"
+import { isEqual } from "@/lib/utils"
+import { PlanType } from "@prisma/client"
+import { z } from "zod"
 
 import { Checkbox } from "../ui/checkbox"
 
@@ -132,7 +132,10 @@ export default function EditRestaurant({ response }: { response: FetchRestaurant
       const updatePromises = []
 
       if (hasGeneralChanges) {
-        const updateData: Partial<EditRestaurantFormValues> = { ...newInfo, id: response?.id }
+        const updateData: Partial<EditRestaurantFormValues> = {
+          ...newInfo,
+          id: response?.id,
+        }
 
         if (file) {
           const uploadedUrl = await uploadImage(file, `${response?.slug}/logo`)

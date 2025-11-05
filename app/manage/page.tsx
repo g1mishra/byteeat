@@ -1,21 +1,15 @@
-import dynamic from "next/dynamic"
-import Link from "next/link"
-import { redirect } from "next/navigation"
+import AuthUserMenu from "@/components/AuthUserMenu"
+import NoRestaurant from "@/components/manage/no-restaurant"
+import { Button } from "@/components/ui/button"
+import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Separator } from "@/components/ui/separator"
 import { fetchRestaurants } from "@/services/restaurantService"
 import { Role } from "@prisma/client"
 import { PlusIcon } from "lucide-react"
 import { getServerSession } from "next-auth"
-
-import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-import { Separator } from "@/components/ui/separator"
-import AuthUserMenu from "@/components/AuthUserMenu"
-import NoRestaurant from "@/components/manage/no-restaurant"
+import dynamic from "next/dynamic"
+import Link from "next/link"
+import { redirect } from "next/navigation"
 
 import { authOptions } from "../api/auth/authOption"
 
@@ -47,12 +41,10 @@ const Restaurant = async () => {
     <div className="flex flex-1 flex-col space-y-6 p-4 pb-6">
       <div className="flex justify-between">
         <div className="space-y-0.5">
-          <h2 className="text-xl  font-bold tracking-tight sm:text-2xl">
+          <h2 className="text-xl font-bold tracking-tight sm:text-2xl">
             Welcome to ByteEat Restaurant Dashboard
           </h2>
-          <p className="text-muted-foreground">
-            Manage your restaurants - menu, tables, and more
-          </p>
+          <p className="text-muted-foreground">Manage your restaurants - menu, tables, and more</p>
         </div>
         <AuthUserMenu user={session?.user} />
       </div>
@@ -71,12 +63,10 @@ const Restaurant = async () => {
               >
                 <Card
                   key={restaurant.id}
-                  className="hover:bg-accent flex h-full flex-col justify-between transition-colors duration-200"
+                  className="flex h-full flex-col justify-between transition-colors duration-200 hover:bg-accent"
                 >
                   <CardHeader>
-                    <CardTitle className="text-lg font-semibold">
-                      {restaurant.name}
-                    </CardTitle>
+                    <CardTitle className="text-lg font-semibold">{restaurant.name}</CardTitle>
                     <CardDescription className="text-sm">
                       {restaurant.address_string}
                     </CardDescription>
@@ -91,11 +81,9 @@ const Restaurant = async () => {
             ))}
             {session.user.role === Role.OWNER ? (
               <WithCreateRestaurantDialog>
-                <Card className="hover:border-primary flex h-full flex-col items-center justify-center border-2 border-dashed p-4 transition-colors duration-200">
+                <Card className="flex h-full flex-col items-center justify-center border-2 border-dashed p-4 transition-colors duration-200 hover:border-primary">
                   <CardHeader>
-                    <CardTitle className="text-lg font-semibold">
-                      Create New Restaurant
-                    </CardTitle>
+                    <CardTitle className="text-lg font-semibold">Create New Restaurant</CardTitle>
                   </CardHeader>
                   <div className="mt-auto">
                     <Button variant="outline" className="w-full">
@@ -107,7 +95,7 @@ const Restaurant = async () => {
               </WithCreateRestaurantDialog>
             ) : (
               <WithJoinRestaurantDialog>
-                <Card className="hover:border-primary flex h-full flex-col items-center justify-center border-2 border-dashed p-4 transition-colors duration-200">
+                <Card className="flex h-full flex-col items-center justify-center border-2 border-dashed p-4 transition-colors duration-200 hover:border-primary">
                   <CardHeader>
                     <CardTitle className="text-lg font-semibold">
                       Join an existing restaurant

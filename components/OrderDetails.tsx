@@ -1,12 +1,3 @@
-import React from "react"
-import { useBluetoothPrinter } from "@/hook/useBluetoothPrinter"
-import useMediaQuery from "@/hook/useMediaQuery"
-import { getOrderWithItemsById, updateOrder } from "@/services/order.services"
-import { getRestaurantSlug } from "@/services/restaurantService"
-import { OrderStatus } from "@prisma/client"
-import { useQuery } from "@tanstack/react-query"
-
-import { generateReceipt } from "@/lib/utils"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Drawer, DrawerContent } from "@/components/ui/drawer"
 import {
@@ -18,6 +9,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { useBluetoothPrinter } from "@/hook/useBluetoothPrinter"
+import useMediaQuery from "@/hook/useMediaQuery"
+import { generateReceipt } from "@/lib/utils"
+import { getOrderWithItemsById, updateOrder } from "@/services/order.services"
+import { getRestaurantSlug } from "@/services/restaurantService"
+import { OrderStatus } from "@prisma/client"
+import { useQuery } from "@tanstack/react-query"
+import React from "react"
 
 import Loading from "./loader"
 import { Button } from "./ui/button"

@@ -1,10 +1,5 @@
 "use client"
 
-import React, { useEffect, useState } from "react"
-import { useSearchParams } from "next/navigation"
-import useMediaQuery from "@/hook/useMediaQuery"
-import { Loader2 } from "lucide-react"
-
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -18,6 +13,10 @@ import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/u
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import useMediaQuery from "@/hook/useMediaQuery"
+import { Loader2 } from "lucide-react"
+import { useSearchParams } from "next/navigation"
+import React, { useEffect, useState } from "react"
 
 interface CheckoutDialogProps {
   onSubmit: (data: {

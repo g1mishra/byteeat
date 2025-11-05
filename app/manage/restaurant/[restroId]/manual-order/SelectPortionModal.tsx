@@ -1,12 +1,6 @@
-import { MenuItemI } from "@/services/menuService"
-
 import { Button } from "@/components/ui/button"
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { MenuItemI } from "@/services/menuService"
 
 type SelectPortionModalProps = {
   dish: MenuItemI
@@ -41,10 +35,7 @@ export default function SelectPortionModal({
             <h3 className="text-2xl font-bold">{dish.dish}</h3>
             <div className="flex flex-wrap items-center justify-center gap-2">
               {dish.PriceItemMap?.map((menu) => (
-                <Button
-                  onClick={() => addDish(menu.portion, dish)}
-                  variant="outline"
-                >
+                <Button onClick={() => addDish(menu.portion, dish)} variant="outline">
                   {menu.portion}
                 </Button>
               ))}

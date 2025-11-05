@@ -1,22 +1,21 @@
 "use client"
 
-import { useState } from "react"
-import dynamic from "next/dynamic"
-import Link from "next/link"
-import { useParams, useRouter, useSearchParams } from "next/navigation"
+import { useCart } from "@/app/store/CartProvider"
+import QuantityActionButton from "@/components/QuantityActionBtn"
+import { QuantityControlAction } from "@/components/slug-view/util"
+import { Button } from "@/components/ui/button"
+import { Separator } from "@/components/ui/separator"
+import { useToast } from "@/components/ui/use-toast"
+import { Cart } from "@/lib/types"
+import { getBasePath, getPathWithQuery } from "@/lib/utils"
 import { addOrderItems, createOrder } from "@/services/order.services"
 import { getRestaurantIdBySlug } from "@/services/restaurantService"
 import { OrderType } from "@prisma/client"
 import { ArrowLeft } from "lucide-react"
-
-import { Cart } from "@/lib/types"
-import { getBasePath, getPathWithQuery } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { Separator } from "@/components/ui/separator"
-import { useToast } from "@/components/ui/use-toast"
-import QuantityActionButton from "@/components/QuantityActionBtn"
-import { QuantityControlAction } from "@/components/slug-view/util"
-import { useCart } from "@/app/store/CartProvider"
+import dynamic from "next/dynamic"
+import Link from "next/link"
+import { useParams, useRouter, useSearchParams } from "next/navigation"
+import { useState } from "react"
 
 const CheckoutDialog = dynamic(() => import("@/components/CheckoutModal"), {
   ssr: false,
@@ -111,9 +110,9 @@ export default function ViewCart() {
 
   return (
     <div className="container mx-auto grid gap-6 p-0">
-      <div className="bg-primary sticky top-0 z-10 flex h-14 items-center justify-between space-x-2 overflow-hidden px-4 text-white">
+      <div className="sticky top-0 z-10 flex h-14 items-center justify-between space-x-2 overflow-hidden bg-[var(--primary-color)] px-4 text-[var(--secondary-color)]">
         <Button
-          className="bg-primary z-10 shrink-0"
+          className="z-10 shrink-0 bg-[var(--primary-color)]"
           size="sm"
           onClick={() =>
             router.push(
@@ -130,7 +129,7 @@ export default function ViewCart() {
         </h1>
       </div>
       {Object.values(cart).length === 0 ? (
-        <div className="text-muted-foreground grid min-h-40 place-content-center text-center">
+        <div className="grid min-h-40 place-content-center text-center text-muted-foreground">
           Your cart is empty.
         </div>
       ) : (
@@ -138,7 +137,7 @@ export default function ViewCart() {
           {Object.values(cart).map((item) => (
             <div
               key={item.id}
-              className="bg-background grid overflow-hidden rounded-lg drop-shadow"
+              className="grid overflow-hidden rounded-lg bg-background drop-shadow"
             >
               <div className="flex justify-between p-4">
                 <div className="flex items-start">
@@ -168,7 +167,7 @@ export default function ViewCart() {
       )}
       {Object.values(cart).length > 0 && (
         <div className="my-4 flex w-full px-6">
-          <div className="bg-background w-full rounded-lg p-4 drop-shadow md:p-6">
+          <div className="w-full rounded-lg bg-background p-4 drop-shadow md:p-6">
             <h2 className="mb-2 text-lg font-bold">Order Summary</h2>
             <div className="mb-2 flex items-center justify-between">
               <div>Subtotal</div>

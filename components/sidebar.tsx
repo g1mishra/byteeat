@@ -1,10 +1,9 @@
 "use client"
 
-import React from "react"
-import dynamic from "next/dynamic"
-import { MenuIcon, X } from "lucide-react"
-
 import { cn } from "@/lib/utils"
+import { MenuIcon, X } from "lucide-react"
+import dynamic from "next/dynamic"
+import React from "react"
 
 import CartIcon from "./icons/cart"
 import LogoOrAvatar from "./logo-or-avatar"
@@ -28,7 +27,6 @@ interface SidebarProps extends React.HTMLAttributes<HTMLElement> {
     whatsapp: string
     restaurantId: string
   } | null
-
   addBackButton?: boolean
   selfOrdering?: boolean
 }
@@ -50,10 +48,10 @@ export function Sidebar({
       <div
         className={cn(
           "hidden min-h-screen flex-col gap-y-2 overflow-y-auto p-4 transition-[all_0.5s_ease-in-out]",
-          "container absolute inset-x-0 top-0 z-50 w-full bg-white sm:border sm:py-8 sm:shadow-xl dark:bg-gray-800",
+          "container absolute inset-x-0 top-0 z-50 w-full bg-white dark:bg-gray-800 sm:border sm:py-8 sm:shadow-xl",
           className,
           {
-            "ml-0 w-full flex": open,
+            "ml-0 flex w-full": open,
           }
         )}
         {...props}
@@ -95,7 +93,7 @@ export function Sidebar({
       </div>
       <div
         className={cn(
-          "bg-primary sticky top-0 z-10 flex h-14 items-center justify-between space-x-2 px-4 text-white",
+          "sticky top-0 z-10 flex h-14 items-center justify-between space-x-2 bg-[var(--primary-color)] px-4 text-[var(--secondary-color)]",
           className,
           {
             hidden: open,

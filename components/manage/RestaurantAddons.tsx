@@ -1,17 +1,5 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import {
-  addRestaurantAddon,
-  deleteRestaurantAddon,
-  fetchRestaurantAddons,
-  updateRestaurantAddon,
-} from "@/services/menuService"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { Edit, PlusCircle, Trash2 } from "lucide-react"
-import { useForm } from "react-hook-form"
-import * as z from "zod"
-
 import { Button } from "@/components/ui/button"
 import {
   Form,
@@ -31,6 +19,17 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import {
+  addRestaurantAddon,
+  deleteRestaurantAddon,
+  fetchRestaurantAddons,
+  updateRestaurantAddon,
+} from "@/services/menuService"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { Edit, PlusCircle, Trash2 } from "lucide-react"
+import { useEffect, useState } from "react"
+import { useForm } from "react-hook-form"
+import * as z from "zod"
 
 const addonSchema = z.object({
   name: z.string().min(1, "Name is required"),

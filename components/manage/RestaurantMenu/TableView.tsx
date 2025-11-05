@@ -1,12 +1,3 @@
-import React, { Dispatch, SetStateAction, Suspense, useMemo } from "react"
-import dynamic from "next/dynamic"
-import Image from "next/image"
-import { MenuItemI, PriceItemMapI } from "@/services/menuService"
-import { ItemType } from "@prisma/client"
-import { ColumnDef } from "@tanstack/react-table"
-import { Pencil, PlusIcon, Save, Trash2, X } from "lucide-react"
-
-import { cn } from "@/lib/utils"
 import { AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -20,12 +11,24 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import VegOrNonVeg from "@/components/veg-or-nonveg"
+import { cn } from "@/lib/utils"
+import { MenuItemI, PriceItemMapI } from "@/services/menuService"
+import { ItemType } from "@prisma/client"
+import { ColumnDef } from "@tanstack/react-table"
+import { Pencil, PlusIcon, Save, Trash2, X } from "lucide-react"
+import dynamic from "next/dynamic"
+import Image from "next/image"
+import React, { Dispatch, SetStateAction, Suspense, useMemo } from "react"
 
 const LazyAccordion = dynamic(() =>
-  import("@/components/ui/accordion").then((mod) => ({ default: mod.Accordion }))
+  import("@/components/ui/accordion").then((mod) => ({
+    default: mod.Accordion,
+  }))
 )
 const LazyAccordionContent = dynamic(() =>
-  import("@/components/ui/accordion").then((mod) => ({ default: mod.AccordionContent }))
+  import("@/components/ui/accordion").then((mod) => ({
+    default: mod.AccordionContent,
+  }))
 )
 interface TableViewProps {
   filteredMenuItems: Record<
@@ -42,7 +45,9 @@ interface TableViewProps {
   removePriceField: (rowId: string, priceIndex: number) => void
   editingRowId: string | null
   setEditingRowId: (id: string) => void
-  editingRows: { [key: string]: MenuItemI & { categoryName: string; newImage?: File } }
+  editingRows: {
+    [key: string]: MenuItemI & { categoryName: string; newImage?: File }
+  }
   saveRowChanges: (rowId: string) => void
   discardRowChanges: (rowId: string) => void
 }
@@ -197,10 +202,10 @@ const TableView: React.FC<TableViewProps> = ({
           const imageToShow = newImage
             ? URL.createObjectURL(newImage)
             : imgPath
-            ? imgPath.startsWith("blob:")
-              ? imgPath
-              : imgPath.split(";")[0]
-            : null
+              ? imgPath.startsWith("blob:")
+                ? imgPath
+                : imgPath.split(";")[0]
+              : null
 
           return (
             <div className="relative size-16">

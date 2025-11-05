@@ -1,17 +1,17 @@
-import dynamic from "next/dynamic"
-import { fetchRestaurant } from "@/services/restaurantService"
-import { EditIcon, LucideSortDesc, MenuIcon, PlusCircleIcon, PlusIcon } from "lucide-react"
-import { getServerSession } from "next-auth"
-
-import { Card } from "@/components/ui/card"
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { authOptions } from "@/app/api/auth/authOption"
 import UnAuthorized from "@/components/UnAuthorized"
 import EditRestaurant from "@/components/manage/EditRestaurant"
 import MenuPositions from "@/components/manage/MenuPositions"
 import RestaurantAddons from "@/components/manage/RestaurantAddons"
 import RestaurantMenu from "@/components/manage/RestaurantMenu/index"
-import { authOptions } from "@/app/api/auth/authOption"
+import RestaurantTheme from "@/components/manage/RestaurantTheme"
+import { Card } from "@/components/ui/card"
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { fetchRestaurant } from "@/services/restaurantService"
+import { EditIcon, LucideSortDesc, MenuIcon, Palette, PlusCircleIcon, PlusIcon } from "lucide-react"
+import { getServerSession } from "next-auth"
+import dynamic from "next/dynamic"
 
 const WithCreateMenuDialog = dynamic(
   () => import("@/components/manage/dialog-trigger/with-create-item"),
@@ -65,6 +65,12 @@ const RestaurantDetails = async ({ params }: any) => {
               >
                 <LucideSortDesc className="mr-2 size-5" /> Menu Positions
               </TabsTrigger>
+              <TabsTrigger
+                value="theme"
+                className="flex flex-1 items-center justify-center rounded-md px-4 py-2 data-[state=active]:bg-white data-[state=active]:shadow-sm"
+              >
+                <Palette className="mr-2 size-5" /> Theme
+              </TabsTrigger>
             </TabsList>
             <ScrollBar orientation="horizontal" />
           </ScrollArea>
@@ -88,6 +94,9 @@ const RestaurantDetails = async ({ params }: any) => {
           </TabsContent>
           <TabsContent value="menu-positions">
             <MenuPositions itemCategory={response?.ItemCategory} />
+          </TabsContent>
+          <TabsContent value="theme" className="mt-6">
+            <RestaurantTheme restaurant={response} />
           </TabsContent>
         </Tabs>
       </div>

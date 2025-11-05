@@ -1,14 +1,13 @@
 "use client"
 
-import React, { useCallback, useEffect, useMemo, useState } from "react"
-import dynamic from "next/dynamic"
-import { MenuItemI, updateMenuItems } from "@/services/menuService"
-import { PlusIcon } from "lucide-react"
-
-import { Button } from "@/components/ui/button"
-import { useToast } from "@/components/ui/use-toast"
 import CenterLoading from "@/components/center-loading"
 import Loading from "@/components/loader"
+import { Button } from "@/components/ui/button"
+import { useToast } from "@/components/ui/use-toast"
+import { MenuItemI, updateMenuItems } from "@/services/menuService"
+import { PlusIcon } from "lucide-react"
+import dynamic from "next/dynamic"
+import React, { useCallback, useEffect, useMemo, useState } from "react"
 
 import WithCreateMenuDialog from "../dialog-trigger/with-create-item"
 import { prepareMenuItemForUpdate, updateLocalMenuItems } from "../utils/restaurantMenu"
@@ -121,14 +120,17 @@ const RestaurantMenu: React.FC<RestaurantMenuProps> = ({
   }, [categories, menuItems, searchTerm])
 
   const groupedItems = useMemo(() => {
-    return filteredMenuItems.reduce((acc, item) => {
-      const categoryName = categories[item.categoryId]
-      if (!acc[categoryName]) {
-        acc[categoryName] = []
-      }
-      acc[categoryName].push(item)
-      return acc
-    }, {} as Record<string, EditableMenuItem[]>)
+    return filteredMenuItems.reduce(
+      (acc, item) => {
+        const categoryName = categories[item.categoryId]
+        if (!acc[categoryName]) {
+          acc[categoryName] = []
+        }
+        acc[categoryName].push(item)
+        return acc
+      },
+      {} as Record<string, EditableMenuItem[]>
+    )
   }, [filteredMenuItems, categories])
 
   // Callbacks
@@ -394,7 +396,7 @@ const RestaurantMenu: React.FC<RestaurantMenuProps> = ({
   return (
     <>
       {isUpdating && <CenterLoading />}
-      <div className="sticky top-0 z-10 flex w-full items-center justify-between gap-2 bg-white pb-4 max-sm:flex-col dark:bg-gray-900">
+      <div className="sticky top-0 z-10 flex w-full items-center justify-between gap-2 bg-white pb-4 dark:bg-gray-900 max-sm:flex-col">
         <SearchBar
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}

@@ -1,5 +1,5 @@
-import { redirect } from "next/navigation"
 import { getServerSession } from "next-auth/next"
+import { redirect } from "next/navigation"
 
 import { authOptions } from "../api/auth/authOption"
 import AuthPage from "./login-page"

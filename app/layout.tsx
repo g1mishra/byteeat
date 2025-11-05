@@ -1,11 +1,11 @@
 import "@/styles/globals.css"
-import React from "react"
 
+import { ThemeProvider } from "@/components/theme-provider"
+import { Toaster } from "@/components/ui/toaster"
 import { siteMetadata } from "@/config/site"
 import { fontSans } from "@/lib/fonts"
 import { cn } from "@/lib/utils"
-import { Toaster } from "@/components/ui/toaster"
-import { ThemeProvider } from "@/components/theme-provider"
+import React from "react"
 
 import QueryProvider from "../components/QueryProvider"
 import AuthContext from "./AuthContext"
@@ -30,7 +30,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
         <body
           suppressHydrationWarning
           className={cn(
-            "bg-background relative flex min-h-screen flex-col overflow-x-hidden font-sans antialiased",
+            "relative flex min-h-screen flex-col overflow-x-hidden bg-background font-sans antialiased",
             fontSans.variable
           )}
         >

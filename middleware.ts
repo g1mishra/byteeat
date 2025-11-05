@@ -15,7 +15,6 @@ export async function middleware(request: NextRequest) {
   const potentialSlug = subdomain?.replace(`${BaseDomain}`, "")
 
   if (!potentialSlug || potentialSlug === "www") {
-    console.log("No potential slug", { host, subdomain, pathname, potentialSlug })
     return NextResponse.next()
   }
 
@@ -36,9 +35,9 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL(`${basePath}/not-found`, request.url), 302)
     }
 
-    if (!restaurant?.isActive && !pathname.includes("subscription-expired")) {
-      return NextResponse.redirect(`${getBasePath(potentialSlug)}/subscription-expired`)
-    }
+    // if (!restaurant?.isActive && !pathname.includes("subscription-expired")) {
+    //   return NextResponse.redirect(`${getBasePath(potentialSlug)}/subscription-expired`)
+    // }
 
     return NextResponse.rewrite(new URL(`${potentialSlug}${pathname}${url.search}`, request.url))
   } catch (error) {

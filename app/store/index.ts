@@ -7,11 +7,9 @@ interface BluetoothPrinterState {
   setIsConnected: (isConnected: boolean) => void
 }
 
-export const bluetoothPrinterStore = create<BluetoothPrinterState>(
-  (set) => ({
-    server: null,
-    setServer: (server) => set({ server }),
-    isConnected: false,
-    setIsConnected: (isConnected) => set({ isConnected }),
-  })
-)
+export const bluetoothPrinterStore = create<BluetoothPrinterState>((set) => ({
+  server: null,
+  setServer: (server) => set({ server }),
+  isConnected: false,
+  setIsConnected: (isConnected) => set({ isConnected }),
+}))

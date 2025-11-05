@@ -1,6 +1,4 @@
-import dynamic from "next/dynamic"
-import { MenuItemI } from "@/services/menuService"
-
+import Loading from "@/components/loader"
 import {
   Accordion,
   AccordionContent,
@@ -9,8 +7,9 @@ import {
 } from "@/components/ui/accordion"
 import { Button } from "@/components/ui/button"
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import Loading from "@/components/loader"
 import VegOrNonVeg from "@/components/veg-or-nonveg"
+import { MenuItemI } from "@/services/menuService"
+import dynamic from "next/dynamic"
 
 const WithUpdateMenuDialog = dynamic(
   () => import("@/components/manage/dialog-trigger/with-update-item"),
@@ -18,10 +17,14 @@ const WithUpdateMenuDialog = dynamic(
 )
 
 const LazyAccordion = dynamic(() =>
-  import("@/components/ui/accordion").then((mod) => ({ default: mod.Accordion }))
+  import("@/components/ui/accordion").then((mod) => ({
+    default: mod.Accordion,
+  }))
 )
 const LazyAccordionContent = dynamic(() =>
-  import("@/components/ui/accordion").then((mod) => ({ default: mod.AccordionContent }))
+  import("@/components/ui/accordion").then((mod) => ({
+    default: mod.AccordionContent,
+  }))
 )
 
 interface GridViewProps {

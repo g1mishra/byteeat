@@ -1,10 +1,9 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { OrdersTableRenderer, dcolumns } from "@/components/OrdersTableRenderer"
 import { getAllOrdersAllRestaurants } from "@/services/order.services"
 import { Order } from "@prisma/client"
-
-import { OrdersTableRenderer, dcolumns } from "@/components/OrdersTableRenderer"
+import { useEffect, useState } from "react"
 
 export default function Orders() {
   const [orders, setOrders] = useState<Order[]>([])
@@ -26,11 +25,5 @@ export default function Orders() {
     fetchOrders()
   }, [])
 
-  return (
-    <OrdersTableRenderer
-      columns={dcolumns}
-      data={orders}
-      isLoading={isLoading}
-    />
-  )
+  return <OrdersTableRenderer columns={dcolumns} data={orders} isLoading={isLoading} />
 }

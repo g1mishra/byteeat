@@ -1,14 +1,13 @@
 "use client"
 
-import { useCallback, useEffect, useRef, useState } from "react"
+import { OrdersTableRenderer, dcolumns } from "@/components/OrdersTableRenderer"
+import { useToast } from "@/components/ui/use-toast"
 import useConnectToEventSource from "@/hook/useConnectToEventSource"
 import { useNotifications } from "@/hook/useNotifications"
+import { debounce } from "@/lib/utils"
 import { getTodayOrdersAllRestaurants } from "@/services/order.services"
 import { Order, OrderStatus } from "@prisma/client"
-
-import { debounce } from "@/lib/utils"
-import { useToast } from "@/components/ui/use-toast"
-import { OrdersTableRenderer, dcolumns } from "@/components/OrdersTableRenderer"
+import { useCallback, useEffect, useRef, useState } from "react"
 
 // Sound to play when a new order is received
 const sound = typeof window !== "undefined" ? new Audio("/new-order.wav") : null
@@ -54,9 +53,7 @@ export default function Orders() {
       if (!orderExists) {
         debounce(() => {
           if (sound) {
-            sound
-              .play()
-              .catch((error) => console.error("Failed to play sound:", error))
+            sound.play().catch((error) => console.error("Failed to play sound:", error))
           }
           toast({
             title: "New Order Received",

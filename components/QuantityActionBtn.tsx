@@ -1,7 +1,6 @@
-import React from "react"
-import { Minus, Plus } from "lucide-react"
-
 import { cn } from "@/lib/utils"
+import { Minus, Plus } from "lucide-react"
+import React from "react"
 
 import { QuantityControlAction } from "./slug-view/util"
 
@@ -12,6 +11,7 @@ interface QuantityActionButtonProps {
   onAction: (action: QuantityControlAction) => void
   buttonSize?: ButtonSize
   customClassName?: string
+  buttonClasses?: string
 }
 
 const QuantityActionButton: React.FC<QuantityActionButtonProps> = ({
@@ -34,14 +34,18 @@ const QuantityActionButton: React.FC<QuantityActionButtonProps> = ({
       )}
     >
       <button
-        className="flex h-full flex-1 items-center justify-center rounded-l-md text-green-600 transition-colors hover:bg-green-100"
+        className={cn(
+          "flex h-full flex-1 items-center justify-center rounded-l-md text-green-600 transition-colors hover:bg-green-100"
+        )}
         onClick={() => onAction(QuantityControlAction.DECREMENT)}
       >
         <Minus size={buttonSize === "normal" ? 20 : 16} className="stroke-current" />
       </button>
       <span className="flex-1 text-center font-medium text-green-700">{currentValue}</span>
       <button
-        className="flex h-full flex-1 items-center justify-center rounded-r-md text-green-600 transition-colors hover:bg-green-100"
+        className={cn(
+          "flex h-full flex-1 items-center justify-center rounded-r-md text-green-600 transition-colors hover:bg-green-100"
+        )}
         onClick={() => onAction(QuantityControlAction.INCREMENT)}
       >
         <Plus size={buttonSize === "normal" ? 20 : 16} className="stroke-current" />

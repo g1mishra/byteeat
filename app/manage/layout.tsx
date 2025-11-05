@@ -1,6 +1,6 @@
 import { Metadata } from "next"
-import { redirect } from "next/navigation"
 import { getServerSession } from "next-auth"
+import { redirect } from "next/navigation"
 
 import { authOptions } from "../api/auth/authOption"
 

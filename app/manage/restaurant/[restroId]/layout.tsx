@@ -1,13 +1,12 @@
 "use server"
 
-import { redirect } from "next/navigation"
+import { authOptions } from "@/app/api/auth/authOption"
+import RestroSidebar, { SidebarItemType } from "@/components/manage/RestroSidebar"
+import { getBasePath } from "@/lib/utils"
 import { getRestaurantSlug } from "@/services/restaurantService"
 import { Role } from "@prisma/client"
 import { getServerSession } from "next-auth"
-
-import { getBasePath } from "@/lib/utils"
-import RestroSidebar, { SidebarItemType } from "@/components/manage/RestroSidebar"
-import { authOptions } from "@/app/api/auth/authOption"
+import { redirect } from "next/navigation"
 
 const RestroLayout = async ({
   children,

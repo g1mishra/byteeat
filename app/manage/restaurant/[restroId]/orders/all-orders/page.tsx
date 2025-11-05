@@ -1,10 +1,9 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { OrdersTableRenderer, dcolumns } from "@/components/OrdersTableRenderer"
 import { getAllOrdersByRestaurant } from "@/services/order.services"
 import { Order, OrderStatus } from "@prisma/client"
-
-import { OrdersTableRenderer, dcolumns } from "@/components/OrdersTableRenderer"
+import { useEffect, useState } from "react"
 
 export default function Orders({ params }: { params: { restroId: string } }) {
   const [orders, setOrders] = useState<Order[]>([])

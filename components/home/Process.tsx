@@ -1,10 +1,9 @@
 "use client"
 
-import React from "react"
-import { useRouter } from "next/navigation"
-import { ClipboardEdit, QrCode, Rocket, UserPlus } from "lucide-react"
-
 import styles from "@/styles/home.module.css"
+import { ClipboardEdit, QrCode, Rocket, UserPlus } from "lucide-react"
+import { useRouter } from "next/navigation"
+import React from "react"
 
 const steps = [
   {

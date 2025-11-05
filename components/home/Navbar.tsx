@@ -1,74 +1,87 @@
 "use client"
 
-import { useState } from "react"
+import { Button } from "@/components/ui/button"
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { ExternalLink, Menu, X } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
-import { Menu, X } from "lucide-react"
-
-import styles from "@/styles/home.module.css"
+import { useState } from "react"
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
 
+  const navLinks = [
+    { href: "#features", label: "Features" },
+    { href: "#pricing", label: "Tech Stack" },
+    { href: "#contact", label: "Contact" },
+  ]
+
   return (
-    <nav className="border-b border-gray-100 bg-white">
+    <nav className="sticky top-0 z-50 border-b bg-white/80 backdrop-blur-lg supports-[backdrop-filter]:bg-white/60">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
-          <div className="flex items-center">
+          {/* Logo */}
+          <Link href="/" className="flex items-center transition-opacity hover:opacity-80">
             <Image
-            
               src="/logo.png"
               width={80}
               height={80}
               className="object-contain"
-              alt="ByteEat | Digital Menu Creator & Restaurant Management System"
+              alt="ByteEat | Restaurant Management System"
               priority
             />
+          </Link>
+
+          {/* Desktop Navigation */}
+          <div className="hidden items-center gap-8 md:flex">
+            {navLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+              >
+                {link.label}
+              </Link>
+            ))}
+            <Button asChild size="sm">
+              <Link href="/manage">
+                <ExternalLink className="mr-2 size-4" />
+                View Demo
+              </Link>
+            </Button>
           </div>
 
-          <div className="hidden items-center space-x-8 md:flex">
-            <Link href="#solutions" className="text-gray-600 hover:text-indigo-600">
-              Solutions
-            </Link>
-            <Link href="#features" className="text-gray-600 hover:text-indigo-600">
-              Features
-            </Link>
-            <Link href="#pricing" className="text-gray-600 hover:text-indigo-600">
-              Pricing
-            </Link>
-            <Link href="#contact" className="text-gray-600 hover:text-indigo-600">
-              Contact
-            </Link>
-            <Link href="/manage" className={styles.primaryButton}>
-              Get Started Free
-            </Link>
-          </div>
-
-          <button className="text-indigo-600 md:hidden">{isOpen ? <X /> : <Menu />}</button>
+          {/* Mobile Navigation */}
+          <Sheet open={isOpen} onOpenChange={setIsOpen}>
+            <SheetTrigger asChild className="md:hidden">
+              <Button variant="ghost" size="icon">
+                <Menu className="size-6" />
+                <span className="sr-only">Toggle menu</span>
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-[300px]">
+              <div className="mt-8 flex flex-col gap-4">
+                {navLinks.map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className="text-lg font-medium transition-colors hover:text-primary"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+                <Button asChild className="mt-4 w-full">
+                  <Link href="/manage" onClick={() => setIsOpen(false)}>
+                    <ExternalLink className="mr-2 size-4" />
+                    View Demo
+                  </Link>
+                </Button>
+              </div>
+            </SheetContent>
+          </Sheet>
         </div>
       </div>
-
-      {isOpen && (
-        <div className="border-t border-gray-100 bg-white md:hidden">
-          <div className="space-y-1 px-2 pb-3 pt-2">
-            <Link href="#solutions" className="block px-3 py-2 text-gray-600 hover:text-indigo-600">
-              Solutions
-            </Link>
-            <Link href="#features" className="block px-3 py-2 text-gray-600 hover:text-indigo-600">
-              Features
-            </Link>
-            <Link href="#pricing" className="block px-3 py-2 text-gray-600 hover:text-indigo-600">
-              Pricing
-            </Link>
-            <Link href="#contact" className="block px-3 py-2 text-gray-600 hover:text-indigo-600">
-              Contact
-            </Link>
-            <Link href="/manage" className={`${styles.primaryButton} w-full text-center`}>
-              Get Started Free
-            </Link>
-          </div>
-        </div>
-      )}
     </nav>
   )
 }

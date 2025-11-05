@@ -32,8 +32,7 @@ const AnalyticsPage: React.FC = () => {
           <div>
             <p className="font-bold">Analytics Coming Soon</p>
             <p className="text-sm">
-              We&apos;re working hard to bring you valuable insights about your
-              restaurant.
+              We&apos;re working hard to bring you valuable insights about your restaurant.
             </p>
           </div>
         </div>

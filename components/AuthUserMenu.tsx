@@ -1,5 +1,6 @@
 "use client"
 
+import { SingOutButton } from "@/components/AuthButton"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import {
@@ -9,7 +10,6 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { SingOutButton } from "@/components/AuthButton"
 
 const AuthUserMenu = ({ user }: { user: any }) => {
   return (
@@ -26,9 +26,7 @@ const AuthUserMenu = ({ user }: { user: any }) => {
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
             <p className="text-sm font-medium leading-none">{user.name}</p>
-            <p className="text-muted-foreground text-xs leading-none">
-              {user.email}
-            </p>
+            <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
           </div>
         </DropdownMenuLabel>
         <DropdownMenuItem asChild>

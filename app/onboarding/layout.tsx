@@ -1,6 +1,6 @@
 import { Metadata } from "next"
-import { redirect } from "next/navigation"
 import { getServerSession } from "next-auth"
+import { redirect } from "next/navigation"
 
 import { authOptions } from "../api/auth/authOption"
 
@@ -13,9 +13,7 @@ interface OnboardingLayoutProps {
   children: React.ReactNode
 }
 
-export default async function OnboardingLayout({
-  children,
-}: OnboardingLayoutProps) {
+export default async function OnboardingLayout({ children }: OnboardingLayoutProps) {
   const serverSession = await getServerSession(authOptions)
 
   if (!serverSession) {

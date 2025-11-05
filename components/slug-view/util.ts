@@ -1,5 +1,5 @@
-import { Cart } from "@/lib/types"
 import { useCart } from "@/app/store/CartProvider"
+import { Cart } from "@/lib/types"
 
 export enum QuantityControlAction {
   INCREMENT = "increment",
@@ -21,18 +21,19 @@ export function changeItemQuantity(
 // for better performance and less computation
 export function useTotalQty(): { [key: string]: number } {
   return useCart()((state) => {
-    return Object.entries(state.cart).reduce((acc, [key, item]) => {
-      const [itemId] = key.split("_")
-      if (!acc[itemId]) {
-        acc[itemId] = 0
-      }
-      acc[itemId] += item.quantity
-      return acc
-    }, {} as { [key: string]: number })
+    return Object.entries(state.cart).reduce(
+      (acc, [key, item]) => {
+        const [itemId] = key.split("_")
+        if (!acc[itemId]) {
+          acc[itemId] = 0
+        }
+        acc[itemId] += item.quantity
+        return acc
+      },
+      {} as { [key: string]: number }
+    )
   })
 }
-
-
 
 // Move arraysEqual outside the component
 export const addonsArraysEqual = (arr1: string[], arr2: string[]) => {

@@ -1,15 +1,10 @@
 "use client"
 
+import { cn } from "@/lib/utils"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 
-import { cn } from "@/lib/utils"
-
-const OrderNav = ({
-  hrefsAndLinks,
-}: {
-  hrefsAndLinks: { href: string; text: string }[]
-}) => {
+const OrderNav = ({ hrefsAndLinks }: { hrefsAndLinks: { href: string; text: string }[] }) => {
   const pathname = usePathname()
   return (
     <div className="mb-8 flex flex-col gap-4 sm:flex-row">

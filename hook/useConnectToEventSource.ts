@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useRef } from "react"
 import { Order } from "@prisma/client"
 import { EventSource } from "extended-eventsource"
+import { useCallback, useEffect, useRef } from "react"
 
 const useConnectToEventSource = (
   url: string,

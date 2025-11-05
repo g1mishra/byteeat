@@ -1,8 +1,7 @@
 "use server"
 
-import { Restaurant, SubscriptionStatus } from "@prisma/client"
-
 import prisma from "@/lib/prisma"
+import { Restaurant, SubscriptionStatus } from "@prisma/client"
 
 import { checkAuth } from "./utils.service"
 
@@ -112,9 +111,11 @@ export type SubscriptionStatusResult = {
   expirationDate: Date | null
 }
 
-async function fetchRestaurantSubscriptionStatus(
-  slug: string
-): Promise<{ isValid: boolean; isActive: boolean; status: SubscriptionStatus | null }> {
+async function fetchRestaurantSubscriptionStatus(slug: string): Promise<{
+  isValid: boolean
+  isActive: boolean
+  status: SubscriptionStatus | null
+}> {
   if (!slug) {
     return { isValid: false, isActive: false, status: null }
   }
@@ -280,7 +281,10 @@ const getRestaurantSlug = async (
 export type FetchRestaurantReturnType = Awaited<ReturnType<typeof fetchRestaurant>>
 
 const addRestaurant = async (
-  restaurant: RestaurantI & { logoUrl?: string; subscription: "STARTER" | "PRO" },
+  restaurant: RestaurantI & {
+    logoUrl?: string
+    subscription: "STARTER" | "PRO"
+  },
   userId: string
 ): Promise<Restaurant> => {
   try {
@@ -321,18 +325,30 @@ const addRestaurant = async (
   }
 }
 
-const updateRestaurant = async (restaurantData: Partial<RestaurantI>) => {
-  try {
-    if (!restaurantData.id) {
-      throw new Error("Restaurant ID is required")
+export const updateRestaurant = async (
+  restaurantId: string,
+  data: {
+    name?: string
+    address_string?: string
+    city?: string
+    state?: string
+    country?: string
+    logoUrl?: string
+    tableSize?: number
+    theme?: {
+      primaryColor: string
+      secondaryColor: string
+      fontFamily: string
+      menuStyle: string
+      buttonStyle: string
     }
+  }
+) => {
+  try {
     await checkAuth("You are not authorized to update this restaurant")
-
-    const { id, ...updateData } = restaurantData
-
     return await prisma.restaurant.update({
-      where: { id },
-      data: updateData,
+      where: { id: restaurantId },
+      data,
     })
   } catch (error) {
     throw error
@@ -413,5 +429,4 @@ export {
   fetchRestaurantSubscriptionStatus,
   getRestaurantIdBySlug,
   getRestaurantSlug,
-  updateRestaurant,
 }

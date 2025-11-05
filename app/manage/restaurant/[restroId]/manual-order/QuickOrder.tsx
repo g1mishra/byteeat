@@ -1,20 +1,19 @@
 "use client"
 
-import { useMemo, useRef, useState } from "react"
-import { useBluetoothPrinter } from "@/hook/useBluetoothPrinter"
-import { addOrderItems, createOrder } from "@/services/order.services"
-import { OrderType, Prisma } from "@prisma/client"
-import { Drumstick, Leaf, Search, ShoppingCart } from "lucide-react"
-
-import { Cart } from "@/lib/types"
-import { generateReceipt } from "@/lib/utils"
+import { addonsArraysEqual } from "@/components/slug-view/util"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { toast } from "@/components/ui/use-toast"
-import { addonsArraysEqual } from "@/components/slug-view/util"
+import { useBluetoothPrinter } from "@/hook/useBluetoothPrinter"
+import { Cart } from "@/lib/types"
+import { generateReceipt } from "@/lib/utils"
+import { addOrderItems, createOrder } from "@/services/order.services"
+import { OrderType, Prisma } from "@prisma/client"
+import { Drumstick, Leaf, Search, ShoppingCart } from "lucide-react"
+import { useMemo, useRef, useState } from "react"
 
 import AddedDish from "./AddedDish"
 import ConfirmOrderModal from "./ConfirmOrderModal"
@@ -192,7 +191,7 @@ export default function QuickOrder({ restaurant }: QuickOrderProps) {
             <Button variant="outline" className="relative">
               <ShoppingCart className="size-5" />
               {totalItems > 0 && (
-                <span className="bg-primary text-primary-foreground absolute -right-2 -top-2 flex size-5 items-center justify-center rounded-full text-xs">
+                <span className="absolute -right-2 -top-2 flex size-5 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground">
                   {totalItems}
                 </span>
               )}

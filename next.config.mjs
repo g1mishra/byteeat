@@ -6,6 +6,7 @@ const nextConfig = {
       "byteeat.s3.ap-south-1.amazonaws.com",
       "byte-eat-staticfiles.s3.amazonaws.com",
       "lh3.googleusercontent.com",
+      "res.cloudinary.com",
     ],
   },
 

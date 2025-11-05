@@ -1,9 +1,8 @@
 "use client"
 
-import { useState } from "react"
-import { useQRCode } from "next-qrcode"
-
 import { getBasePath } from "@/lib/utils"
+import { useQRCode } from "next-qrcode"
+import { useState } from "react"
 
 function QRMenu({ totalTables = 0, slug }: { totalTables?: number; slug: string }) {
   const { Canvas } = useQRCode()

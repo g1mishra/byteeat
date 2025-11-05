@@ -1,8 +1,8 @@
 "use client"
 
-import React, { useState } from "react"
 import useMediaQuery from "@/hook/useMediaQuery"
 import { MenuItemI } from "@/services/menuService"
+import React, { useState } from "react"
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../ui/dialog"
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "../../ui/drawer"
@@ -35,7 +35,7 @@ export default function WithUpdateMenuDialog({
       <>
         {cloneChildren}
         <Dialog open={isOpen} onOpenChange={setIsOpen} modal>
-          <DialogContent className="flex h-auto max-h-[95vh] w-full max-w-[95vw]  flex-col justify-center border-none">
+          <DialogContent className="flex h-auto max-h-[95vh] w-full max-w-[95vw] flex-col justify-center border-none">
             <DialogHeader>
               <DialogTitle>Update Item</DialogTitle>
             </DialogHeader>

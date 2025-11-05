@@ -1,8 +1,12 @@
 "use client"
 
-import React, { useMemo } from "react"
-import Link from "next/link"
-import { usePathname } from "next/navigation"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import {
   BarChart3Icon,
   ClipboardIcon,
@@ -20,14 +24,9 @@ import {
   ShoppingBagIcon,
   UsersIcon,
 } from "lucide-react"
-
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import Link from "next/link"
+import { usePathname } from "next/navigation"
+import React, { useMemo } from "react"
 
 // Types
 type IconType = typeof HomeIcon
@@ -94,7 +93,7 @@ const SidebarItem = React.memo(({ href, icon, label, isActive, target }: Sidebar
           target={target}
           className={`flex size-9 items-center justify-center rounded-lg transition-colors md:size-8 ${
             isActive
-              ? "bg-primary text-primary-foreground group shrink-0 gap-2 rounded-full text-lg font-semibold md:text-base"
+              ? "group shrink-0 gap-2 rounded-full bg-primary text-lg font-semibold text-primary-foreground md:text-base"
               : "text-muted-foreground hover:text-foreground"
           }`}
           prefetch={false}
@@ -129,7 +128,7 @@ const MobileMoreMenu = React.memo(({ items, pathname }: MobileMoreMenuProps) => 
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
-            <DropdownMenuTrigger className="text-muted-foreground hover:text-foreground flex size-9 items-center justify-center rounded-lg transition-colors">
+            <DropdownMenuTrigger className="flex size-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground">
               <MoreHorizontalIcon className="size-5" />
               <span className="sr-only">More</span>
             </DropdownMenuTrigger>
@@ -184,7 +183,7 @@ const RestroSidebar = ({
 
   return (
     <div className="flex w-full flex-col sm:flex-row sm:space-x-4">
-      <div className="sm:bg-muted/40 fixed inset-x-0 bottom-0 z-50 flex h-16 w-full flex-row justify-around border-t bg-white/90 sm:relative sm:h-screen sm:w-14 sm:flex-col sm:border-r sm:border-t-0">
+      <div className="fixed inset-x-0 bottom-0 z-50 flex h-16 w-full flex-row justify-around border-t bg-white/90 sm:relative sm:h-screen sm:w-14 sm:flex-col sm:border-r sm:border-t-0 sm:bg-muted/40">
         <aside className="flex size-full flex-row items-center justify-around sm:fixed sm:inset-y-0 sm:left-0 sm:z-10 sm:w-14 sm:flex-col">
           <nav className="flex w-full flex-row items-center justify-around px-2 sm:h-full sm:flex-col sm:gap-4 sm:py-5">
             <TooltipProvider>

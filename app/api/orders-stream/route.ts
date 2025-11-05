@@ -1,10 +1,9 @@
-import { NextRequest, NextResponse } from "next/server"
+import { getStartAndEndOfDay } from "@/lib/dateUtils"
+import prisma from "@/lib/prisma"
 import { checkUserRestaurantPermission } from "@/services/restaurantService"
 import { Order } from "@prisma/client"
 import { getServerSession } from "next-auth/next"
-
-import { getStartAndEndOfDay } from "@/lib/dateUtils"
-import prisma from "@/lib/prisma"
+import { NextRequest, NextResponse } from "next/server"
 
 import { authOptions } from "../auth/authOption"
 
@@ -22,10 +21,7 @@ const RETRY_DELAY = 1000 // 1 second
 // This is required to enable streaming
 export const dynamic = "force-dynamic"
 
-async function retryOperation<T>(
-  operation: () => Promise<T>,
-  retries = MAX_RETRIES
-): Promise<T> {
+async function retryOperation<T>(operation: () => Promise<T>, retries = MAX_RETRIES): Promise<T> {
   try {
     return await operation()
   } catch (error) {
@@ -80,10 +76,7 @@ export async function POST(req: NextRequest) {
           userId: session.user.id,
         }
         if (restaurantId) {
-          const hasPermission = await checkUserRestaurantPermission(
-            session.user.id,
-            restaurantId
-          )
+          const hasPermission = await checkUserRestaurantPermission(session.user.id, restaurantId)
           if (!hasPermission) {
             sendEvent({
               type: "error",
@@ -138,9 +131,6 @@ export async function POST(req: NextRequest) {
     return new NextResponse(stream, { headers })
   } catch (error) {
     console.error("Error creating orders stream:", error)
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }

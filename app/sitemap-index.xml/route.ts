@@ -1,7 +1,6 @@
 // app/sitemap-index/route.ts
-import { NextResponse } from "next/server"
-
 import { buildSitemapIndex, generateSitemaps } from "@/lib/sitemapUtils"
+import { NextResponse } from "next/server"
 
 const BASE_URL = "https://www.byteeat.in"
 
@@ -9,10 +8,7 @@ export async function GET() {
   try {
     const dynamicSitemaps = await generateSitemaps()
 
-    const sitemaps = [
-      `${BASE_URL}/sitemap.xml`,
-      ...dynamicSitemaps.map((sitemap) => sitemap.url),
-    ]
+    const sitemaps = [`${BASE_URL}/sitemap.xml`, ...dynamicSitemaps.map((sitemap) => sitemap.url)]
 
     const sitemapIndexXML = await buildSitemapIndex(sitemaps)
 

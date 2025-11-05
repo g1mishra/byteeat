@@ -1,10 +1,10 @@
 "use client"
 
-import { useCallback, useState } from "react"
-import dynamic from "next/dynamic"
 import { useBluetoothPrinter } from "@/hook/useBluetoothPrinter"
 import useMediaQuery from "@/hook/useMediaQuery"
 import { Order, OrderStatus, OrderType } from "@prisma/client"
+import dynamic from "next/dynamic"
+import { useCallback, useState } from "react"
 
 import OrderList from "./OrderList"
 import OrderTable from "./OrderTable"
@@ -49,17 +49,13 @@ export function OrdersTableRenderer({
   const { handleRequestDevice, isConnected } = useBluetoothPrinter()
   const [currentOrder, setCurrentOrder] = useState<Order | null>(null)
   const isMobile = useMediaQuery("(max-width: 768px)")
-  const [orderTypeFilter, setOrderTypeFilter] = useState<OrderType | "All">(
-    "QR"
-  )
+  const [orderTypeFilter, setOrderTypeFilter] = useState<OrderType | "All">("QR")
 
   const filteredData = data.filter((order) => {
     const matchesStatus =
-      statusFilter === "All" ||
-      order.status.toLowerCase() === statusFilter.toLowerCase()
+      statusFilter === "All" || order.status.toLowerCase() === statusFilter.toLowerCase()
     const matchesType =
-      orderTypeFilter === "All" ||
-      order.type?.toLowerCase() === orderTypeFilter.toLowerCase()
+      orderTypeFilter === "All" || order.type?.toLowerCase() === orderTypeFilter.toLowerCase()
     return matchesStatus && matchesType
   })
 
@@ -97,18 +93,13 @@ export function OrdersTableRenderer({
         </div>
         <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:gap-4">
           <div className="flex items-center gap-2 whitespace-nowrap">
-            <label
-              htmlFor="orderTypeFilter"
-              className="text-sm font-medium text-gray-700"
-            >
+            <label htmlFor="orderTypeFilter" className="text-sm font-medium text-gray-700">
               Type:
             </label>
             <select
               id="orderTypeFilter"
               value={orderTypeFilter}
-              onChange={(event) =>
-                setOrderTypeFilter(event.target.value as OrderType | "All")
-              }
+              onChange={(event) => setOrderTypeFilter(event.target.value as OrderType | "All")}
               className="w-full rounded-md border p-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
             >
               <option value="All">All</option>
@@ -118,18 +109,13 @@ export function OrdersTableRenderer({
           </div>
 
           <div className="flex items-center gap-2 whitespace-nowrap">
-            <label
-              htmlFor="statusFilter"
-              className="text-sm font-medium text-gray-700"
-            >
+            <label htmlFor="statusFilter" className="text-sm font-medium text-gray-700">
               Status:
             </label>
             <select
               id="statusFilter"
               value={statusFilter}
-              onChange={(event) =>
-                setStatusFilter(event.target.value as OrderStatus | "All")
-              }
+              onChange={(event) => setStatusFilter(event.target.value as OrderStatus | "All")}
               className="w-full rounded-md border p-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
             >
               <option value="All">All</option>

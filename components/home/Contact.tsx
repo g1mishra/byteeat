@@ -1,14 +1,18 @@
 "use client"
 
-import React from "react"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import { useToast } from "@/components/ui/use-toast"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Mail, MapPin, Phone } from "lucide-react"
+import { ExternalLink, Github, Mail, MapPin, Phone, Send } from "lucide-react"
+import Link from "next/link"
+import React from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
-
-import styles from "@/styles/home.module.css"
-
-import { useToast } from "../ui/use-toast"
 
 // Form validation schema
 const contactFormSchema = z.object({
@@ -63,104 +67,134 @@ export default function Contact({ id }: { id: string }) {
   }
 
   return (
-    <div className={`py-24 ${styles.sectionGradient}`} id={id}>
+    <div className="bg-muted/30 py-24" id={id}>
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="mb-16 text-center">
-          <h2 className={styles.sectionTitle}>Get In Touch</h2>
-          <p className="text-lg text-gray-600">We&apos;d love to hear from you</p>
+        <div className="mb-16 space-y-4 text-center">
+          <Badge variant="secondary">Contact</Badge>
+          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">Get In Touch</h2>
+          <p className="text-lg text-muted-foreground">
+            Connect with me for collaboration or inquiries
+          </p>
         </div>
-        <div className="grid gap-16 md:grid-cols-2">
+
+        <div className="grid gap-8 md:grid-cols-2">
           {/* Contact Information */}
-          <div className={`${styles.cardGradient} rounded-2xl p-8`}>
-            <div className="space-y-8">
-              <div>
-                <h3 className="mb-6 text-xl font-semibold text-gray-900">Contact Information</h3>
-                <div className="space-y-4">
-                  <div className="flex items-center">
-                    <Mail className="mr-3 size-5 text-indigo-600" />
-                    <a
-                      href="mailto:byteeat.in@gmail.com"
-                      className="text-gray-600 hover:text-indigo-600"
-                    >
-                      byteeat.in@gmail.com
-                    </a>
+          <Card>
+            <CardHeader>
+              <CardTitle>Developer Contact</CardTitle>
+              <CardDescription>Feel free to reach out directly</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-4">
+                <a
+                  href="mailto:g1mishra.dev@gmail.com"
+                  className="group flex items-center gap-3 rounded-lg p-3 transition-colors hover:bg-accent"
+                >
+                  <div className="rounded-lg bg-primary p-2 text-primary-foreground">
+                    <Mail className="size-5" />
                   </div>
-                  <div className="flex items-center">
-                    <Phone className="mr-3 size-5 text-indigo-600" />
-                    <a href="tel:+918447509186" className="text-gray-600 hover:text-indigo-600">
-                      +91 84475 09186
-                    </a>
+                  <div className="flex-1">
+                    <p className="text-sm text-muted-foreground">Email</p>
+                    <p className="font-medium transition-colors group-hover:text-primary">
+                      g1mishra.dev@gmail.com
+                    </p>
                   </div>
-                  <div className="flex items-start">
-                    <MapPin className="mr-3 mt-1 size-5 text-indigo-600" />
-                    <span className="text-gray-600">
-                      Rama Mandi
-                      <br />
-                      Jalandhar, PN 144005
-                      <br />
-                      India
-                    </span>
+                </a>
+
+                <div className="flex items-start gap-3 rounded-lg p-3">
+                  <div className="rounded-lg bg-primary p-2 text-primary-foreground">
+                    <MapPin className="size-5" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm text-muted-foreground">Location</p>
+                    <p className="font-medium">India</p>
                   </div>
                 </div>
               </div>
-              <div>
-                <h3 className="mb-6 text-xl font-semibold text-gray-900">Office Hours</h3>
-                <div className="space-y-2 text-gray-600">
-                  <p>Monday - Friday: 9:00 AM - 6:00 PM (IST)</p>
-                  <p>Saturday: 10:00 AM - 4:00 PM (IST)</p>
-                  <p>Sunday: Closed</p>
+
+              <div className="space-y-4 border-t pt-6">
+                <h3 className="font-semibold">Project Links</h3>
+                <div className="flex flex-col gap-2">
+                  <Button asChild variant="outline" className="justify-start">
+                    <Link href="https://github.com/g1mishra/byte-eat-ui" target="_blank">
+                      <Github className="mr-2 size-4" />
+                      GitHub Repository
+                      <ExternalLink className="ml-auto size-4" />
+                    </Link>
+                  </Button>
+                  <Button asChild variant="outline" className="justify-start">
+                    <Link href="/manage">
+                      <ExternalLink className="mr-2 size-4" />
+                      Live Demo
+                    </Link>
+                  </Button>
                 </div>
+                <p className="text-sm text-muted-foreground">
+                  ✨ Open source and available for review
+                </p>
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
           {/* Contact Form */}
-          <div className={`${styles.cardGradient} rounded-2xl p-8`}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <div>
-                <label className="mb-2 block text-gray-700">Name</label>
-                <input
-                  {...form.register("name")}
-                  type="text"
-                  className="w-full rounded-lg border border-gray-200 px-4 py-2 focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600"
-                />
-                {form.formState.errors.name && (
-                  <p className="mt-1 text-sm text-red-600">{form.formState.errors.name.message}</p>
-                )}
-              </div>
-              <div>
-                <label className="mb-2 block text-gray-700">Email</label>
-                <input
-                  {...form.register("email")}
-                  type="email"
-                  className="w-full rounded-lg border border-gray-200 px-4 py-2 focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600"
-                />
-                {form.formState.errors.email && (
-                  <p className="mt-1 text-sm text-red-600">{form.formState.errors.email.message}</p>
-                )}
-              </div>
-              <div>
-                <label className="mb-2 block text-gray-700">Message</label>
-                <textarea
-                  {...form.register("message")}
-                  rows={4}
-                  className="w-full rounded-lg border border-gray-200 px-4 py-2 focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600"
-                ></textarea>
-                {form.formState.errors.message && (
-                  <p className="mt-1 text-sm text-red-600">
-                    {form.formState.errors.message.message}
-                  </p>
-                )}
-              </div>
-              <button
-                type="submit"
-                className={`${styles.primaryButton} w-full`}
-                disabled={form.formState.isSubmitting}
-              >
-                {form.formState.isSubmitting ? "Sending..." : "Send Message"}
-              </button>
-            </form>
-          </div>
+          <Card>
+            <CardHeader>
+              <CardTitle>Send a Message</CardTitle>
+              <CardDescription>I&apos;ll get back to you as soon as possible</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="name">Name</Label>
+                  <Input id="name" {...form.register("name")} placeholder="Your name" />
+                  {form.formState.errors.name && (
+                    <p className="text-sm text-destructive">{form.formState.errors.name.message}</p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    {...form.register("email")}
+                    placeholder="your.email@example.com"
+                  />
+                  {form.formState.errors.email && (
+                    <p className="text-sm text-destructive">
+                      {form.formState.errors.email.message}
+                    </p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="message">Message</Label>
+                  <Textarea
+                    id="message"
+                    {...form.register("message")}
+                    placeholder="Your message..."
+                    rows={5}
+                  />
+                  {form.formState.errors.message && (
+                    <p className="text-sm text-destructive">
+                      {form.formState.errors.message.message}
+                    </p>
+                  )}
+                </div>
+
+                <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
+                  {form.formState.isSubmitting ? (
+                    "Sending..."
+                  ) : (
+                    <>
+                      <Send className="mr-2 size-4" />
+                      Send Message
+                    </>
+                  )}
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>

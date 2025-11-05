@@ -1,10 +1,9 @@
 "use server"
 
+import { authOptions } from "@/app/api/auth/authOption"
+import prisma from "@/lib/prisma"
 import { Role } from "@prisma/client"
 import { getServerSession } from "next-auth"
-
-import prisma from "@/lib/prisma"
-import { authOptions } from "@/app/api/auth/authOption"
 
 export async function getUser(userId: string) {
   try {

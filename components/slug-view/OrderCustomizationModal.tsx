@@ -1,11 +1,10 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react"
-import Image from "next/image"
-import { MenuItemI } from "@/services/menuService"
-
+import { useCart } from "@/app/store/CartProvider"
 import { Button } from "@/components/ui/button"
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer"
 import VegOrNonVeg from "@/components/veg-or-nonveg"
-import { useCart } from "@/app/store/CartProvider"
+import { MenuItemI } from "@/services/menuService"
+import Image from "next/image"
+import React, { useCallback, useEffect, useMemo, useState } from "react"
 
 import QuantityActionButton from "../QuantityActionBtn"
 import { QuantityControlAction, addonsArraysEqual, changeItemQuantity } from "./util"
@@ -25,6 +24,11 @@ interface OrderCustomizationModalProps {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>
   variant: OrderCustomizationModalVariant
   editMeta?: OrderCustomizationModalEditMeta
+  theme?: {
+    buttonStyle: "rounded" | "square" | "pill"
+    primaryColor: string
+    secondaryColor: string
+  }
 }
 
 const OrderCustomizationModal: React.FC<OrderCustomizationModalProps> = ({
@@ -33,6 +37,7 @@ const OrderCustomizationModal: React.FC<OrderCustomizationModalProps> = ({
   setOpen,
   variant,
   editMeta,
+  theme,
 }) => {
   const [selectedPortion, setSelectedPortion] = useState("")
   const [selectedAddons, setSelectedAddons] = useState<string[]>([])
@@ -210,7 +215,7 @@ const OrderCustomizationModal: React.FC<OrderCustomizationModalProps> = ({
                         value={priceItem.portion}
                         checked={selectedPortion === priceItem.portion}
                         onChange={() => setSelectedPortion(priceItem.portion)}
-                        className="text-primary focus:ring-primary accent-primary size-4 rounded"
+                        className="size-4 rounded text-primary accent-primary focus:ring-primary"
                       />
                     </div>
                   </label>
@@ -241,7 +246,7 @@ const OrderCustomizationModal: React.FC<OrderCustomizationModalProps> = ({
                               : prev.filter((id) => id !== addon.id)
                           )
                         }}
-                        className="text-primary focus:ring-primary size-4 rounded"
+                        className="size-4 rounded text-primary focus:ring-primary"
                       />
                     </div>
                   </label>
@@ -253,7 +258,7 @@ const OrderCustomizationModal: React.FC<OrderCustomizationModalProps> = ({
               <div>
                 <h3 className="mb-2 text-base font-semibold">Add a cooking request (optional)</h3>
                 <textarea
-                  className="focus:border-primary focus:ring-primary w-full rounded-lg border border-gray-300 p-2 text-sm"
+                  className="w-full rounded-lg border border-gray-300 p-2 text-sm focus:border-primary focus:ring-primary"
                   placeholder="e.g. Don't make it too spicy"
                   rows={3}
                 />
@@ -271,7 +276,17 @@ const OrderCustomizationModal: React.FC<OrderCustomizationModalProps> = ({
               <Button
                 onClick={handleUpdateCart}
                 disabled={!quantity}
-                className="bg-primary hover:bg-primary/90 rounded-lg px-4 py-2 text-sm text-white"
+                className={
+                  theme?.buttonStyle === "pill"
+                    ? "rounded-full"
+                    : theme?.buttonStyle === "square"
+                      ? "rounded-none"
+                      : "rounded-md"
+                }
+                style={{
+                  backgroundColor: theme?.primaryColor,
+                  color: theme?.secondaryColor,
+                }}
               >
                 {editMeta?.id ? "Update item" : "Add item"} ₹{eachItemPrice * quantity}
               </Button>
@@ -282,7 +297,5 @@ const OrderCustomizationModal: React.FC<OrderCustomizationModalProps> = ({
     </Drawer>
   )
 }
-
-
 
 export default React.memo(OrderCustomizationModal)

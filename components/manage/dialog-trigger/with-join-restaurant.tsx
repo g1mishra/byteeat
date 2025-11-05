@@ -1,13 +1,5 @@
 "use client"
 
-import { cloneElement, useState } from "react"
-import useMediaQuery from "@/hook/useMediaQuery"
-import { validateJoiningKey } from "@/services/waiter.service"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { REGEXP_ONLY_DIGITS_AND_CHARS } from "input-otp"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
-
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -17,20 +9,16 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Drawer, DrawerContent } from "@/components/ui/drawer"
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from "@/components/ui/form"
-import {
-  InputOTP,
-  InputOTPGroup,
-  InputOTPSeparator,
-  InputOTPSlot,
-} from "@/components/ui/input-otp"
+import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form"
+import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from "@/components/ui/input-otp"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import useMediaQuery from "@/hook/useMediaQuery"
+import { validateJoiningKey } from "@/services/waiter.service"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { REGEXP_ONLY_DIGITS_AND_CHARS } from "input-otp"
+import { cloneElement, useState } from "react"
+import { useForm } from "react-hook-form"
+import { z } from "zod"
 
 export default function WithJoinRestaurantDialog({
   children,
@@ -74,7 +62,7 @@ export default function WithJoinRestaurantDialog({
               </DialogDescription>
             </DialogHeader>
             <ScrollArea className="max-h-[90vh] w-full overflow-y-auto p-4">
-            <JoinRestaurant closeModal={() => setIsOpen(false)} />
+              <JoinRestaurant closeModal={() => setIsOpen(false)} />
             </ScrollArea>
           </DrawerContent>
         </Drawer>
@@ -114,11 +102,7 @@ function JoinRestaurant({ closeModal }: { closeModal: () => void }) {
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <InputOTP
-                  maxLength={6}
-                  pattern={REGEXP_ONLY_DIGITS_AND_CHARS}
-                  {...field}
-                >
+                <InputOTP maxLength={6} pattern={REGEXP_ONLY_DIGITS_AND_CHARS} {...field}>
                   <InputOTPGroup>
                     <InputOTPSlot index={0} />
                     <InputOTPSlot index={1} />

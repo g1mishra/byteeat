@@ -1,8 +1,5 @@
 "use client"
 
-import { useSearchParams } from "next/navigation"
-import { signIn } from "next-auth/react"
-
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -12,6 +9,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import { signIn } from "next-auth/react"
+import { useSearchParams } from "next/navigation"
 
 export default function AuthPage() {
   const searchParams = useSearchParams()
@@ -22,9 +21,9 @@ export default function AuthPage() {
   }
 
   return (
-    <div className="bg-background flex min-h-screen items-center justify-center p-4">
+    <div className="flex min-h-screen items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md shadow-lg">
-        <CardHeader className="bg-primary space-y-1 pb-6 text-white">
+        <CardHeader className="space-y-1 bg-primary pb-6 text-white">
           <CardTitle className="text-2xl font-bold">Welcome Back</CardTitle>
           <CardDescription className="text-gray-100">Sign in to your account</CardDescription>
         </CardHeader>
@@ -63,7 +62,7 @@ export default function AuthPage() {
         <CardFooter className="flex justify-center px-6 pb-6">
           <p className="text-center text-sm text-gray-600">
             By continuing, you agree to our{" "}
-            <a href="/terms" className="text-primary font-medium hover:underline">
+            <a href="/terms" className="font-medium text-primary hover:underline">
               Terms of Service
             </a>
           </p>

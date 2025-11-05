@@ -1,13 +1,12 @@
+import { authOptions } from "@/app/api/auth/authOption"
+import NotFound from "@/app/not-found"
+import UnAuthorized from "@/components/UnAuthorized"
 import {
   fetchRestaurant,
   getRestaurantIdBySlug,
   getRestaurantSlug,
 } from "@/services/restaurantService"
 import { getServerSession } from "next-auth"
-
-import UnAuthorized from "@/components/UnAuthorized"
-import { authOptions } from "@/app/api/auth/authOption"
-import NotFound from "@/app/not-found"
 
 import QRMenu from "./QRView"
 

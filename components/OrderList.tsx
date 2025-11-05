@@ -1,10 +1,9 @@
-import React from "react"
-import { Order, OrderStatus } from "@prisma/client"
-
 import { fromatDate } from "@/lib/dateUtils"
+import { cn, getOrderToken } from "@/lib/utils"
+import { Order, OrderStatus } from "@prisma/client"
+import React from "react"
 
 import OrderTableAction from "./OrderTableAction"
-import { getOrderToken, cn } from "@/lib/utils"
 
 interface OrderListProps {
   columns: { header: string; accessor: keyof OrderI }[]
@@ -29,28 +28,27 @@ const OrderList: React.FC<OrderListProps> = ({
         filteredData.map((order) => (
           <div
             key={order.id}
-            className={cn(
-              "rounded-lg border p-4 shadow-sm transition duration-150 ease-in-out",
-              {
-                "bg-yellow-50 border-yellow-200": order.status === "PENDING",
-                "bg-red-50 border-red-200": order.status === "CANCELLED",
-                "bg-green-50 border-green-200": order.status === "ACCEPTED",
-                "bg-white": !["PENDING", "CANCELLED", "ACCEPTED"].includes(order.status),
-              }
-            )}
+            className={cn("rounded-lg border p-4 shadow-sm transition duration-150 ease-in-out", {
+              "border-yellow-200 bg-yellow-50": order.status === "PENDING",
+              "border-red-200 bg-red-50": order.status === "CANCELLED",
+              "border-green-200 bg-green-50": order.status === "ACCEPTED",
+              "bg-white": !["PENDING", "CANCELLED", "ACCEPTED"].includes(order.status),
+            })}
           >
             {columns.map((column) => (
               <div key={column.accessor} className="mb-2 flex items-center justify-between">
                 <span className="text-sm font-semibold text-gray-600">{column.header}</span>
-                <span className={cn(
-                  "text-sm",
-                  {
-                    "font-medium text-yellow-600": order.status === "PENDING" && column.accessor === "status",
-                    "font-medium text-red-600": order.status === "CANCELLED" && column.accessor === "status",
-                    "font-medium text-green-600": order.status === "ACCEPTED" && column.accessor === "status",
+                <span
+                  className={cn("text-sm", {
+                    "font-medium text-yellow-600":
+                      order.status === "PENDING" && column.accessor === "status",
+                    "font-medium text-red-600":
+                      order.status === "CANCELLED" && column.accessor === "status",
+                    "font-medium text-green-600":
+                      order.status === "ACCEPTED" && column.accessor === "status",
                     "text-gray-800": column.accessor !== "status",
-                  }
-                )}>
+                  })}
+                >
                   {column.accessor === "action" ? (
                     <OrderTableAction
                       rowOrder={order}
@@ -64,7 +62,11 @@ const OrderList: React.FC<OrderListProps> = ({
                       {getOrderToken(order.id)?.toUpperCase()}
                     </span>
                   ) : column.accessor === "tableNo" ? (
-                    order.tableNo === 0 ? "N/A" : order.tableNo
+                    order.tableNo === 0 ? (
+                      "N/A"
+                    ) : (
+                      order.tableNo
+                    )
                   ) : (
                     String(order[column.accessor])
                   )}
@@ -74,9 +76,7 @@ const OrderList: React.FC<OrderListProps> = ({
           </div>
         ))
       ) : (
-        <div className="flex h-24 items-center justify-center text-gray-500">
-          No results found.
-        </div>
+        <div className="flex h-24 items-center justify-center text-gray-500">No results found.</div>
       )}
     </div>
   )

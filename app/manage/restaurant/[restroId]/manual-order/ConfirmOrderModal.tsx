@@ -1,8 +1,3 @@
-import React, { useEffect } from "react"
-import { useBluetoothPrinter } from "@/hook/useBluetoothPrinter"
-import useMediaQuery from "@/hook/useMediaQuery"
-
-import { Cart } from "@/lib/types"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -19,6 +14,10 @@ import {
   DrawerTitle,
 } from "@/components/ui/drawer"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { useBluetoothPrinter } from "@/hook/useBluetoothPrinter"
+import useMediaQuery from "@/hook/useMediaQuery"
+import { Cart } from "@/lib/types"
+import React, { useEffect } from "react"
 
 type ConfirmOrderModalProps = {
   open: boolean

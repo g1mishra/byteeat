@@ -1,29 +1,28 @@
-import React from "react"
-import { BarChart, Clock, DollarSign, Smile } from "lucide-react"
-
 import styles from "@/styles/home.module.css"
+import { BarChart, Clock, DollarSign, Smile } from "lucide-react"
+import React from "react"
 
 const benefits = [
   {
-    icon: <Clock className="text-accent size-12" />,
+    icon: <Clock className="size-12 text-accent" />,
     title: "Increased Efficiency",
     stats: "Reduce order time by 50%",
     description: "Minimize human errors and streamline your operations",
   },
   {
-    icon: <DollarSign className="text-accent size-12" />,
+    icon: <DollarSign className="size-12 text-accent" />,
     title: "Cost Reduction",
     stats: "Save on printing costs",
     description: "Optimize staff efficiency and reduce operational expenses",
   },
   {
-    icon: <Smile className="text-accent size-12" />,
+    icon: <Smile className="size-12 text-accent" />,
     title: "Enhanced Experience",
     stats: "Modern dining experience",
     description: "Deliver faster service and improve customer satisfaction",
   },
   {
-    icon: <BarChart className="text-accent size-12" />,
+    icon: <BarChart className="size-12 text-accent" />,
     title: "Better Insights",
     stats: "Data-driven decisions",
     description: "Gain valuable customer behavior analytics",
