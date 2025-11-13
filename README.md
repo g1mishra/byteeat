@@ -2,7 +2,7 @@
 
 A modern, full-stack restaurant management system featuring digital menus, QR code ordering, real-time order tracking, and comprehensive analytics.
 
-<img width="2859" height="1514" alt="image" src="https://github.com/user-attachments/assets/90a9200a-643b-4ca0-8b0a-7c9f35e77bad" />
+<img width="2859" height="1514" alt="ByteEat Dashboard" src="https://github.com/user-attachments/assets/90a9200a-643b-4ca0-8b0a-7c9f35e77bad" />
 
 ## 🚀 Features
 
