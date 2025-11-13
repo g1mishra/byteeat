@@ -1,36 +1,226 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# ByteEat - Restaurant Management System
 
-## Getting Started
+A modern, full-stack restaurant management system featuring digital menus, QR code ordering, real-time order tracking, and comprehensive analytics.
 
-First, run the development server:
+![ByteEat Dashboard](public/dashboard-preview.png)
 
+## 🚀 Features
+
+### Customer-Facing Features
+- **QR Code Digital Menus** - Contactless menu access via customized QR codes
+- **Real-time Ordering** - Place orders directly from tables without waiter intervention
+- **Menu Categories & Search** - Easy navigation with categorized items and search functionality
+- **Order Tracking** - Real-time order status updates (Pending → Preparing → Ready)
+- **Responsive Design** - Optimized for mobile, tablet, and desktop devices
+
+### Restaurant Management
+- **Menu Management** - Create, update, and organize menu items with images
+- **Order Management** - Track and manage customer orders in real-time
+- **Table Management** - Generate unique QR codes for each table
+- **Analytics Dashboard** - Insights into orders, revenue, and popular items
+- **Staff Management** - Role-based access control (Admin/Waiter)
+- **Receipt Generation** - Automatic receipt generation for completed orders
+
+## 🛠️ Tech Stack
+
+### Frontend
+- **Next.js 14** (App Router) - React framework for production
+- **TypeScript** - Type-safe code
+- **TailwindCSS** - Utility-first CSS framework
+- **shadcn/ui** - Re-usable component library
+- **Lucide Icons** - Beautiful icon set
+
+### Backend
+- **Next.js API Routes** - Serverless API endpoints
+- **NextAuth.js** - Authentication solution
+- **Prisma ORM** - Type-safe database client
+- **MongoDB** - NoSQL database
+
+### Additional Tools
+- **Cloudinary** - Image upload and storage
+- **QR Code Generator** - Dynamic QR code generation
+- **React Hook Form** - Form validation
+- **Zod** - Schema validation
+
+## 📦 Installation
+
+### Prerequisites
+- Node.js 18+ and npm/pnpm
+- MongoDB database (local or MongoDB Atlas)
+- Cloudinary account (for image uploads)
+
+### Setup
+
+1. **Clone the repository**
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/g1mishra/byte-eat-ui.git
+cd byte-eat-ui
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. **Install dependencies**
+```bash
+pnpm install
+# or
+npm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. **Environment Configuration**
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+Create a `.env` file in the root directory:
 
-## Learn More
+```env
+# Database
+DATABASE_URL="mongodb+srv://<username>:<password>@cluster.xxxxx.mongodb.net/byte_eat_db"
 
-To learn more about Next.js, take a look at the following resources:
+# Cloudinary (Image Upload)
+CLOUDINARY_CLOUD_NAME="your_cloud_name"
+CLOUDINARY_API_KEY="your_api_key"
+CLOUDINARY_API_SECRET="your_api_secret"
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# NextAuth
+NEXTAUTH_URL="http://localhost:3000"
+NEXTAUTH_SECRET="your-secret-key-here"
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+# App Configuration
+NEXT_PUBLIC_APP_URL="http://localhost:3000"
+```
 
-## Deploy on Vercel
+4. **Database Setup**
+```bash
+pnpm migrate
+# or
+npm run migrate
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+5. **Run the development server**
+```bash
+pnpm dev
+# or
+npm run dev
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+Open [http://localhost:3000](http://localhost:3000) to see the application.
+
+## 📂 Project Structure
+
+```
+byte_eat_ui/
+├── app/                      # Next.js app directory
+│   ├── [slug]/              # Dynamic customer-facing routes
+│   │   └── view-cart/       # Order placement logic
+│   ├── manage/              # Restaurant management dashboard
+│   │   └── restaurant/      
+│   │       └── [restroId]/  
+│   │           ├── manual-order/  # Manual order creation
+│   │           ├── menu/          # Menu management
+│   │           └── orders/        # Order management
+│   ├── api/                 # API routes
+│   └── onboarding/          # User onboarding
+├── components/              # React components
+│   ├── home/               # Landing page components
+│   └── ui/                 # Reusable UI components
+├── services/               # API service functions
+│   ├── order.services.ts   # Order-related operations
+│   ├── menu.services.ts    # Menu management
+│   └── helper.service.ts   # Helper functions
+├── lib/                    # Utility functions
+├── prisma/                 # Database schema
+│   └── schema.prisma       # Prisma schema definition
+├── public/                 # Static assets
+├── styles/                 # Global styles
+└── types/                  # TypeScript type definitions
+```
+
+## 🔑 Key Files
+
+### Order Placement Logic
+- **[app/[slug]/view-cart/page.tsx](app/[slug]/view-cart/page.tsx)** - Customer order placement
+- **[app/manage/restaurant/[restroId]/manual-order/QuickOrder.tsx](app/manage/restaurant/[restroId]/manual-order/QuickOrder.tsx)** - Manual order creation
+- **[services/order.services.ts](services/order.services.ts)** - Core order service functions
+
+### Menu Management
+- **[services/helper.service.ts](services/helper.service.ts)** - Menu item CRUD operations
+- **[services/menu.services.ts](services/menu.services.ts)** - Menu service functions
+
+## 🚦 Available Scripts
+
+```bash
+# Development
+pnpm dev          # Start development server
+
+# Build
+pnpm build        # Build for production
+
+# Production
+pnpm start        # Start production server
+
+# Database
+pnpm migrate      # Push database schema changes
+
+# Code Quality
+pnpm lint         # Run ESLint
+pnpm prettier     # Format code with Prettier
+```
+
+## 🗄️ Database Schema
+
+The application uses **15+ database models** including:
+- User, Restaurant, MenuItem, Category
+- Order, OrderItem, PriceItemMap
+- Table, Waiter, Analytics
+- And more...
+
+See [prisma/schema.prisma](prisma/schema.prisma) for the complete schema.
+
+## 🌐 Deployment
+
+### Vercel (Recommended)
+
+1. Push your code to GitHub
+2. Import project to Vercel
+3. Add environment variables
+4. Deploy
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/g1mishra/byte-eat-ui)
+
+### Other Platforms
+The application can be deployed to any platform supporting Next.js:
+- Netlify
+- Railway
+- AWS
+- DigitalOcean
+
+## 📱 Live Demo
+
+Check out the live demo: [https://byteeat.vercel.app](https://byteeat.vercel.app)
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## 📄 License
+
+This project is open source and available under the [MIT License](LICENSE).
+
+## 👨‍💻 Author
+
+**Jeevan Mishra**
+- GitHub: [@g1mishra](https://github.com/g1mishra)
+- LinkedIn: [Jeevan Mishra](https://www.linkedin.com/in/g1mishra)
+
+## 🙏 Acknowledgments
+
+- Built with [Next.js](https://nextjs.org/)
+- UI components from [shadcn/ui](https://ui.shadcn.com/)
+- Icons from [Lucide](https://lucide.dev/)
+- Hosted on [Vercel](https://vercel.com)
+
+---
+
+⭐ Star this repository if you find it helpful!
